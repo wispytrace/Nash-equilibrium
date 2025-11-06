@@ -15,6 +15,8 @@ from .euler_constraint_uc import Model
 from .euler_constraint2 import Model
 from .euler_mq import Model
 from .fixed_switch import Model
+from .fixed_high_order import Model
+from .euler_constraint_asym import Model
 
 Res = {
     "fixed" : fixed.Model,
@@ -34,4 +36,6 @@ Res = {
     "euler_mq": euler_mq.Model,
     "fixed_switch": fixed_switch.Model,
     "euler_constraint_uc": euler_constraint_uc.Model,
+    "fixed_high_order": fixed_high_order.Model,
+    "euler_constraint_asym": euler_constraint_asym.Model
 }

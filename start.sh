@@ -7,6 +7,22 @@
 # ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
 # cd /app/ros2_ws/src/game
 
+config_name=r_4
+cd /app/ros2_ws
+colcon build
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
+cd /app/ros2_ws/src/game
+
+# config_name=r_3
+# cd /app/ros2_ws
+# colcon build
+# source /opt/ros/humble/setup.bash
+# source install/setup.bash
+# ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
+# cd /app/ros2_ws/src/game
+
 # config_name=asym_4
 # cd /app/ros2_ws
 # colcon build
@@ -15,13 +31,30 @@
 # ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
 # cd /app/ros2_ws/src/game
 
-config_name=r_r
-cd /app/ros2_ws
-colcon build
-source /opt/ros/humble/setup.bash
-source install/setup.bash
-ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
-cd /app/ros2_ws/src/game
+# config_name=r_r1
+# cd /app/ros2_ws
+# colcon build
+# source /opt/ros/humble/setup.bash
+# source install/setup.bash
+# ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
+# cd /app/ros2_ws/src/game
+
+# config_name=p1
+# cd /app/ros2_ws
+# colcon build
+# source /opt/ros/humble/setup.bash
+# source install/setup.bash
+# ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
+# cd /app/ros2_ws/src/game
+
+
+# config_name=asym4
+# cd /app/ros2_ws
+# colcon build
+# source /opt/ros/humble/setup.bash
+# source install/setup.bash
+# ros2 launch game launch.py num_nodes:=5 config:=fixed2@$config_name
+# cd /app/ros2_ws/src/game
 
 # config_name=r_0
 # cd /app/ros2_ws

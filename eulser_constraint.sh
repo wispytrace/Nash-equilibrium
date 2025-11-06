@@ -1,11 +1,17 @@
 #!/bin/bash
+cp /app/launch_dir/launch_5.py /app/ros2_ws/src/game/launch/launch.py
+echo "已复制 launch_5.py 到目标目录 /app/ros2_ws/src/game/launch/"
 
 config_name="euler_constraint"
 draw_model="euler_constraint"
 # 定义配置索引列表
 # config_indices=("3_1" "3_2" "3_3" "3_4" "3_5" "3_6")
+# config_indices=("3_11" "3_12" "3_13")
+# config_indices=("3_11" "3_12" "3_13" "3_14" "3_15")
+# config_indices=("c5" "c6")
 config_indices=("5")
 # config_indices=("3_7" "3_8" "3_9" "3_10")
+# config_indices=("c1" "c2" "c3" "c4")
 
 
 # 功能函数定义

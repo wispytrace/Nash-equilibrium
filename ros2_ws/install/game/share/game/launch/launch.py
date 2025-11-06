@@ -6,7 +6,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
 import sys
 
-node_nums = 5
+node_nums = 6
 
 def generate_launch_description():
     

@@ -2,6 +2,7 @@ import json
 import os
 from models import Res
 import time
+import numpy as np
 class Agent:
     def __init__(self, agent_conifg) -> None:
         
@@ -25,9 +26,12 @@ class Agent:
     def memory_to_list(self, memory):
         listed_memory = {}
         for k, v in memory.items():
-            listed_memory[k] = v.tolist()
+            if isinstance(v, np.ndarray):
+                listed_memory[k] = v.tolist()
+            else:
+                listed_memory[k] = v
         return listed_memory
-    
+        
     def send_msg(self):
         memory = json.dumps(self.memory_to_list(self.model.memory))
         return memory
@@ -44,6 +48,7 @@ class Agent:
         model_config = self.agent_config['model_config']
         for k, v in model_config['share'].items():
             model_config[k] = v
+        print(model_config['private'])
         for k, v in model_config['private'][str(id)].items():
             model_config[k] = v
         model_config['time_delta'] = self.agent_config['time_delta']

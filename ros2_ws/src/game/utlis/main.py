@@ -17,9 +17,16 @@ plot.plot_graph()
 # labels = configs.CONFIG_MAP["fixed"]['compared']['labels']
 # plot.plot_compared_graph({
 #         'box': [0.45, 0.82],
-#         'timescale': [0, 4.0],
+#         'timescale': [0, 10],
 #         'font_size' : 8,
-#         'labels' : {"asym2@asym_4": "Asymptotic Convergence", "asym@exp_2": "Exponential Convergence", "fixed4@r_r":"Fixed-time Convergence"}},
+#         'labels' : {"asym2@asym_4": "Algorithm from [23]", "asym@exp_2": "Algorithm from [25]", "fixed@p1": "Algorithm from [31]", "fixed4@r_r1":"Algorithm (6)-(11)"}},
+# )
+
+# plot.plot_compared_graph({
+#         'box': [0.45, 0.82],
+#         'timescale': [0, 10],
+#         'font_size' : 8,
+#         'labels' : {"asym2@asym_4": "Lu, et al., 2018", "asym@exp_2": "Zou, eta al., 2021", "fixed@p1": "Sun, eta al., 2020",  "fixed4@r_r1":"Fixed-time algorithm (6)-(11)"}},
 # )
 # plot.plot_compared_graph({
 #         'box': [0.25, 0.75],
@@ -45,7 +52,7 @@ plot.plot_graph()
 
 # plot.plot_compared_graph({
 #         'box': [0.68, 0.60],
-#         'timescale': [0, 2.5],
+#         'timescale': [0, 5],
 #         'font_size' : 8,
 #         'labels' : {"fixed4@r_0": "Set 1", "fixed4@r_2": "Set 2", "fixed4@r_3": "Set 3", "fixed4@r_4": "Set 4"},
 #     })
@@ -73,5 +80,5 @@ plot.plot_graph()
 # plot.plot_compared_graph(["3", "3_9"])
 # plot.plot_compared_graph(["3", "3_5"])
 
-plot.plot_compared_graph(["3", "3_7", "3_8", "3_2", "3_10", "3_9"])
+# plot.plot_compared_graph(["3", "3_7", "3_8", "3_2", "3_10", "3_9"])
 

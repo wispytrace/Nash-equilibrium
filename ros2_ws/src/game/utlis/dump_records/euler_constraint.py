@@ -9,9 +9,10 @@ from collections import defaultdict
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import matplotlib as mpl
+from .standard import *
 
 mpl.rcParams['figure.dpi'] = 600 
-mpl.rcParams['lines.linewidth'] = 0.5
+mpl.rcParams['lines.linewidth'] = 1
 mpl.rcParams['xtick.labelsize'] = 10
 mpl.rcParams['ytick.labelsize'] = 10
 
@@ -63,50 +64,167 @@ class DumpRecords:
         graph = Graph.load_matrix(matrix)
         graph.draw_graph(figure_dir)
         
-    def plot_status_graph(self, time, status_vector, opt_value, figure_dir, file_name=None, var_name='x', ylabel='Action'):
-        plt.clf()
+    # def plot_status_graph(
+    #     self,
+    #     time,
+    #     status_vector,
+    #     figure_dir,
+    #     file_name_prefix=None,
+    #     var_name='x',
+    #     ylabel_list=None
+    # ):
+    #     """
+    #     参数说明
+    #     ----------
+    #     time : array_like
+    #         时间序列，长度为T
+    #     status_vector : np.ndarray
+    #         状态向量，shape=(N, T, D)
+    #         N：智能体数量（如5），T：时间点（如6000），D：状态维度（如2）
+    #     figure_dir : str
+    #         图片保存目录
+    #     file_name_prefix : str, optional
+    #         输出文件名前缀；最终文件名为"{prefix}_dim{d}.png"
+    #     var_name : str, optional
+    #         状态变量前缀字符
+    #     ylabel_list : list, optional
+    #         y轴标题列表，长度与状态维度一致
+        
+    #     说明
+    #     ---------
+    #     会为每个状态维度保存一张图片，图像中包含所有智能体的该维度曲线，并绘制末端收敛虚线。
+    #     """
 
-        colors = list(mcolors.TABLEAU_COLORS.keys())
+    #     os.makedirs(figure_dir, exist_ok=True)
+
+    #     status_vector = np.array(status_vector)
+    #     N, T, D = status_vector.shape
+
+    #     colors = list(mcolors.TABLEAU_COLORS.values())
+        
+    #     for d in range(D):
+    #         # plt.figure(figsize=(8, 5))
+    #         legends = []
+    #         for i in range(N):
+    #             y = status_vector[i, :, d]
+    #             color = colors[i % len(colors)]
+    #             plt.plot(time, y, color=color, label='$x_{i'+ str(i+1) + '}$')
+                
+    #             # 绘制收敛点虚线
+    #             plt.hlines(
+    #                 y[-1], xmin=time[0], xmax=time[-1],
+    #                 colors=color, linestyles='dashed', linewidth=1.2,
+    #                 label='$x_{i'+ str(i+1) + '}^{\star}$'
+    #             )
+    #             legends.append(f"{var_name}_{i+1}")
+            
+    #         plt.xlabel('Time(s)', fontsize=15)
+    #         # y轴标题
+    #         if ylabel_list is not None and len(ylabel_list) == D:
+    #             plt.ylabel(ylabel_list[d], fontsize=14)
+    #         else:
+    #             lable_bottom = "$x_{i" + str(d+1) + "}(m)$"
+    #             plt.ylabel(lable_bottom, fontsize=15)
+    #         plt.legend(fontsize=12, loc='upper right')
+    #         plt.xlim(left=0, right=time[-1])
+    #         plt.tight_layout()
+            
+    #         # 保存图片
+    #         if file_name_prefix:
+    #             fname = f"{file_name_prefix}_dim{d+1}.png"
+    #         else:
+    #             fname = f"status_dim{d+1}.png"
+    #         path = os.path.join(figure_dir, fname)
+    #         plt.savefig(path)
+    #         plt.close()
+    #         print(f"Saved figure: {path}")
+
+    def plot_status_graph(
+        self,
+        time,
+        status_vector,
+        figure_dir,
+        file_name_prefix=None,
+        var_name='x',
+        ylabel_list=None
+    ):
+        os.makedirs(figure_dir, exist_ok=True)
+
         status_vector = np.array(status_vector)
-        shape = status_vector.shape
-        for i in range(shape[0]):
-            for j in range(shape[2]):
-                plt.plot(time, np.array(status_vector[i,:,j]), color=mcolors.TABLEAU_COLORS[colors[(i*shape[2]+j)%len(colors)]], label="${}{}{}$".format(var_name, self.charater[i+1], self.charater[j+1]))
-            # plt.plot(time, opt_value[i], '--', color=mcolors.TABLEAU_COLORS[colors[2*i+1]], label=["$y{}_1$".format(self.charater[i+1]), "$y{}_2$".format(self.charater[i+1])])
+        N, T, D = status_vector.shape
 
-        # plt.legend(loc='lower left', bbox_to_anchor=(0.85, 0))
-        plt.xlim(left=0,right=3)
-        plt.ylim(top=230)
-        # plt.ylim(0, max(opt_value)+2)
-        plt.legend(loc='upper right', ncol=2, fontsize=12)
-        plt.xlabel('Time(s)', fontsize=15)
-        plt.ylabel(ylabel, fontsize=15)
-        if file_name is not None:
-            plt.savefig(figure_dir + f"/{file_name}.png")
-        else:
-            plt.savefig(figure_dir + "/status.png")
-        # print(figure_dir + f"/{file_name}.png")
-    
+        colors = list(mcolors.TABLEAU_COLORS.values())
+
+        for d in range(D):
+            for i in range(N):
+                y = status_vector[i, :, d]
+                final_value = y[-1]
+                diff_trajectory = y - final_value
+                
+                color = colors[i % len(colors)]
+                plt.plot(time, diff_trajectory, color=color, label=f"Player {i+1}", linewidth=1)
+            plt.hlines(
+                0, xmin=time[0], xmax=time[-1],
+                colors='black', linestyles='solid', linewidth=0.5)
+            plt.xlabel('Time(s)', fontsize=15)
+            
+            if ylabel_list is not None and len(ylabel_list) == D:
+                plt.ylabel(ylabel_list[d], fontsize=14)
+            else:
+                lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
+                plt.ylabel(lable_bottom, fontsize=15)
+                
+            plt.legend(fontsize=12, loc='upper right')
+            plt.xlim(left=0, right=time[-1])
+            plt.tight_layout()
+
+            if file_name_prefix:
+                fname = f"{file_name_prefix}_dim{d+1}.png"
+            else:
+                fname = f"status_dim{d+1}.png"
+            path = os.path.join(figure_dir, fname)
+            plt.savefig(path)
+            plt.savefig(path.replace(".png", ".eps"))
+            plt.close()
+            print(f"Saved figure: {path}")
+
     def plot_trajectory_graph(self, status_vector, figure_dir):
         plt.clf()
         colors = list(mcolors.TABLEAU_COLORS.keys())
         status_vector = np.array(status_vector)
         shape = status_vector.shape
+        end_points = []  # 保存每个轨迹的终点
+
         for i in range(shape[0]):
             x = status_vector[i,:,0]
             y = status_vector[i,:,1]
             plt.plot(x, y, 
              color=colors[i],
              linestyle='-',
-             linewidth=1,
+             linewidth=1.5,
              alpha=0.7,
              label=f'Player {i+1}')
             
             # 标记起始点和终点
             plt.scatter(x[0], y[0], color=colors[i], marker='o', s=50, edgecolor='black')
             plt.scatter(x[-1], y[-1], color=colors[i], marker='s', s=50, edgecolor='black')
+            end_points.append([x[-1], y[-1]])
+        
         plt.xlabel("$x_{i1}$(m)", fontsize=15)
         plt.ylabel("$x_{i2}$(m)", fontsize=15)
+        end_points = np.array(end_points)
+        new_endpoints = np.zeros((end_points.shape[0]+1, end_points.shape[1]))
+        new_endpoints[0] = end_points[0]
+        new_endpoints[1] = end_points[1]
+        new_endpoints[2] = end_points[3]
+        new_endpoints[3] = end_points[4]
+        new_endpoints[4] = end_points[2]
+        new_endpoints[5] = end_points[0]
+
+        # new_endpoints = np.append(new_endpoints, end_points[0], axis=0)
+        # end_points[[2, 3, 4]] = end_points[[3, 4, 5]]
+        plt.plot(new_endpoints[:,0], new_endpoints[:,1], 
+                linestyle='--', linewidth=1, color='black', alpha=1)
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.legend(
             loc='upper right',
@@ -129,6 +247,8 @@ class DumpRecords:
         # 显示图表
         plt.tight_layout()
         plt.savefig(figure_dir + "/trajectories.png")
+        plt.savefig(figure_dir + "/trajectories.eps")
+
 
     def plot_error_graph(self, time, status_vector, opt_value, figure_dir):
 
@@ -268,7 +388,18 @@ class DumpRecords:
         plt.ylabel(y_label, fontsize=15)
         
         plt.savefig(figure_dir+f"/{file_name}.jpeg")
-
+    
+    def get_convergencce_time(self, status_vector, opt_value, error=1.05e-4, time_delta=2.5e-3, result_dir="/app/records/compared/convergence_time"):
+        status_vector = np.array(status_vector)
+        for i in range(len(status_vector)):
+            # print(status_vector[i])
+            for j in range(status_vector.shape[2]):
+                # print(status_vector[i,:,j,:]-opt_value)
+                status_error = np.linalg.norm(status_vector[i,:,j,:] - opt_value)
+                # print(status_error)
+                if status_error <= error:
+                    print(i, j*time_delta)
+                    break
 
     def plot_compared_graph(self, config_index_list):
         compared_dir = f"/app/records/compared/"
@@ -290,7 +421,8 @@ class DumpRecords:
         for index in config_index_list:
             print(f"extracting {index}.......")
             record_path = f"/app/records/{self.config['agent_config']['model']}/{index}"
-            records = self.read_records(self.config['agent_config']['model'], index)
+            model, index_num = index.split("@")
+            records = self.read_records(model, index_num)
             memory = self.extract_records(records)
             status_vector = self.align_list(memory['x'])
             virtual_vector = self.align_list(memory['y'])
@@ -322,9 +454,10 @@ class DumpRecords:
         self.plot_assemble_estimation_graph(times, virtual_vectors, opt_values, figure_dir, "virtual_status_opt", "||y-$x^{\star}$||", right=3)
         self.plot_assemble_estimation_graph(times, status_vectors, virtual_vectors, figure_dir, "status_virtual", "||x-y||", right=3)
         self.plot_assemble_estimation_graph(times, status_vectors, opt_values, figure_dir, "status_opt", "||x-$x^{\star}$||", right=3)
-        if "oi" in memory.keys():
-            print(np.array(zero_opt_values).shape, np.array(ois).shape)
-            self.plot_assemble_estimation_graph(np.array(times)[:,1:], np.array(ois), np.array(zero_opt_values), figure_dir, "hi_opt", "||$h$||", right=3)
+        self.get_convergencce_time(status_vectors, opt_value=np.array([[-0.5, -0.32], [0.5, -0.32], [-0.5, 0.18], [0.5, 0.18], [0, 0.68]]))
+        # if "oi" in memory.keys():
+        #     print(np.array(zero_opt_values).shape, np.array(ois).shape)
+        #     self.plot_assemble_estimation_graph(np.array(times)[:,1:], np.array(ois), np.array(zero_opt_values), figure_dir, "hi_opt", "||$h$||", right=3)
 
 
     def plot_graph(self):
@@ -345,7 +478,7 @@ class DumpRecords:
         partial_cost = self.align_list(memory['partial_cost'])
         opt_value = np.zeros(status_vector.shape)
         time = np.array(memory['time'][-1][:len(status_vector[0])])
-        ui = self.align_list(memory['ui'])
+        # ui = self.align_list(memory['ui'])
 
 
         # oi = self.align_list(memory['oi'])
@@ -358,13 +491,22 @@ class DumpRecords:
         time = np.array(memory['time'][-1][:len(status_vector[0])])
                 
         # config_index_list = ["0","0_5", "0_3", "0_4"]
-        self.plot_matrix_graph(figure_dir)
-        # self.plot_compared_graph(config_index_list,figure_dir)
+        # config_index_list = ["c1","c2", "c3", "c4"]
+        # self.plot_matrix_graph(figure_dir)
+        # self.plot_compared_graph(config_index_list)
 
-        self.plot_status_graph(time, status_vector, virtual_vector, figure_dir)
-        self.plot_status_graph(time, virtual_vector, virtual_vector,figure_dir, "virtual_status", 'y')
-        time = np.array(memory['time'][-1][:len(ui[0])])
-        self.plot_status_graph(time, ui, ui,figure_dir, "ui", "u", "Control torque vector")
+        self.plot_status_graph(time, status_vector, figure_dir)
+        # self.plot_algorithm_compare(["euler_constraint_asym@6", "euler_constraint@7"])
+        # self.plot_compared_graph(["euler_constraint_asym@c4", "euler_constraint@c1", "euler_constraint@c2", "euler_constraint@c3"])
+        self.plot_compared_graph(["euler_constraint_uc@c5", "euler_constraint_uc@c6"])
+
+        # self.plot_algorithm_compare(["euler_constraint_asym@c4", "euler_constraint@c1", "euler_constraint@c2", "euler_constraint@c3"])
+        # self.plot_algorithm_compare(["euler_constraint_uc@c5", "euler_constraint_uc@c6"])
+
+        # self.plot_compared_graph(["3_16", "3_11", "3_12", "3_13", "3_14", "3_15"])
+        # self.plot_status_graph(time, virtual_vector, virtual_vector,figure_dir, "virtual_status", 'y')
+        # time = np.array(memory['time'][-1][:len(ui[0])])
+        # self.plot_status_graph(time, ui, ui,figure_dir, "ui", "u", "Control torque vector")
         self.plot_trajectory_graph(status_vector, figure_dir)
         # print(self.index)
         # self.plot_compared_graph(['3', '3_1', '3_2', '3_3'], )
@@ -382,6 +524,37 @@ class DumpRecords:
 
         # self.plot_assemble_estimation_graph(time, [estimate_vector], [virtual_vector], figure_dir, "virtual_status_estimate")
     
+    def plot_algorithm_compare(self, config_index_list):
+        compared_dir = f"/app/records/compared/"
+        folder_path = ""
+        for index in config_index_list:
+            folder_path += '@'+index
+        figure_dir = compared_dir+folder_path
+        os.makedirs(figure_dir, exist_ok=True)
+        status_vectors = []
+        virtual_vectors = []
+        estimate_vectors = []
+        cost_estimates = []
+        partial_costs = []
+        opt_values = []
+        times = []
+        ois = []
+        zero_opt_values = []
+        # labels = ["Case 1", "Case 2", "Case 3", "Case 4", "Case 5"]
+        for index in config_index_list:
+            print(f"extracting {index}.......")
+            model, index_num = index.split("@")
+            records = self.read_records(model, index_num)
+            memory = self.extract_records(records)
+            status_vector = self.align_list(memory['x'])
+
+            time = np.array(memory['time'][-1][:len(status_vector[0])])
+            status_vectors.append(status_vector)
+            times.append(time)
+        
+        plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value=np.array([[-0.5, -0.32], [0.5, -0.32], [-0.5, 0.18], [0.5, 0.18], [0, 0.68]]), labels=["Asymptotic convergence", "Fixed-time convergence", "finitetime", "asy"]),
+    
+
     def get_subfigure(self, bbox, xlim, ylim, start, end):
         fig, ax = plt.subplots(1, 1)
         axins = inset_axes(ax, width="40%", height="30%",loc='lower left',
@@ -479,38 +652,6 @@ class DumpRecords:
         # plt.rcParams.update({'font.size':font_size}) 
         ax.legend(loc='lower left', bbox_to_anchor=(box[0], box[1]), fontsize=15)
         plt.savefig(compared_dir+"/compared_estimate2.jpeg".format(str(labels)[:10]))
-
-    # def plot_compared_graph(self, config):
-    #     plt.clf()
-    #     compared_dir = f"/app/records/compared/"
-    #     labels = config['labels']
-    #     timescale = config['timescale']
-    #     font_size = config['font_size']
-    #     box=config['box']
-    #     opt_value = [26.0990, 31.0459, 36.0000, 40.9505, 45.9000]
-    #     colors = list(mcolors.TABLEAU_COLORS.keys())
-    #     compared_name = ''
-    #     count = 0
-    #     for config_index in labels.keys():
-    #         model, index = config_index.split('@')
-    #         records = self.read_records(model, index)
-    #         memory = self.extract_records(records)
-    #         norm_error = copy.deepcopy(np.array(memory['time'][-1]))
-    #         for i in range(len(norm_error)):
-    #             norm_error[i] = np.linalg.norm(np.array(memory['x'])[:,i])
-    #         plt.plot(np.array(memory['time'][-1]), norm_error, color=mcolors.TABLEAU_COLORS[colors[count%(len(colors))]], label=labels[config_index])
-    #         compared_name += config_index
-    #         count += 1
-    #     compared_dir += compared_name
-    #     os.makedirs(compared_dir, exist_ok=True)
-    #     plt.xlim(timescale[0], timescale[1])
-    #     plt.ylim(bottom=0)
-    #     plt.xlabel('time(sec)', fontsize=15)
-    #     plt.ylabel("||x - x*||", fontsize=15)
-    #     # plt.rcParams.update({'font.size':font_size}) 
-    #     plt.legend(loc='lower left', bbox_to_anchor=(box[0], box[1]), fontsize=12)
-    #     plt.savefig(compared_dir+"/compared.png".format(str(labels)[:10]))
-
 
 
 class FixedSettleTime:

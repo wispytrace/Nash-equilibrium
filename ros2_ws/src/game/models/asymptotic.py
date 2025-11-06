@@ -20,6 +20,8 @@ class Model:
         self.memory_updation['z'] += (self.memory['z'] - memory['z'])
         self.memory_updation['z'][adj_agent_id] += (self.memory['z'][adj_agent_id] - memory['x'][0])
 
+        self.memory_updation['lambda'] += (self.memory['lambda'] - memory['lambda'])
+
     def estimation_update_function(self):
         e = self.model_config['e']
         estimation_update = np.zeros(self.memory_updation['z'].shape)

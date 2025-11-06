@@ -42,7 +42,17 @@
 # cd /app/ros2_ws/src/game
 # python3 ./utlis/main.py $config_name $config_index $draw_model
 
-config_index=r_0
+# config_index=r_0
+# config_name="fixed2"
+# draw_model="fixed"
+# cd ros2_ws
+# # colcon build
+# source /opt/ros/humble/setup.bash
+# source install/setup.bash
+# cd /app/ros2_ws/src/game
+# python3 ./utlis/main.py $config_name $config_index $draw_model
+
+config_index=p1
 config_name="fixed2"
 draw_model="fixed"
 cd ros2_ws

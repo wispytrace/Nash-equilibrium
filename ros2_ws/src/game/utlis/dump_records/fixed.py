@@ -66,7 +66,7 @@ class DumpRecords:
         plt.xlim(0, 2.5)
         plt.ylim(0, max(opt_value)+4)
         plt.legend(loc='upper right', ncol=2, fontsize=12)
-        plt.xlabel('time(sec)', fontsize=15)
+        plt.xlabel('Time(s)', fontsize=15)
         plt.ylabel('Action', fontsize=15)
         plt.savefig(figure_dir + "/status.png")
 
@@ -82,9 +82,10 @@ class DumpRecords:
         plt.xlim(0, 2.5)
         # plt.ylim(bottom=0)
         plt.legend(loc='upper right', fontsize=12)
-        plt.xlabel('time(sec)', fontsize=15)
+        plt.xlabel('Time(s)', fontsize=15)
         plt.ylabel('Control input', fontsize=15)
         plt.savefig(figure_dir + "/status_update.png")
+        print("save to "+figure_dir + "/status_update.png")
         
 
     def plot_estimation_graph(self, time, status_vector, estimate_vector, opt_value, figure_dir):
@@ -100,7 +101,7 @@ class DumpRecords:
             plt.plot(time, [opt_value[i]]*len(time), '--', label="x{}*".format(self.charater[i+1]))
             plt.annotate(str(opt_value[i]), xy=(1.5, opt_value[i]), xytext=(1.75, opt_value[i]+4),arrowprops=dict(arrowstyle="->", facecolor='blue', edgecolor='blue'))
             plt.legend()
-            plt.xlabel('time(sec)')
+            plt.xlabel('Time(s)')
             plt.ylim(0, opt_value[i]+10)
             plt.ylabel("x{} and its estimates from other players".format(self.charater[i+1]))
             plt.savefig(figure_dir+"/estimation_{}.jpeg".format(i+1))
@@ -118,7 +119,7 @@ class DumpRecords:
             plt.clf()
             plt.plot(time, estimation_error[i], color=mcolors.TABLEAU_COLORS[colors[i]])
             plt.plot(time, [0]*len(time), '--', color="black")
-            plt.xlabel('time(sec)')
+            plt.xlabel('Time(s)')
             plt.ylabel("|x{} - x{}*|".format(self.charater[i+1], self.charater[i+1]))
             plt.xlim(0, 2.5)
             plt.savefig(figure_dir + "/error_{}.jpeg".format(i+1))
@@ -135,7 +136,7 @@ class DumpRecords:
         for i in range(agent_nums):
             plt.plot(time, estimation_error[i], color=mcolors.TABLEAU_COLORS[colors[i]], label=("|x{} - x{}*|".format(self.charater[i+1], self.charater[i+1])))
             plt.legend(loc='lower left', bbox_to_anchor=(0.75, 0))
-            plt.xlabel('time(sec)')
+            plt.xlabel('Time(s)')
             plt.xlim(left=0, right=2.5)
             plt.ylabel("Error between Player's Action and Nash Equilibrium".format(self.charater[i+1], self.charater[i+1]))
             plt.savefig(figure_dir + "/assemble_error.jpeg")
@@ -157,7 +158,7 @@ class DumpRecords:
                     color=mcolors.TABLEAU_COLORS[colors[(i+j)%(len(colors))]], label="z{}{} - x{}".format(self.charater[j+1], self.charater[i+1],  self.charater[i+1]))
                 plt.legend(loc='lower left', bbox_to_anchor=(0.51, 0), ncol=3, prop={'size': 7, 'weight': 'bold'})
 
-        plt.xlabel('time(sec)')
+        plt.xlabel('Time(s)')
         plt.xlim(0, 2.5)
         plt.ylabel("Error between Player's Action and Estimation from Others".format(self.charater[i+1]))
         plt.savefig(figure_dir+"/assemble_estimation.jpeg".format(i+1))
@@ -231,14 +232,14 @@ class DumpRecords:
         time = np.array(memory['time'][-1])
         status_vector = np.array(memory['x'])
         estimate_vector = np.array(memory['z'])
-        ui = np.array(memory['update_value'])
+        # ui = np.array(memory['update_value'])
         
         
         opt_value = [2.0475755648379073, 2.496178193752349, 2.9672215956150314, 3.421972769128372, 3.876074463373425]
         # abs_error = 0.02
         self.plot_matrix_graph(figure_dir)
         self.plot_status_graph(time, status_vector, opt_value, figure_dir)
-        self.plot_ui_graph(time[:-1], ui, figure_dir)
+        # self.plot_ui_graph(time[:-1], ui, figure_dir)
         # self.plot_estimation_graph(time, status_vector, estimate_vector, opt_value, figure_dir)
         # self.plot_error_graph(time, status_vector, opt_value, figure_dir)
         # self.plot_assemble_error_graph(time, status_vector, opt_value, figure_dir)
@@ -335,7 +336,7 @@ class DumpRecords:
         os.makedirs(compared_dir, exist_ok=True)
         plt.xlim(timescale[0], timescale[1])
         plt.ylim(bottom=0)
-        plt.xlabel('time(sec)',  fontsize=15)
+        plt.xlabel('Time(s)',  fontsize=15)
         plt.ylabel("||z - $1_N \otimes x$||",  fontsize=15)
         plt.rcParams.update({'font.size':font_size}) 
         plt.legend(loc='upper right', fontsize=15)
@@ -369,7 +370,7 @@ class DumpRecords:
         os.makedirs(compared_dir, exist_ok=True)
         plt.xlim(timescale[0], timescale[1])
         plt.ylim(bottom=0)
-        plt.xlabel('time(sec)', fontsize=15)
+        plt.xlabel('Time(s)',  fontsize=15)
         plt.ylabel("||v - $1_N \otimes F(x)$||",  fontsize=15)
         plt.rcParams.update({'font.size':font_size}) 
         plt.legend(loc='upper right', fontsize=15)
@@ -410,6 +411,8 @@ class DumpRecords:
     #     ax.legend(loc='upper right', fontsize=15)
     #     plt.savefig(compared_dir+"/compared_estimate2.jpeg".format(str(labels)[:10]))
 
+
+
     def plot_compared_graph(self, config):
         plt.clf()
         compared_dir = f"/app/records/compared/"
@@ -417,10 +420,11 @@ class DumpRecords:
         timescale = config['timescale']
         font_size = config['font_size']
         box=config['box']
-        opt_value = [2.0603340809778703, 2.5147599568984695, 2.968758529304096, 3.4229727209351926, 3.8768737900900647]
+        opt_value = [2.0596, 2.5142, 2.9687, 3.4232, 3.8778]
         colors = list(mcolors.TABLEAU_COLORS.keys())
         compared_name = ''
         count = 0
+        is_cite = {}
         for config_index in labels.keys():
             model, index = config_index.split('@')
             records = self.read_records(model, index)
@@ -428,17 +432,28 @@ class DumpRecords:
             norm_error = copy.deepcopy(np.array(memory['time'][-1]))
             for i in range(len(norm_error)):
                 norm_error[i] = np.linalg.norm(np.array(memory['x'])[:,i,0] - opt_value)
+
+                if norm_error[i] < 5e-4:
+                    if config_index  not in is_cite:
+                        is_cite[config_index] = True
+                    # print(i)
+                        print(config_index, memory['time'][-1][i])
+                else:
+                    if config_index in is_cite:
+                        del is_cite[config_index]
+                norm_error[i] = np.log10(norm_error[i])
             plt.plot(np.array(memory['time'][-1]), norm_error, color=mcolors.TABLEAU_COLORS[colors[count%(len(colors))]], label=labels[config_index])
             compared_name += config_index
             count += 1
         compared_dir += compared_name
         os.makedirs(compared_dir, exist_ok=True)
         plt.xlim(timescale[0], timescale[1])
-        plt.ylim(bottom=0)
-        plt.xlabel('time(sec)', fontsize=15)
-        plt.ylabel("||x - x*||", fontsize=15)
+        # plt.ylim(bottom=0)
+        plt.xlabel('Time(s)',  fontsize=15)
+        plt.ylabel("$log_{10}(||x - x*||)$", fontsize=15)
+        # plt.ylabel("||x - x*||", fontsize=15)
         # plt.rcParams.update({'font.size':font_size}) 
-        plt.legend(loc='upper right', fontsize=12)
+        plt.legend(loc='upper right', fontsize=10)
         plt.savefig(compared_dir+"/compared.png".format(str(labels)[:10]))
     
     # def plot_compared_graph(self, config):

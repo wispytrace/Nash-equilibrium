@@ -43,7 +43,7 @@ class Model:
                 sign = -1
             
             estimation_update[i] = -1*sign*(c1*np.power(value_fabs, p) + c2*np.power(
-                value_fabs, q)) - gama*sign
+                value_fabs, q))
         
         return estimation_update
 
@@ -67,7 +67,7 @@ class Model:
         partial_value_fabs = np.fabs(partial_value)
 
         update_value = -(sign*delta*np.power(partial_value_fabs, p) + sign *
-                         eta*np.power(partial_value_fabs, q) + sign*epsilon*partial_value_fabs)
+                         eta*np.power(partial_value_fabs, q))
 
         return update_value
 

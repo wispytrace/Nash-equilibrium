@@ -5,7 +5,7 @@ from .switching import DumpRecords
 from .high_order import DumpRecords
 from .euler_constraint import DumpRecords
 from .fixed_switch import DumpRecords
- 
+from .fixed_high_order import DumpRecords
 
 Draw = {
     "fixed" : fixed.DumpRecords,
@@ -15,4 +15,5 @@ Draw = {
     "high_order": high_order.DumpRecords,
     "euler_constraint" : euler_constraint.DumpRecords,
     "fixed_switch": fixed_switch.DumpRecords,
+    "fixed_high_order": fixed_high_order.DumpRecords,
 }

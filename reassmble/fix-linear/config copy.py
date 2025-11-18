@@ -139,7 +139,7 @@ def parameter_calculate(index):
     m_hat = min_eig
     l_hat = np.sqrt(2.08**2+0.04**2*3)*scale
     h_m = max_eig
-    print("h_m:", h_m)
+    print("h_m:", h_m) 
 
     adjacency_matrix = np.array([[0, 1, 0, 1],
                   [1, 0, 1, 0],
@@ -156,20 +156,20 @@ def parameter_calculate(index):
 
 
     beta1 = 1
-    beta2 = 0.4
-    alpha1 = 1000
-    alpha2 = 2000
+    beta2 = 0.5
+    alpha1 = 600
+    alpha2 = 2200
 
 
     mu = 0.85
     nu = 1.15
 
 
-    rho1 = 0.1
+    rho1 = 0.02
     rho2 = 0.06
     rho3 = 0.05
     rho4 = 0.04
-    rho5 = 0.02
+    rho5 = 0.025
 
     Nsqrt = N**(1/2)
 
@@ -191,10 +191,10 @@ def parameter_calculate(index):
     b2 = (N**2*(n+1))**(1-nu) * 2**((1-nu)/(nu**2))
     print(f"b2: {b2:.6f}")
 
-    g1 = c1 + Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
+    g1 = c1 + beta1*Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
     print(f"g1: {g1:.6f}")
 
-    g2 = c2 + c3*rho1*(1-nu) + (c4*rho1+Nsqrt)*rho3**(-nu)/(1+nu) + h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu
+    g2 = c2 + c3*rho1*(1-nu) + (c4*rho1+beta2*Nsqrt)*rho3**(-nu)/(1+nu) + h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu
     print(f"g2: {g2:.6f}", h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu)
 
     delta1 = (alpha1* (2*min_eig_M)**((1+mu)/2))/2 - g1
@@ -207,7 +207,7 @@ def parameter_calculate(index):
     print(f"delta3: {delta3:.6f}")
 
     delta4 = (2*m_hat-h_m)*beta2 - (c4*rho1+Nsqrt*beta2)*rho3*nu/(1+nu) - h_m*(c2+c3*rho1**(1-nu))*rho5/(Nsqrt*(nu+1)) - h_m*c4*rho1/Nsqrt
-    print(f"delta4: {delta4:.6f}", h_m*(c2+c3*rho1**(1-nu))*rho5/(Nsqrt*(nu+1)), h_m*c2+c3*rho1**(1-nu))
+    print(f"delta4: {delta4:.6f}", h_m*(c2+c3*rho1**(1-nu))*rho5/(Nsqrt*(nu+1)), (c4*rho1+Nsqrt*beta2)*rho3*nu/(1+nu), h_m*c4*rho1/Nsqrt)
 
     d1 = min(delta3, 2**(1/2-nu/2)*delta4)
     print(f"d1: {d1:.6f}")
@@ -217,12 +217,12 @@ def parameter_calculate(index):
     rho2 = 1
     rho3 = 0.6
     rho4 = 0.5
-    rho5 = 2.8
+    rho5 = 3.2
 
-    g1 = c1 + Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
+    g1 = c1 + beta1*Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
     print(f"g1: {g1:.6f}")
 
-    g2 = c2 + c3*rho1*(1-nu) + (c4*rho1+Nsqrt)*rho3**(-nu)/(1+nu) + h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu
+    g2 = c2 + c3*rho1*(1-nu) + (c4*rho1+beta2*Nsqrt)*rho3**(-nu)/(1+nu) + h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu
     print(f"g2: {g2:.6f}", h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu)
 
     delta3 = (2*m_hat-h_m)*beta1 - Nsqrt*beta1*rho2*n**(1/2-mu/2)*mu/(mu+1) - h_m*c1*rho4/(Nsqrt*(mu+1))

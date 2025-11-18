@@ -67,7 +67,7 @@ class Model:
 
     def power(self, value, a):
         if len(value.shape) == 0:
-            if np.fabs(value) < 1e-10:
+            if np.fabs(value) < 1e-6:
                 return 0
             else:
                 return np.power(np.fabs(value), a) * self.approximate_sign(value)
@@ -93,7 +93,7 @@ class Model:
         return sign_value
 
     def approximate_sign(self, value):
-        extra = 1e-3
+        extra = 5e-3
         value = value/(np.fabs(value)+extra)
         return value
     

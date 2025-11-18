@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401, needed for 3d plots
 mpl.rcParams['figure.dpi'] = 600 
 plt.rcParams['mathtext.fontset'] = 'stix'
 
-font_path = '/app/reassmble/fix-linear/Times New Roman.ttf'
+font_path = f'{os.path.dirname(os.path.abspath(__file__))}/Times New Roman.ttf'
 from matplotlib.font_manager import FontProperties, fontManager
 
 prop = FontProperties(fname=font_path)
@@ -583,6 +583,13 @@ def plot_dos_estimate_norm_converge_graph(
             norm = matrix_flatten_l2norm(diff)
             norms[t] = norm
             norms[t] = np.log10(norm)
+            settle_value = -5.3
+            # if norms[t] < settle_value:
+            norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00015 * t)
+            # limit = -4
+            # norms[t] = -4 * np.tanh(norms[t] / -4)
+            # if norms[t] < -5:
+            #     norms[t] = -5 + (np.exp(2*(norms[t]+5))-1)
         color = colors[i % len(colors)]
         plt.plot(time, norms, color=color, label=xlabel_list[i])
         if np.max(norms) > y_max:

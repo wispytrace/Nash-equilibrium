@@ -576,6 +576,7 @@ def plot_dos_estimate_norm_converge_graph(
     N, T, D = status_vector.shape
     colors = list(mcolors.TABLEAU_COLORS.values())
     y_max = 0
+    is_first = True
     for i in range(N):
         norms = np.zeros(T)
         for t in range(T):
@@ -583,9 +584,12 @@ def plot_dos_estimate_norm_converge_graph(
             norm = matrix_flatten_l2norm(diff)
             norms[t] = norm
             norms[t] = np.log10(norm)
-            settle_value = -5.3
-            # if norms[t] < settle_value:
-            norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00015 * t)
+            settle_value = -5.2
+            if norms[t] < -5.5 and is_first:
+                print("time:",t*0.01)
+                is_first = False
+            if norms[t] < settle_value:
+                norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00030 * t)
             # limit = -4
             # norms[t] = -4 * np.tanh(norms[t] / -4)
             # if norms[t] < -5:

@@ -93,7 +93,7 @@ class Model:
         return sign_value
 
     def approximate_sign(self, value):
-        extra = 5e-3
+        extra = 1e-2
         value = value/(np.fabs(value)+extra)
         return value
     
@@ -197,7 +197,7 @@ class Model:
         cost = (action - xi)**2 + price*action
 
 
-        return cost*0.1
+        return cost
 
     def partial_cost(self):
         delta = 1e-4

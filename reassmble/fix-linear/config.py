@@ -1,19 +1,18 @@
 import numpy as np
-
-
+import copy
 
 
 config = {
     "r_1":
     {
-        "epochs" : 300000,
+        "epochs" : 100000,
         "adjacency_matrix" : [[1, 1, 1, 1 ],
                                 [1, 1, 1, 1],
                                 [1, 1, 1, 1 ],
                                 [1, 1, 1, 1 ]], 
         "agent_config":
         {  
-            "time_delta": 2e-4,
+            "time_delta": 5e-4,
             "model": "fixed_linear",
             "record_interval": 50,
             "record_flag": 1,
@@ -23,19 +22,20 @@ config = {
                 "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
                 "scale_dict": {},
                 "N": 4,
+
                 "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
                 # "cost_scale": 0.1,
                 # "epsilon": 0.1,
                 "DoS_interval":{
                     "1":[[1, 1.5], [15.5, 16], [24.5, 25]],
-                    "2":[[5.5, 5.7], [11, 11.3]],
-                    "3":[[10, 10.5], [20, 20.5]],
+                    "2":[[5.5, 5.7], [11, 11.3], [30, 30.5]],
+                    "3":[[10, 10.5], [20, 20.5], [35, 35.5]],
                 },
 
                 'share': {
-                    "p": 0.8,
-                    "q": 1.2,
-                    'alpha': [450, 1300, 0, 0],
+                    "p": 0.75,
+                    "q": 1.25,
+                    'alpha': [200, 500, 0, 0],
                     'beta':[1, 0.5],
                     'po': 5,
                     "a": 0.04
@@ -80,6 +80,35 @@ config = {
     },
 
 }
+
+
+def set_by_path(dic, path, value):
+    """
+    dic: 要操作的字典
+    path: 字符串路径，例 "agent_config.model_config.private.1.order"
+    value: 新值
+    """
+    keys = path.split('.')
+    d = dic
+    for k in keys[:-1]:
+        d = d[k]
+    d[keys[-1]] = value
+
+
+def batch_modify_config(base_config, path_list, value_list):
+    new_config = copy.deepcopy(base_config)
+    for path, value in zip(path_list, value_list):
+        set_by_path(new_config, path, value)
+    return new_config
+
+config["r_2"] = batch_modify_config(config["r_1"],
+    ["agent_config.model_config.DoS_interval"],
+    [{
+        "1":[[1, 1.5], [15.5, 16]],
+        "2":[[5.5, 5.7], [11, 11.3]],
+        "3":[[10, 10.5]],
+        }]
+)
 
 
 def compute_eigenvalues(matrix):

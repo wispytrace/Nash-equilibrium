@@ -153,12 +153,13 @@ class DumpRecords:
         # self.plot_compared_graph(config_index_list,figure_dir)
         # opt_value = np.array([[-0.9999385195244029, 0.16660663117309651, 0.3333955560508185], [4.8152365222943084e-05, -0.8334287020540452, 0.3334118895597235], [1.0001074180788625, 0.16654159249067055, 0.33345503463020215], [4.815265801524303e-05, 1.166571297885446, 0.33341188945528427], [2.0000614803817807, 0.16660663112190888, 3.333395556015464], [-1.999953791549649, 0.16663322749224166, 3.3333734276470937]])
         # plot_status_error_graph(time, virtual_vector, figure_dir, ylabel_list=["$\omega_{i1} - y_{i1}^*$", "$\omega_{i2} - y_{i2}^*$", "$\omega_{i3} - y_{i3}^*$"], opt_value=opt_value, xlim=[0, 2])
-        # plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='y', file_name_prefix='actual', opt_value=opt_value)
+        # plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='
+        # y', file_name_prefix='actual', opt_value=opt_value)
         # plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y')
         # plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
         plot_single_status_converge_graph(time, virtual_vector, figure_dir, file_name_prefix="virtual_state", ylabel="$\omega_{i}$",xlabel_list=["$\omega_1$", "$\omega_2$", "$\omega_3$", "$\omega_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
         plot_single_status_converge_graph(time, status_vector, figure_dir, file_name_prefix="state", ylabel="$P_i$",xlabel_list=["$P_1$", "$P_2$", "$P_3$", "$P_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
-        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="||$z_i$-$\omega$||", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$lg(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
         # plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
 
         # self.plot_compared_graph(["3", "3_14", "3_15", "3_11", "3_12", "3_13"])
@@ -185,7 +186,7 @@ class DumpRecords:
 
 if __name__ == "__main__":
     from config import config
-    index = "r_1"
+    index = "r_4"
 
     dumpRecords = DumpRecords(config[index], index)
     current_dir = os.path.dirname(os.path.realpath(__file__))

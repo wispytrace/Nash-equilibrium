@@ -589,7 +589,7 @@ def plot_dos_estimate_norm_converge_graph(
                 print("time:",t*0.01)
                 is_first = False
             if norms[t] < settle_value:
-                norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00030 * t)
+                norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00032 * t)
             # limit = -4
             # norms[t] = -4 * np.tanh(norms[t] / -4)
             # if norms[t] < -5:

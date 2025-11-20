@@ -110,6 +110,15 @@ config["r_2"] = batch_modify_config(config["r_1"],
         }]
 )
 
+config["r_3"] = batch_modify_config(config["r_1"],
+    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta"],
+    [[200, 0,0,0], [1, 0]]
+)
+
+config["r_4"] = batch_modify_config(config["r_1"],
+    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
+    [[500, 0,0,0], [1, 0], 1, 1]
+)
 
 def compute_eigenvalues(matrix):
     """

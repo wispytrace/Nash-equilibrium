@@ -6,7 +6,7 @@ import os
 import json
 import time
 # 1. 配置参数
-config_index = "r_4"
+config_index = "r_r"
 num_agents = 4
 
 

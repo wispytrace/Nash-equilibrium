@@ -444,7 +444,7 @@ def plot_single_status_converge_graph(
     plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
     plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
     plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
-    plt.xlim(left=0, right=time[-1])
+    plt.xlim(left=0, right=10)
     plt.tight_layout()
     if y_bottom is not None:
         plt.ylim(bottom=y_bottom, top=y_max*1.1)

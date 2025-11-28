@@ -112,6 +112,17 @@ class DumpRecords:
     #     self.plot_assemble_estimation_graph(times, status_vectors, opt_values, figure_dir, "status_opt", "||x-$x^{\star}$||", right=3)
     #     self.get_convergencce_time(status_vectors, opt_value=np.array([[-0.5, -0.32], [0.5, -0.32], [-0.5, 0.18], [0.5, 0.18], [0, 0.68]]))
 
+    def get_opt_value(self):
+        r = [10, 20, 30, 40]
+        sum = 2*np.sum(r)
+        p = (sum - 20)/2.2
+        opt_value = []
+        for ri in r:
+            yi = (2*ri - 5 - 0.04*p)/2.04
+            opt_value.append(yi)
+        print(opt_value)
+        return np.array(opt_value)
+
     def plot_graph(self, record_path=None):
         if record_path is None:
             record_path = f"/app/records/{self.config['agent_config']['model']}/{self.index}"
@@ -157,9 +168,11 @@ class DumpRecords:
         # y', file_name_prefix='actual', opt_value=opt_value)
         # plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y')
         # plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
+        # opt_value = virtual_vector[:, -1, :]
         plot_single_status_converge_graph(time, virtual_vector, figure_dir, file_name_prefix="virtual_state", ylabel="$\omega_{i}$",xlabel_list=["$\omega_1$", "$\omega_2$", "$\omega_3$", "$\omega_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
         plot_single_status_converge_graph(time, status_vector, figure_dir, file_name_prefix="state", ylabel="$y_i$",xlabel_list=["$y_1$", "$y_2$", "$y_3$", "$y_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
         plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$lg(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        get_convergencce_time(status_vector[:,:,0:1], opt_value=self.get_opt_value(), time_vector=time)
         # plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
 
         # self.plot_compared_graph(["3", "3_14", "3_15", "3_11", "3_12", "3_13"])
@@ -187,7 +200,7 @@ class DumpRecords:
 if __name__ == "__main__":
     from config import config
     index = "r_1"
-
+    
     dumpRecords = DumpRecords(config[index], index)
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_path = f"{current_dir}/records/{config[index]['agent_config']['model']}/{index}"

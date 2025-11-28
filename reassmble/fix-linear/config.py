@@ -254,13 +254,25 @@ def batch_modify_config(base_config, path_list, value_list):
         set_by_path(new_config, path, value)
     return new_config
 
+def get_scaled_dos(dos_intrvals, scale=0.5):
+    scaled_dos = {}
+    for k,v in dos_intrvals.items():
+        scaled_dos[k] = []
+        for interval in v:
+            scaled_dos[k].append([interval[0], interval[0]+ (interval[1]-interval[0])*scale])
+    return scaled_dos
+
 config["r_2"] = batch_modify_config(config["r_1"],
     ["agent_config.model_config.DoS_interval"],
-    [{
-        "1":[[1, 1.5], [15.5, 16]],
-        "2":[[5.5, 5.7], [11, 11.3]],
-        "3":[[10, 10.5]],
-        }]
+    [
+    get_scaled_dos({
+                    "1":[[0.2, 0.3], [2, 2.3], [25.5, 25.6]],
+                    "2":[[0.3, 0.4], [10, 10.2], [25.8, 26.0]],
+                    "3":[[0.4, 0.5], [2.3, 2.5], [26.2, 26.3]],
+                    "4":[[0.5, 0.6], [10, 10.3], [26.5, 26.6]],
+                    "5":[[0.6, 0.7], [15, 15.5], [40, 40.5]]
+                })
+    ]
 )
 
 config["r_3"] = batch_modify_config(config["r_1"],
@@ -273,6 +285,19 @@ config["r_4"] = batch_modify_config(config["r_1"],
     [[500, 0,0,0], [1, 0], 1, 1]
 )
 
+
+config["r_5"] = batch_modify_config(config["r_1"],
+    ["agent_config.model_config.DoS_interval"],
+    [
+    {
+                    "1":[],
+                    "2":[],
+                    "3":[],
+                    "4":[],
+                    "5":[]
+        }
+    ]
+)
 
 def compute_eigenvalues(matrix):
     """

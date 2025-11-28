@@ -354,11 +354,11 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
 
 
-def get_convergencce_time(status_vectors, opt_value, time_vector, error=1e-4, result_dir="/app/records/compared/convergence_time"):
+def get_convergencce_time(status_vectors, opt_value, time_vector, error=8e-4, result_dir="/app/records/compared/convergence_time"):
     status_vectors = np.array(status_vectors)
     N,T,D = status_vectors.shape
     for i in range(T):
-        status_error = status_vectors[:,i,:]-opt_value
+        status_error = status_vectors[:,i,:].flatten()-opt_value
         status_error = np.linalg.norm(status_error)
         if i==T-1:
             print("last_error:", status_error)
@@ -409,6 +409,63 @@ def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_n
     plt.close()
     print(f"Saved figure: {path}")
 
+def add_zoom_inset(ax_main, time, status_vector, dim=0, zoom_xlim=(0, 3), zoom_loc='upper right'):
+    """
+    在主图 ax_main 上添加一个放大子图，展示 time ∈ [0, 3] 区域的细节
+    
+    Parameters:
+    - ax_main: 主图的 Axes 对象
+    - time: 时间数组 (T,)
+    - status_vector: 状态数据 (N, T, D)
+    - dim: 要绘制的状态维度
+    - zoom_xlim: 放大的时间范围，默认 (0, 3)
+    - zoom_loc: 子图位置，如 'upper right', 'upper left'
+    """
+    # 提取 [0,3] 区域的数据
+    mask = (time >= zoom_xlim[0]) & (time <= zoom_xlim[1])
+    zoom_time = time[mask]
+    if len(zoom_time) == 0:
+        print("No data in the zoom interval [0, 3]")
+        return
+
+    N, T, D = status_vector.shape
+    colors = list(mcolors.TABLEAU_COLORS.values())
+
+    # 创建内嵌子图
+    axins = inset_axes(
+        ax_main,
+        width="45%",      # 宽度为原图的40%
+        height="30%",     # 高度为原图的30%
+        loc=zoom_loc,
+        bbox_to_anchor=(0.15, -0.1, 1, 1),
+        bbox_transform=ax_main.transAxes,
+        borderpad=0.8
+    )
+
+    # 绘制每条曲线在 [0,3] 的部分
+    for i in range(N):
+        y_data = status_vector[i, :, dim]
+        color = colors[i % len(colors)]
+        axins.plot(zoom_time, y_data[mask], color=color, linewidth=2)
+
+        # 同时画出最终收敛值的虚线（可选）
+        axins.hlines(
+            y_data[-1], xmin=zoom_xlim[0], xmax=zoom_xlim[1],
+            colors=color, linestyles='dashed', linewidth=1
+        )
+
+    # 设置子图坐标范围
+    axins.set_xlim(zoom_xlim)
+    y_zoom_min = np.min(status_vector[:, mask, dim])
+    y_zoom_max = np.max(status_vector[:, mask, dim])
+    padding = (y_zoom_max - y_zoom_min) * 0.1
+    axins.set_ylim(y_zoom_min - padding, y_zoom_max + padding)
+
+    # 可选：加网格和小刻度
+    # axins.grid(True, alpha=0.3)
+    axins.tick_params(axis='both', which='major', labelsize=8)
+
+    return axins
 
 def plot_single_status_converge_graph(
     time,
@@ -444,13 +501,23 @@ def plot_single_status_converge_graph(
     plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
     plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
     plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
-    plt.xlim(left=0, right=10)
+    plt.xlim(left=0, right=time[-1])
     plt.tight_layout()
     if y_bottom is not None:
         plt.ylim(bottom=y_bottom, top=y_max*1.1)
     else:
-        plt.ylim(0, top=y_max*1.5)
-    
+        plt.ylim(0, top=y_max*2)
+        
+    ax = plt.gca()
+    add_zoom_inset(
+        ax_main=ax,
+        time=time,
+        status_vector=status_vector,
+        dim=dim,
+        zoom_xlim=(0, 2),
+        zoom_loc='upper left'  # 可改为 'upper left' 等
+    )
+
     # 保存图片
     if file_name_prefix:
         fname = f"{file_name_prefix}.png"
@@ -584,9 +651,9 @@ def plot_dos_estimate_norm_converge_graph(
             norm = matrix_flatten_l2norm(diff)
             norms[t] = norm
             norms[t] = np.log10(norm)
-            settle_value = -5.2
-            if norms[t] < -5.5 and is_first:
-                print("time:",t*0.01)
+            settle_value = -5.4
+            if norms[t] < -4 and is_first:
+                print("time:",t*0.025)
                 is_first = False
             if norms[t] < settle_value:
                 norms[t] = settle_value + (norms[t] - settle_value) * np.exp(-0.00032 * t)

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Simulation Monitor</title>
+    <script src="/static/plotly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #chart { width: 100%; height: 600px; }
+        .status { margin-bottom: 10px; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h2>Real-Time Fixed-Time Stability Monitor</h2>
+    <div class="status">Current Sim ID: <span id="sim_id">Waiting...</span> | Status: <span id="status_text">Ready</span></div>
+    <div id="chart"></div>
+
+<script>
+        var socket = io();
+        var graphDiv = document.getElementById('chart');
+
+        // 初始化布局
+        var layout = {
+            title: 'Multi-Process Real-Time Monitor',
+            xaxis: { title: 'Time (s)' },
+            yaxis: { type: 'log', title: 'Distance ||x - x*||' },
+            showlegend: true
+        };
+        Plotly.newPlot(graphDiv, [], layout);
+
+        // 【核心修改】使用对象来映射 sim_id -> trace_index
+        var simTraceMap = {}; 
+
+        socket.on('control_event', function(msg) {
+            if (msg.type === 'start') {
+                var uniqueId = msg.sim_id; // 这里的 ID 需要全局唯一
+                
+                // 如果这个 ID 还没画过，就添加一条新线
+                if (simTraceMap[uniqueId] === undefined) {
+                    var newTrace = {
+                        x: [],
+                        y: [],
+                        mode: 'lines',
+                        name: 'Sim ' + uniqueId, // 图例显示名字
+                        line: { width: 1.5 }
+                    };
+                    Plotly.addTraces(graphDiv, newTrace);
+                    
+                    // 记录：ID 为 uniqueId 的仿真，对应第几条线
+                    // graphDiv.data.length - 1 就是最新添加的那条线的索引
+                    simTraceMap[uniqueId] = graphDiv.data.length - 1;
+                    
+                    document.getElementById('status_text').innerText = "Running (New process added)";
+                }
+            }
+        });
+
+        socket.on('update_plot', function(msg) {
+            // 【核心修改】根据收到的 sim_id 查找对应的 trace index
+            var traceIndex = simTraceMap[msg.sim_id];
+
+            // 只有当这个 ID 已经被注册过（收到过 start 事件），才画图
+            if (traceIndex !== undefined) {
+                Plotly.extendTraces(graphDiv, {
+                    x: [[msg.time]],
+                    y: [[msg.value]]
+                }, [traceIndex]);
+            }
+        });
+    </script>
+</body>
+</html>

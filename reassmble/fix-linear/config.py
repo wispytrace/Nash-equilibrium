@@ -115,6 +115,7 @@ config = {
                     "q": 1.25,
                     'alpha': [200, 500, 0, 0],
                     'beta':[1, 0.5],
+                    'tau': [1, 0.5],
                     'po': 5,
                     "a": 0.04
                 },
@@ -296,6 +297,25 @@ config["r_5"] = batch_modify_config(config["r_1"],
                     "4":[],
                     "5":[]
         }
+    ]
+)
+
+dos1 = [[0.2+i, i+1] for i in range(10)]
+dos2 = [[10.2+i, 11+i] for i in range(10)]
+dos3 = [[20.2+i, 21+i] for i in range(10)]
+dos4 = [[30.2+i, 31+i] for i in range(10)]
+dos5 = [[40.2+i, 41+i] for i in range(10)]
+
+config["r_6"] = batch_modify_config(config["r_1"],
+    ["agent_config.model_config.share.tau", "agent_config.model_config.DoS_interval"],
+    [[0.005,0.005],
+    {
+        "1":dos1,
+        "2":dos2,
+        "3":dos3,
+        "4":dos4,
+        "5":dos5
+    }
     ]
 )
 

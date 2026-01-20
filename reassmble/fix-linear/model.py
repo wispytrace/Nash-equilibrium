@@ -101,10 +101,14 @@ class Model:
         p = self.model_config['p']
         q = self.model_config['q']
         beta = self.model_config['beta']
+        tau = self.model_config.get('tau', self.model_config['beta'])
 
         partial_value_cost = self.partial_cost()
 
-        update_value = - beta[0] * self.power(partial_value_cost, p) - beta[1] * self.power(partial_value_cost, q)
+        if self.topology_index != 0:
+            update_value = -tau[0] * self.power(partial_value_cost, p) - tau[1] * self.power(partial_value_cost, q)
+        else:
+            update_value = - beta[0] * self.power(partial_value_cost, p) - beta[1] * self.power(partial_value_cost, q)
         # print(partial_value_cost)
 
         self.memory['update_value'] = update_value

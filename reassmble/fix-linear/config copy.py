@@ -219,6 +219,32 @@ def parameter_calculate(index):
     rho4 = 0.5
     rho5 = 3.2
 
+    beta1 = 0.005
+    beta2 = 0.005
+    c1 = beta1 * N**(1-mu/2)* n**(1-mu) * 2**(1-mu) * l_hat**mu
+    print(f"c1: {c1:.6f}")
+
+    c2 = beta2 * N**(1/2) * (2**(nu-2)+2) * (nu) * l_hat**nu
+    print(f"c2: {c2:.6f}")
+
+    c3 = beta2 * N**(1/2) * (2**(nu-2)+2) * l_hat * n**(1-nu/2)
+    print(f"c3: {c3:.6f}")
+
+    c4 = beta2 * N**(1/2) * n**(nu-1) * (2**(nu-2)+2) * l_hat * (nu-1) * n**(1-nu/2)
+    print(f"c4: {c4:.6f}")
+
+    b1 = (N**2*(n+1))**(1/2-nu/2) * 2**((2*(1-nu))/((nu+1)**2))
+    print(f"b1: {b1:.6f}")
+
+    b2 = (N**2*(n+1))**(1-nu) * 2**((1-nu)/(nu**2))
+    print(f"b2: {b2:.6f}")
+
+    g1 = c1 + beta1*Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
+    print(f"g1: {g1:.6f}")
+
+    g2 = c2 + c3*rho1*(1-nu) + (c4*rho1+beta2*Nsqrt)*rho3**(-nu)/(1+nu) + h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu
+    print(f"g2: {g2:.6f}", h_m*(c2+c3*rho1**(1-nu))*rho5**(-1/nu)*nu)
+
     g1 = c1 + beta1*Nsqrt*rho2**(-mu)/(mu+1) + h_m*c1*rho4**(-1/mu)*mu/(Nsqrt*(mu+1))
     print(f"g1: {g1:.6f}")
 

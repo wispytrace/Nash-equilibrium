@@ -199,7 +199,7 @@ class DumpRecords:
 
 if __name__ == "__main__":
     from config import config
-    index = "r_1"
+    index = "r_6"
     
     dumpRecords = DumpRecords(config[index], index)
     current_dir = os.path.dirname(os.path.realpath(__file__))

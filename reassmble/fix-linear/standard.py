@@ -651,7 +651,7 @@ def plot_dos_estimate_norm_converge_graph(
             norm = matrix_flatten_l2norm(diff)
             norms[t] = norm
             norms[t] = np.log10(norm)
-            settle_value = -5.4
+            settle_value = -4.5
             if norms[t] < -4 and is_first:
                 print("time:",t*0.025)
                 is_first = False

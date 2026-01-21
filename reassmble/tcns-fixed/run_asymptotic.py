@@ -8,7 +8,7 @@ import time
 import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
-import socketio  # 新增
+# import socketio  # 新增
 import random
 np.random.seed(42)  # 确保每次运行的随机数相同
 # 1. 全局配置
@@ -38,8 +38,8 @@ config = {
                     'u': 8,
                     'p' : 1,
                     'q' : 1,
-                    'gama': 5,
-                    'e': 5,
+                    'gama': 2,
+                    'e': 2,
                     'min_c1': 5,
                     'min_delta': 1,
                 },
@@ -52,6 +52,44 @@ config = {
                     '4': {'c1': 50, 'c2':50,'delta': 5, 'eta': 5, 'epsilon': 0, 'r': 7.0},
                 }
             },
+        }
+    },
+    "p1":
+    {
+        "simulation_time": 50,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 1e-3,
+            "model": "fixed",
+            "record_interval": 100,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'c': 18,
+                'a': 0.2,
+                'b': 2.5,
+                'l': 0,
+                'u': 8.0,
+                'p' : 1,
+                'q' : 1,
+                'min_c1': 40,
+                'min_delta': 2,
+                'gama': 100,
+                'alpha': 10
+                },
+
+                'private': {
+                '0': { 'c1': 3, 'c2':3, 'delta': 1, 'eta': 1, 'epsilon': 0, 'r':5},
+                '1': {'c1': 3, 'c2':3,'delta': 1, 'eta': 1, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1': 3, 'c2':3,'delta': 1, 'eta': 1, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1': 3, 'c2':3,'delta': 1, 'eta': 1, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1': 3, 'c2':3,'delta': 1, 'eta': 1, 'epsilon': 0, 'r': 7.0},
+                },
+            }
         }
     },
 }
@@ -119,13 +157,13 @@ class CentralizedModel:
         max_system_norm = 0.0
         for i in range(self.num_agents):
             agent_norm = self.agntes[i].update() # 假设 model.update() 返回范数
-            if agent_norm > max_system_norm:
-                max_system_norm = agent_norm
+        #     if agent_norm > max_system_norm:
+        #         max_system_norm = agent_norm
         
-        # 3. 自适应步长计算 (指数衰减策略)
-        decay_factor = np.exp(-self.k * max_system_norm)
-        new_dt = self.dt_min + (self.dt_max - self.dt_min) * decay_factor
-        new_dt = max(new_dt, self.dt_min) # 确保不低于最小值
+        # # 3. 自适应步长计算 (指数衰减策略)
+        # decay_factor = np.exp(-self.k * max_system_norm)
+        # new_dt = self.dt_min + (self.dt_max - self.dt_min) * decay_factor
+        # new_dt = max(new_dt, self.dt_min) # 确保不低于最小值
         
         # 4. 应用新步长
         # for agent in self.agntes:
@@ -307,7 +345,8 @@ class CentralizedModel:
 
 if __name__ == "__main__":
     # 初始化 Socket
-    sio = socketio.Client()
+    sio = None
+    # sio = socketio.Client()
     try:
         sio.connect('http://localhost:5000')
     except:
@@ -328,7 +367,7 @@ if __name__ == "__main__":
         unique_sim_id = f"{process_prefix}{i}"
         
         random_vec = np.random.randn(num_agents, 1) 
-        init_value_large = (random_vec / np.linalg.norm(random_vec)) * 10000
+        init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
         
         centralized_system = CentralizedModel(
             num_agents=num_agents, 

@@ -8,13 +8,13 @@ import time
 import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
-import socketio  # 新增
+# import socketio  # 新增
 import random
 np.random.seed(42)  # 确保每次运行的随机数相同
 # 1. 全局配置
 config = {
     "r_r": {
-        "simulation_time": 50, # 总仿真时长 (秒)
+        "simulation_time": 40, # 总仿真时长 (秒)
         "adjacency_matrix": [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
         "agent_config": {
             "time_delta": 5e-4, # 初始步长
@@ -27,7 +27,7 @@ config = {
                 'share': {
                     'init_value': np.zeros((5, 1)),
                     'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
-                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 20,
                 },
                 'private': {
                 '0': { 'c1': 2.58, 'c2': 2.58, 'delta': 2.5, 'varphi':  2.58, 'sigma':  2.58,'eta':  2.5, 'epsilon': 0, 'r':5.0},
@@ -39,9 +39,35 @@ config = {
             }
         }
     },
+    "r_r1": {
+        "simulation_time": 40, # 总仿真时长 (秒)
+        "adjacency_matrix": [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config": {
+            "time_delta": 5e-4, # 初始步长
+            "model": "fixed4",
+            "record_interval": 50, # 每多少步记录一次数据
+            "record_flag": 1,
+            "model_config": {
+                "N": 5,
+                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                    'init_value': np.zeros((5, 1)),
+                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 20,
+                },
+                'private': {
+                '0': { 'c1': 4, 'c2': 4, 'delta': 3, 'varphi':  4, 'sigma':  4,'eta':  3, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
 }
 
-config_index = "r_r"
+config_index = "r_r1"
 num_agents = 5
 
 class CentralizedModel:
@@ -138,7 +164,7 @@ class CentralizedModel:
                     if self.sio.connected:
                         x_list = [agent.memory['x'] for agent in self.agntes]
                         x_matrix = np.array(x_list).reshape(self.num_agents, 1)
-                        NE_vector = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
+                        NE_vector = np.array([2.06, 31, 2.97, 3.42, 3.88]).reshape(-1, 1)
                         dist = np.linalg.norm(x_matrix - NE_vector)
                         
                         self.sio.emit('sim_data', {
@@ -202,7 +228,7 @@ class CentralizedModel:
         time_steps = np.array(centralized_data["time_steps"])
         
         # 定义 NE 点
-        NE_vector = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
+        NE_vector = np.array([2.06, 31, 2.97, 3.42, 3.88]).reshape(-1, 1)
 
         # 数据处理
         x_trajs_list = centralized_data["trajectories"]["x"]
@@ -292,7 +318,7 @@ class CentralizedModel:
 
 if __name__ == "__main__":
     # 初始化 Socket
-    sio = socketio.Client()
+    sio = None
     try:
         sio.connect('http://localhost:5000')
     except:
@@ -308,10 +334,7 @@ if __name__ == "__main__":
     magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
 
     for i, magnitude in enumerate(magnitudes):
-        if i != 43:
-            continue
-        # 【修改】组合出全局唯一的 sim_id
-        # 前端收到的是字符串，这样就不会冲突了
+
         unique_sim_id = f"{process_prefix}{i}"
 
         random_vec = np.random.randn(num_agents, 1) 

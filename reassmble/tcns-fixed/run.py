@@ -308,12 +308,12 @@ if __name__ == "__main__":
     magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
 
     for i, magnitude in enumerate(magnitudes):
+        if i != 43:
+            continue
         # 【修改】组合出全局唯一的 sim_id
         # 前端收到的是字符串，这样就不会冲突了
         unique_sim_id = f"{process_prefix}{i}"
-        if i <= 42:
-            continue
-        
+
         random_vec = np.random.randn(num_agents, 1) 
         init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
         

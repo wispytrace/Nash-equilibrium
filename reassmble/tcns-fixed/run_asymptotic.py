@@ -38,7 +38,7 @@ config = {
                     'u': 8,
                     'p' : 1,
                     'q' : 1,
-                    'gama': 20,
+                    'gama': 5,
                     'e': 5,
                     'min_c1': 5,
                     'min_delta': 1,

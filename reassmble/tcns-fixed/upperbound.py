@@ -215,9 +215,11 @@ G2 = 2**((1+q)/2) * c2 / (6**((1+q)/2)) * (5*5)**((1-q)/2)
 T2 = 2/(G1*(1-p)) + 2/(G2*(q-1))
 print("Another upper bound on the convergence rate:", T2)
 
-chi1, chi2 = calculate_chi(40, 40, 0.85, 1.15, N=25)
+chi1, chi2 = calculate_chi(20, 20, 0.85, 1.15, N=25)
+chi1 = chi1 * (1/0.258)**((1-p)/(1+q))
+chi2 = chi2 * (1/0.258)**((2*q)/(1+q))
 print(f"Chi1: {chi1}, Chi2: {chi2}")
-T = 1/(chi1*0.1*(1-(1-p)/(1+q))) + 1/(chi2*0.1*((2*q)/(1+q)-1))
+T = 1/(chi1*0.04*(1-(1-p)/(1+q))) + 1/(chi2*0.04*((2*q)/(1+q)-1))
 print(T)
 
 

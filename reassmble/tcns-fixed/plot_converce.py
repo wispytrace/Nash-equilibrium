@@ -3,8 +3,6 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from matplotlib.patches import ConnectionPatch, Rectangle
 
 # ================= 配置区域 =================
 DATA_DIR_PATTERN = "./records/fixed4/r_r/sim_*/all_agents_trajectories.json"
@@ -15,20 +13,35 @@ NE_VECTOR = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
 # 梯度计算参数
 VALUE_INDEX = np.array([5, 5.5, 6, 6.5, 7])
 
-# 理论时间
-THEORETICAL_T_MAX = 38.34
-
-# 绘图配置
-X_LIMIT = 50
+# 全局绘图样式
+X_LIMIT = 40
 Y_LIMIT_TOP = 4.5
-LINE_COLOR = 'blue'
-LINE_ALPHA = 0.3
-LINE_WIDTH = 1.0
+LINE_ALPHA = 0.4
+LINE_WIDTH = 1.5
 
-# 插图 (Inset) 配置
-INSET_X_RANGE = (0, 10)
-# 插图位置 [x, y, width, height]
-INSET_POSITION = [0.25, 0.35, 0.4, 0.4]
+# ==================== 用户自定义区域 ====================
+# 在这里修改每个图的：
+# 1. theoretical_T: 理论收敛时间
+# 2. t_label: 竖线在图例中显示的标签 (支持 LaTeX)
+# 3. color: 线条颜色 (R, G, B) 元组，范围 0-1
+# =======================================================
+PLOT_CONFIGS = {
+    "Verification_NE": {
+        "theoretical_T": 8.2*2 + 13.988,  # 修改这里的数值
+        "t_label": '$T=30.39s$',            # 修改这里的标签
+        "color": (1.0, 0.0, 0.0)          # 红色
+    },
+    "Verification_Z_Consensus": {
+        "theoretical_T": 8.2,            # 修改这里的数值
+        "t_label": '$T_1=8.2s$',     # 修改这里的标签
+        "color": (0.0, 0.6, 0.0)          # 绿色
+    },
+    "Verification_V_Gradient": {
+        "theoretical_T": 8.2*2,            # 修改这里的数值
+        "t_label": '$T_1+T_2=16.4s$',      # 修改这里的标签
+        "color": (0.0, 0.0, 1.0)          # 蓝色
+    }
+}
 
 # ================= 核心计算逻辑 =================
 
@@ -39,94 +52,63 @@ def calculate_gradient_vectorized(x_t):
 
 # ================= 通用绘图函数 =================
 
-def plot_generic_metric(metric_name, y_label_latex, calc_error_func):
+def plot_generic_metric(metric_name, y_label_latex, calc_error_func, 
+                        theoretical_T, t_label, line_color_rgb):
+    """
+    通用绘图函数，支持自定义颜色和理论时间T
+    """
     files = glob.glob(DATA_DIR_PATTERN)
     if not files:
         print(f"Error: No files found in {DATA_DIR_PATTERN}")
         return
 
-    print(f"[{metric_name}] Found {len(files)} files. Plotting...")
+    print(f"[{metric_name}] Found {len(files)} files. Plotting with T={theoretical_T:.2f}...")
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # === 创建局部放大子图 ===
-    axins = ax.inset_axes(INSET_POSITION)
+    fig, ax = plt.subplots()
 
     valid_count = 0
-    y_min_inset = float('inf')
-    y_max_inset = float('-inf')
-
+    
     for file_path in files:
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
             
+            # 计算误差
             time_steps, error_norm = calc_error_func(data)
+            # 取对数
             log_error = np.log10(error_norm)
             
-            # 主图绘制
+            # 绘制线条
             ax.plot(time_steps, log_error, 
-                     color=LINE_COLOR, linewidth=LINE_WIDTH, alpha=LINE_ALPHA)
+                    color=line_color_rgb,  # 使用传入的 RGB 颜色
+                    linewidth=LINE_WIDTH, 
+                    alpha=LINE_ALPHA)
             
-            # 插图绘制
-            axins.plot(time_steps, log_error, 
-                       color=LINE_COLOR, linewidth=LINE_WIDTH, alpha=LINE_ALPHA)
-            
-            # 统计极值
-            mask = (time_steps >= INSET_X_RANGE[0]) & (time_steps <= INSET_X_RANGE[1])
-            if np.any(mask):
-                local_data = log_error[mask]
-                y_min_inset = min(y_min_inset, np.min(local_data))
-                y_max_inset = max(y_max_inset, np.max(local_data))
-
             valid_count += 1
             
         except Exception as e:
             print(f"Skipping {file_path}: {e}")
 
-    # === 主图样式 ===
-    ax.axvline(x=THEORETICAL_T_MAX, color='red', linestyle='--', linewidth=2.5, label='$T_{max}$')
+    # === 绘制理论时间竖线 ===
+    if theoretical_T is not None:
+        ax.axvline(x=theoretical_T, color='black', linestyle='--', 
+                   linewidth=2.5, label=t_label)
+
+    # === 图表样式设置 ===
     ax.set_xlabel('Time (s)', fontsize=14)
     ax.set_ylabel(y_label_latex, fontsize=14)
     ax.set_xlim(left=0, right=X_LIMIT)
     ax.set_ylim(top=Y_LIMIT_TOP)
     
-    # 图例
+    # === 图例处理 (去重) ===
+    # 获取所有图柄和标签
     handles, labels = ax.get_legend_handles_labels()
+    # 使用字典去重 (因为有多条仿真线，但只需要显示T的图例，
+    # 如果想显示仿真线的图例，可以在 ax.plot 中添加 label，但通常不需要)
     by_label = dict(zip(labels, handles))
-    ax.legend(by_label.values(), by_label.keys(), fontsize=12, loc='center right')
-
-    # === 插图样式 ===
-    axins.set_xlim(INSET_X_RANGE[0], INSET_X_RANGE[1])
-    if valid_count > 0:
-        y_margin = (y_max_inset - y_min_inset) * 0.1
-        axins.set_ylim(y_min_inset - y_margin, y_max_inset + y_margin)
-    axins.tick_params(axis='both', which='major', labelsize=10)
-
-    # === 绘制指引箭头和框 (关键修改) ===
     
-    xlims = axins.get_xlim()
-    ylims = axins.get_ylim()
-
-    # # 1. 主图上的矩形框：改为实线 '-'
-    # rect = Rectangle((xlims[0], ylims[0]), xlims[1]-xlims[0], ylims[1]-ylims[0],
-    #                  linewidth=1.2, edgecolor='black', facecolor='none', linestyle='-') # <--- 这里改成了实线
-    # ax.add_patch(rect)
-
-    # 2. 箭头配置：实线箭头
-    # arrow_props = dict(arrowstyle="->", linestyle="-", color="black", lw=1.2, mutation_scale=15)
-
-    # # 箭头 1 (左上)
-    # con1 = ConnectionPatch(xyA=(xlims[0], ylims[1]), coordsA=ax.transData,
-    #                        xyB=(0, 1), coordsB=axins.transAxes,
-    #                        **arrow_props)
-    # fig.add_artist(con1)
-
-    # # 箭头 2 (右下)
-    # con2 = ConnectionPatch(xyA=(xlims[1], ylims[0]), coordsA=ax.transData,
-    #                        xyB=(1, 0), coordsB=axins.transAxes,
-    #                        **arrow_props)
-    # fig.add_artist(con2)
+    if by_label:
+        ax.legend(by_label.values(), by_label.keys(), fontsize=12, loc='upper right')
 
     plt.tight_layout()
     save_name = f"Figure_{metric_name}.png"
@@ -165,6 +147,36 @@ def _calc_gradient_error(data):
 # ================= 主程序 =================
 
 if __name__ == "__main__":
-    plot_generic_metric("Verification_NE", r'$\log_{10}(\|x(t) - x^*\|)$', _calc_state_error)
-    plot_generic_metric("Verification_Z_Consensus", r'$\log_{10}(\|z - \mathbf{1}_N \otimes x\|)$', _calc_consensus_error)
-    plot_generic_metric("Verification_V_Gradient", r'$\log_{10}(\|v - \mathbf{1}_N \otimes \nabla F(x)\|)$', _calc_gradient_error)
+    
+    # 1. 纳什均衡误差图
+    cfg_ne = PLOT_CONFIGS["Verification_NE"]
+    plot_generic_metric(
+        metric_name="Verification_NE", 
+        y_label_latex=r'$\log_{10}(\|x(t) - x^*\|)$', 
+        calc_error_func=_calc_state_error,
+        theoretical_T=cfg_ne["theoretical_T"],
+        t_label=cfg_ne["t_label"],
+        line_color_rgb=cfg_ne["color"]
+    )
+
+    # 2. 一致性误差图
+    cfg_z = PLOT_CONFIGS["Verification_Z_Consensus"]
+    plot_generic_metric(
+        metric_name="Verification_Z_Consensus", 
+        y_label_latex=r'$\log_{10}(\|z - \mathbf{1}_N \otimes x\|)$', 
+        calc_error_func=_calc_consensus_error,
+        theoretical_T=cfg_z["theoretical_T"],
+        t_label=cfg_z["t_label"],
+        line_color_rgb=cfg_z["color"]
+    )
+
+    # 3. 梯度跟踪误差图
+    cfg_v = PLOT_CONFIGS["Verification_V_Gradient"]
+    plot_generic_metric(
+        metric_name="Verification_V_Gradient", 
+        y_label_latex=r'$\log_{10}(\|v - \mathbf{1}_N \otimes \nabla F(x)\|)$', 
+        calc_error_func=_calc_gradient_error,
+        theoretical_T=cfg_v["theoretical_T"],
+        t_label=cfg_v["t_label"],
+        line_color_rgb=cfg_v["color"]
+    )

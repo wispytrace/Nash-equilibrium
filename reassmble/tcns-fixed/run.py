@@ -13,6 +13,32 @@ import random
 np.random.seed(42)  # 确保每次运行的随机数相同
 # 1. 全局配置
 config = {
+    "r_a": {
+        "simulation_time": 40, # 总仿真时长 (秒)
+        "adjacency_matrix": [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config": {
+            "time_delta": 1e-4, # 初始步长
+            "model": "fixed4",
+            "record_interval": 50, # 每多少步记录一次数据
+            "record_flag": 1,
+            "model_config": {
+                "N": 5,
+                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                    'init_value': np.zeros((5, 1)),
+                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
+                },
+                'private': {
+                '0': { 'c1': 3, 'c2': 3, 'delta': 3, 'varphi':  3, 'sigma':  3,'eta':  3, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  3, 'c2': 3,'delta':  3,'varphi':  3, 'sigma':  3, 'eta':  3, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  3, 'c2': 3,'delta':  3,'varphi':  3, 'sigma':  3, 'eta':  3, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  3, 'c2': 3,'delta':  3,'varphi':  3, 'sigma':  3, 'eta':  3, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  3, 'c2': 3,'delta':  3,'varphi':  3, 'sigma':  3, 'eta':  3, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
     "r_r": {
         "simulation_time": 50, # 总仿真时长 (秒)
         "adjacency_matrix": [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
@@ -39,9 +65,103 @@ config = {
             }
         }
     },
+
+    "r_r_d": {
+        "simulation_time": 40, # 总仿真时长 (秒)
+        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
+        "agent_config": {
+            "time_delta": 1e-3, # 初始步长
+            "model": "fixed4",
+            "record_interval": 50, # 每多少步记录一次数据
+            "record_flag": 1,
+            "model_config": {
+                "N": 5,
+                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                    'init_value': np.zeros((5, 1)),
+                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
+                },
+                'private': {
+                '0': { 'c1': 10, 'c2': 10, 'delta': 6, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
+
+    "r_r_dr": {
+        "simulation_time": 40, # 总仿真时长 (秒)
+        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
+        "agent_config": {
+            "time_delta": 1e-4, # 初始步长
+            "model": "fixed4",
+            "record_interval": 50, # 每多少步记录一次数据
+            "record_flag": 1,
+            "model_config": {
+                "N": 5,
+                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                    'init_value': np.zeros((5, 1)),
+                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
+                },
+                'private': {
+                '0': { 'c1': 10, 'c2': 10, 'delta': 6, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
+
+   "r_r1":
+    {
+        "simulation_time" : 40,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 1e-3,
+            "model": "fixed4",
+            "record_interval": 200,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                'init_value': np.array([[0.0], [0.0], [0.0], [0.0], [0.0]]),
+                'c': 18,
+                'a': 0.2,
+                'b': 2.5,
+                'l': 0,
+                'u': 8.0,
+                'p' : 0.5,
+                'q' : 1.5,
+                'min_c1': 40,
+                'min_delta': 2,
+                'gama': 30,
+                },
+
+                'private': {
+                '0': { 'c1': 0.5, 'c2': 0.5, 'delta': 2, 'varphi':  0.5, 'sigma':  0.5,'eta':  2, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  0.5, 'c2': 0.5,'delta':  2,'varphi':  0.5, 'sigma':  0.5, 'eta':  2, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  0.5, 'c2': 0.5,'delta':  2,'varphi':  0.5, 'sigma':  0.5, 'eta':  2, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  0.5, 'c2': 0.5,'delta':  2,'varphi':  0.5, 'sigma':  0.5, 'eta':  2, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  0.5, 'c2': 0.5,'delta':  2,'varphi':  0.5, 'sigma':  0.5, 'eta':  2, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
+
 }
 
-config_index = "r_r"
+config_index = "r_r_dr"
 num_agents = 5
 
 class CentralizedModel:
@@ -138,7 +258,7 @@ class CentralizedModel:
                     if self.sio.connected:
                         x_list = [agent.memory['x'] for agent in self.agntes]
                         x_matrix = np.array(x_list).reshape(self.num_agents, 1)
-                        NE_vector = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
+                        NE_vector = np.array([2.06, 31, 2.97, 3.42, 3.88]).reshape(-1, 1)
                         dist = np.linalg.norm(x_matrix - NE_vector)
                         
                         self.sio.emit('sim_data', {
@@ -218,7 +338,7 @@ class CentralizedModel:
 
         # 绘图
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.semilogy(time_steps, dist_to_NE, linewidth=1.5, color='blue', label='$\|x(t) - x^*\|$')
+        ax.plot(time_steps, np.log10(dist_to_NE), linewidth=1.5, color='blue', label='$\|x(t) - x^*\|$')
         ax.grid(True, which="both", ls="--", alpha=0.4)
         ax.set_xlabel('Time (s)')
         ax.set_ylabel('Distance to NE (Log Scale)')
@@ -308,8 +428,8 @@ if __name__ == "__main__":
     magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
 
     for i, magnitude in enumerate(magnitudes):
-        if i != 43:
-            continue
+        # if i != 43:
+        #     continue
         # 【修改】组合出全局唯一的 sim_id
         # 前端收到的是字符串，这样就不会冲突了
         unique_sim_id = f"{process_prefix}{i}"

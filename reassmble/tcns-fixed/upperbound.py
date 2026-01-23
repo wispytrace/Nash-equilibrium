@@ -36,11 +36,7 @@ def parameter_calculate():
     """
     N = 5
     scale = 0.10
-    adjacency_matrix = np.array([[0, 1, 0, 0, 1],
-                  [1, 0, 1, 0,0],
-                  [0, 1, 0, 1, 0],
-                  [0, 0, 1, 0, 1],
-                  [1, 0, 0, 1, 0]])
+    adjacency_matrix = np.array([[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]])
     
     D = np.diag(np.sum(adjacency_matrix, axis=1))
     L = D - adjacency_matrix
@@ -195,8 +191,8 @@ p = 0.85
 q = 1.15
 phic = 0.174
 
-delta = 8
-eta = 8
+delta = 6
+eta = 6
 
 C5 = delta*(1-c)/((1+c)**(1-p))
 C6 = eta*(1-c)/((1-c)**(1-q)) 
@@ -215,11 +211,11 @@ G2 = 2**((1+q)/2) * c2 / (6**((1+q)/2)) * (5*5)**((1-q)/2)
 T2 = 2/(G1*(1-p)) + 2/(G2*(q-1))
 print("Another upper bound on the convergence rate:", T2)
 
-chi1, chi2 = calculate_chi(20, 20, 0.85, 1.15, N=25)
+chi1, chi2 = calculate_chi(10, 10, 0.85, 1.15, N=25)
 chi1 = chi1 * (1/0.258)**((1-p)/(1+q))
 chi2 = chi2 * (1/0.258)**((2*q)/(1+q))
 print(f"Chi1: {chi1}, Chi2: {chi2}")
-T = 1/(chi1*0.04*(1-(1-p)/(1+q))) + 1/(chi2*0.04*((2*q)/(1+q)-1))
+T = 1/(chi1*0.085*(1-(1-p)/(1+q))) + 1/(chi2*0.085*((2*q)/(1+q)-1))
 print(T)
 
 

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import glob
 
 # ================= 配置区域 =================
-DATA_DIR_PATTERN = "./records/fixed4/r_r/sim_*/all_agents_trajectories.json"
+DATA_DIR_PATTERN = "./records/fixed4/r_r_d/sim_*/all_agents_trajectories.json"
 
 # 纳什均衡点
 NE_VECTOR = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
@@ -28,17 +28,17 @@ LINE_WIDTH = 1.5
 PLOT_CONFIGS = {
     "Verification_NE": {
         "theoretical_T": 8.2*2 + 13.988,  # 修改这里的数值
-        "t_label": '$T=30.39s$',            # 修改这里的标签
+        "t_label": '$T=33.26(s)$',            # 修改这里的标签
         "color": (1.0, 0.0, 0.0)          # 红色
     },
     "Verification_Z_Consensus": {
         "theoretical_T": 8.2,            # 修改这里的数值
-        "t_label": '$T_1=8.2s$',     # 修改这里的标签
+        "t_label": '$T_1=7.3(s)$',     # 修改这里的标签
         "color": (0.0, 0.6, 0.0)          # 绿色
     },
     "Verification_V_Gradient": {
-        "theoretical_T": 8.2*2,            # 修改这里的数值
-        "t_label": '$T_1+T_2=16.4s$',      # 修改这里的标签
+        "theoretical_T": 7.3*2,            # 修改这里的数值
+        "t_label": '$T_1+T_2=14.6(s)$',      # 修改这里的标签
         "color": (0.0, 0.0, 1.0)          # 蓝色
     }
 }

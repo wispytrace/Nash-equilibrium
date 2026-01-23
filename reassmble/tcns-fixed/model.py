@@ -27,7 +27,7 @@ class Model:
         self.memory_updation['v'][adj_agent_id] += (self.memory['v'][adj_agent_id] - memory['partial_cost'])
 
     def my_sign(self, value):
-        eplsilon = 1e-2
+        eplsilon = 5e-3
         value_fabs = np.fabs(value)
         return value/(value_fabs+eplsilon)
         
@@ -162,12 +162,35 @@ class Model:
         return cost
 
     def partial_cost(self):
-        delta = 1e-10
-        cost = self.cost_function()
-        self.memory['z'][self.agent_id] += delta
-        cost_hat = self.cost_function()
-        self.memory['z'][self.agent_id] -= delta
-        return (cost_hat - cost) / delta
+        #以此替换原本的差分计算逻辑
+        a = self.model_config['a']
+        b = self.model_config['b']
+        xr = self.model_config['r']
+        xi = self.memory['z'][self.agent_id]
+
+        # 1. 计算总和 Status Sum
+        status_sum = np.sum(self.memory['z'])
+            
+        # 2. 计算当前的价格 Pi (a * sum + b)
+        Pi = a * status_sum + b
+        
+        # 3. 计算解析梯度 (Analytical Gradient)
+        # 公式: 2*(xi - xr) + Pi + a*xi
+        # 解释: 
+        #   2*(xi - xr) 来自 (xi-xr)^2 的导数
+        #   Pi          来自 xi * Pi 对 xi 的直接导数
+        #   a * xi      来自 xi * Pi 对内部求和项中 xi 的链式法则导数
+        grad = 2 * (xi - xr) + Pi + a * xi
+
+        return grad
+
+    # def partial_cost(self):
+    #     delta = 1e-10
+    #     cost = self.cost_function()
+    #     self.memory['z'][self.agent_id] += delta
+    #     cost_hat = self.cost_function()
+    #     self.memory['z'][self.agent_id] -= delta
+    #     return (cost_hat - cost) / delta
 
     def update(self):
         self.memory_updation['x'] = self.status_update_function()
@@ -193,4 +216,3 @@ class Model:
         
         # 4. 返回范数供外部调整步长使用
         return update_norm
-

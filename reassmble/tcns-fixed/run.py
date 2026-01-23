@@ -65,20 +65,12 @@ config = {
             }
         }
     },
-<<<<<<< HEAD
 
     "r_r_d": {
         "simulation_time": 40, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 1e-3, # 初始步长
-=======
-    "r_r1": {
-        "simulation_time": 40, # 总仿真时长 (秒)
-        "adjacency_matrix": [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
-        "agent_config": {
-            "time_delta": 5e-4, # 初始步长
->>>>>>> 64f68f2d7735fadb024e47d5609e01d8f07def4d
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -88,7 +80,6 @@ config = {
                 'share': {
                     'init_value': np.zeros((5, 1)),
                     'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
-<<<<<<< HEAD
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
                 'private': {
@@ -97,21 +88,10 @@ config = {
                 '2': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
                 '3': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
                 '4': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
-=======
-                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 20,
-                },
-                'private': {
-                '0': { 'c1': 4, 'c2': 4, 'delta': 3, 'varphi':  4, 'sigma':  4,'eta':  3, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  4, 'c2': 4,'delta':  3,'varphi':  4, 'sigma':  4, 'eta':  3, 'epsilon': 0, 'r': 7.0},
->>>>>>> 64f68f2d7735fadb024e47d5609e01d8f07def4d
                 },
             }
         }
     },
-<<<<<<< HEAD
 
     "r_r_dr": {
         "simulation_time": 40, # 总仿真时长 (秒)
@@ -182,11 +162,6 @@ config = {
 }
 
 config_index = "r_r_dr"
-=======
-}
-
-config_index = "r_r1"
->>>>>>> 64f68f2d7735fadb024e47d5609e01d8f07def4d
 num_agents = 5
 
 class CentralizedModel:
@@ -453,14 +428,10 @@ if __name__ == "__main__":
     magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
 
     for i, magnitude in enumerate(magnitudes):
-<<<<<<< HEAD
         # if i != 43:
         #     continue
         # 【修改】组合出全局唯一的 sim_id
         # 前端收到的是字符串，这样就不会冲突了
-=======
-
->>>>>>> 64f68f2d7735fadb024e47d5609e01d8f07def4d
         unique_sim_id = f"{process_prefix}{i}"
 
         random_vec = np.random.randn(num_agents, 1) 

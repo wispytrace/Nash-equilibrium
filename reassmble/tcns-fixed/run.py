@@ -97,7 +97,7 @@ config = {
         "simulation_time": 40, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
-            "time_delta": 1e-4, # 初始步长
+            "time_delta": 1e-3, # 初始步长
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -322,7 +322,7 @@ class CentralizedModel:
         time_steps = np.array(centralized_data["time_steps"])
         
         # 定义 NE 点
-        NE_vector = np.array([2.06, 31, 2.97, 3.42, 3.88]).reshape(-1, 1)
+        NE_vector = np.array([2.06, 2.51, 2.97, 3.42, 3.88]).reshape(-1, 1)
 
         # 数据处理
         x_trajs_list = centralized_data["trajectories"]["x"]

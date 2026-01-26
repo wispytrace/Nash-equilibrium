@@ -70,7 +70,7 @@ config = {
         "simulation_time": 40, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
-            "time_delta": 1e-3, # 初始步长
+            "time_delta": 1e-4, # 初始步长
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -78,7 +78,7 @@ config = {
                 "N": 5,
                 "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
                 'share': {
-                    'init_value': np.zeros((5, 1)),
+                    'init_value': np.array([[4.5], [3.5], [2.5], [1.5], [1.0]]),
                     'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
@@ -93,11 +93,12 @@ config = {
         }
     },
 
+
     "r_r_dr": {
-        "simulation_time": 40, # 总仿真时长 (秒)
+        "simulation_time": 5, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
-            "time_delta": 1e-3, # 初始步长
+            "time_delta": 1e-4, # 初始步长
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -105,7 +106,7 @@ config = {
                 "N": 5,
                 "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
                 'share': {
-                    'init_value': np.zeros((5, 1)),
+                    'init_value': np.array([[4.5], [3.5], [2.5], [1.5], [1.0]]),
                     'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
@@ -115,6 +116,33 @@ config = {
                 '2': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
                 '3': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
                 '4': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
+                },
+            }
+        }
+    },
+
+    "r_r_dr1": {
+        "simulation_time": 5, # 总仿真时长 (秒)
+        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
+        "agent_config": {
+            "time_delta": 1e-4, # 初始步长
+            "model": "fixed4",
+            "record_interval": 50, # 每多少步记录一次数据
+            "record_flag": 1,
+            "model_config": {
+                "N": 5,
+                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
+                'share': {
+                    'init_value': np.array([[4.5], [3.5], [2.5], [1.5], [1.0]]),
+                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
+                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
+                },
+                'private': {
+                '0': { 'c1': 2, 'c2': 2, 'delta': 6, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
                 },
             }
         }
@@ -161,7 +189,7 @@ config = {
 
 }
 
-config_index = "r_r_dr"
+config_index = "r_r_dr1"
 num_agents = 5
 
 class CentralizedModel:
@@ -290,7 +318,8 @@ class CentralizedModel:
             "trajectories": {
                 "x": [[] for _ in range(self.num_agents)],
                 "z": [[] for _ in range(self.num_agents)],
-                "v": [[] for _ in range(self.num_agents)]
+                "v": [[] for _ in range(self.num_agents)],
+                "ui": [[] for _ in range(self.num_agents)]
             }
         }
 
@@ -304,6 +333,7 @@ class CentralizedModel:
                 centralized_data["trajectories"]["x"][i].append(entry['x'])
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
+                centralized_data["trajectories"]["ui"][i].append(entry['update_value'])
 
         save_path = self.get_save_path()
         file_path = os.path.join(save_path, "all_agents_trajectories.json")
@@ -391,8 +421,8 @@ class CentralizedModel:
         while self.current_sim_time < self.total_sim_time:
             # 获取当前这一步的 dt
             current_dt = self.agntes[0].time_delta
-            self.record()
             self.update()
+            self.record()
             self.current_sim_time += current_dt
 
             if self.sio:
@@ -410,41 +440,46 @@ class CentralizedModel:
         print(f"Sim {self.sim_id} Done. Steps: {self.counts}")
 
 
+def run_single_simulation():
+    centralized_system = CentralizedModel(num_agents=num_agents, sim_id="single_run_101")
+    centralized_system.run()
+
 if __name__ == "__main__":
+    run_single_simulation()
     # 初始化 Socket
-    sio = None
-    try:
-        sio.connect('http://localhost:5000')
-    except:
-        sio = None
+    # sio = None
+    # try:
+    #     sio.connect('http://localhost:5000')
+    # except:
+    #     sio = None
 
-    # 【新增】生成一个进程唯一的 ID 前缀
-    # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    import os
-    process_prefix = f"Proc{os.getpid()}_" 
-    print(f"Running with Process Prefix: {process_prefix}")
+    # # 【新增】生成一个进程唯一的 ID 前缀
+    # # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
+    # import os
+    # process_prefix = f"Proc{os.getpid()}_" 
+    # print(f"Running with Process Prefix: {process_prefix}")
 
-    TOTAL_SIMULATIONS = 100
-    magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
+    # TOTAL_SIMULATIONS = 100
+    # magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
 
-    for i, magnitude in enumerate(magnitudes):
-        # if i != 43:
-        #     continue
-        # 【修改】组合出全局唯一的 sim_id
-        # 前端收到的是字符串，这样就不会冲突了
-        unique_sim_id = f"{process_prefix}{i}"
+    # for i, magnitude in enumerate(magnitudes):
+    #     # if i != 43:
+    #     #     continue
+    #     # 【修改】组合出全局唯一的 sim_id
+    #     # 前端收到的是字符串，这样就不会冲突了
+    #     unique_sim_id = f"{process_prefix}{i}"
 
-        random_vec = np.random.randn(num_agents, 1) 
-        init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
+    #     random_vec = np.random.randn(num_agents, 1) 
+    #     init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
         
-        centralized_system = CentralizedModel(
-            num_agents=num_agents, 
-            sim_id=unique_sim_id,  # <--- 传入这个唯一 ID
-            init_value_override=init_value_large,
-            sio_client=sio
-        )
-        centralized_system.run()
+    #     centralized_system = CentralizedModel(
+    #         num_agents=num_agents, 
+    #         sim_id=unique_sim_id,  # <--- 传入这个唯一 ID
+    #         init_value_override=init_value_large,
+    #         sio_client=sio
+    #     )
+    #     centralized_system.run()
         
-        if sio: time.sleep(0.1)
+    #     if sio: time.sleep(0.1)
 
-    if sio: sio.disconnect()
+    # if sio: sio.disconnect()

@@ -191,27 +191,27 @@ p = 0.85
 q = 1.15
 phic = 0.174
 
-delta = 6
-eta = 6
+delta = 8
+eta = 8
 
-C5 = delta*(1-c)/((1+c)**(1-p))
-C6 = eta*(1-c)/((1-c)**(1-q)) 
+C5 = (8-c*8.2)/((1+c)**(1-p))*2**((1+p)/2)
+C6 = (8-c*8.2)/((1-c)**(1-q))*2**((1+q)/2)
 
 print(C5, C6, 1/((1+c)**(1-p)), c/((1-c)**(1-p)))
 T = 2/(C5*(1-p)) + 2/(C6*(q-1))
 print("Upper bound on the convergence rate:", T)
 parameter_calculate()
 
-c1 = 20
-c2 = 20
-lambda_min = 0.24
-G1 = 2**((1+p)/2) * c1 / (6**((1+p)/2))
-G2 = 2**((1+q)/2) * c2 / (6**((1+q)/2)) * (5*5)**((1-q)/2)
+# c1 = 20
+# c2 = 20
+# lambda_min = 0.24
+# G1 = 2**((1+p)/2) * c1 / (6**((1+p)/2))
+# G2 = 2**((1+q)/2) * c2 / (6**((1+q)/2)) * (5*5)**((1-q)/2)
 
-T2 = 2/(G1*(1-p)) + 2/(G2*(q-1))
-print("Another upper bound on the convergence rate:", T2)
+# T2 = 2/(G1*(1-p)) + 2/(G2*(q-1))
+# print("Another upper bound on the convergence rate:", T2)
 
-chi1, chi2 = calculate_chi(10, 10, 0.85, 1.15, N=25)
+chi1, chi2 = calculate_chi(50, 50, 0.85, 1.15, N=25)
 chi1 = chi1 * (1/0.258)**((1-p)/(1+q))
 chi2 = chi2 * (1/0.258)**((2*q)/(1+q))
 print(f"Chi1: {chi1}, Chi2: {chi2}")
@@ -244,3 +244,14 @@ print("-" * 40)
 print(f"C3           = {results['C3']:.6f}")
 print(f"C4           = {results['C4']:.6f}")
 print("-" * 40)
+
+
+x0 = 10**4+5.5
+s = np.sqrt(5)*x0
+print(s)
+s = 22472.978148874146
+gama = 8*(x0)**(p) + 8*x0* s**(0.15)
+print(gama)
+gama = 381918.33673941554
+epslion = 1.6*np.sqrt(5)*gama
+print(epslion)

@@ -26,25 +26,9 @@ class Model:
         self.memory_updation['v'] += (self.memory['v'] - memory['v'])
         self.memory_updation['v'][adj_agent_id] += (self.memory['v'][adj_agent_id] - memory['partial_cost'])
 
-    def power(self, value, a):
-        if len(value.shape) == 0:
-            if np.fabs(value) < 1e-3:
-                return 0
-            else:
-                return np.power(np.fabs(value), a) * self.my_sign(value)
-    
-        powered_value = np.zeros(value.shape)
-        for i in range(len(value)):
-            fabs_value = np.fabs(value[i])
-            if fabs_value < 1e-3:
-                powered_value[i] = 0
-            else:
-                powered_value[i] = np.power(np.fabs(value[i]),a) * self.my_sign(value[i])
-        
-        return powered_value
 
     def my_sign(self, value):
-        eplsilon = 5e-3
+        eplsilon = 5e-2
         value_fabs = np.fabs(value)
         
         return value/(value_fabs+eplsilon)
@@ -141,6 +125,31 @@ class Model:
             value_sum += min(max(value - lambda_star, self.model_config['l']), self.model_config['u'])
         return value_sum - c
         
+    # def status_update_function(self):
+    #     p = self.model_config['p']
+    #     q = self.model_config['q']
+    #     u = self.model_config['u']
+    #     l = self.model_config['l']
+    #     c = self.model_config['c']
+    #     delta = self.model_config['delta']
+    #     eta = self.model_config['eta']
+    #     x_i = self.memory['x']
+        
+    #     values = self.project()
+    #     base_value = -1*x_i + values[self.agent_id]
+
+    #     norm_value = np.linalg.norm(base_value)
+    #     norm_value = min(norm_value, 2*self.model_config['u']*np.sqrt(len(self.memory['z'])))
+    #     update_value = np.zeros(base_value.shape)
+    #     update_value += base_value* eta * np.power(norm_value, q-1)
+    #     if norm_value > 1e-6:
+    #         update_value += base_value* delta / np.power(norm_value, 1-p)
+
+    #     # update_value = update_value *(delta * np.power(norm_value, 1-p) + eta / (np.power(norm_value, 1-q)))
+    #     self.memory['update_value'] = update_value
+        
+    #     return update_value
+
     def status_update_function(self):
         p = self.model_config['p']
         q = self.model_config['q']
@@ -152,16 +161,13 @@ class Model:
         x_i = self.memory['x']
         
         values = self.project()
-        base_value = -1*x_i + values[self.agent_id]
+        update_value = -1*x_i + values[self.agent_id]
 
-        norm_value = np.linalg.norm(base_value)
-        norm_value = min(norm_value, 2*self.model_config['u']*np.sqrt(len(self.memory['z'])))
-        update_value = np.zeros(base_value.shape)
-        update_value += base_value* eta * np.power(norm_value, q-1)
-        if norm_value > 1e-6:
-            update_value += base_value* delta / np.power(norm_value, 1-p)
+               
+        norm_value = np.linalg.norm(values)
+        norm_value = min(max(norm_value, 1e-4), 2*self.model_config['u']*np.sqrt(len(self.memory['z'])))
 
-        # update_value = update_value *(delta * np.power(norm_value, 1-p) + eta / (np.power(norm_value, 1-q)))
+        update_value = update_value *(delta / np.power(norm_value, 1-p) + eta / (np.power(norm_value, 1-q)))
         self.memory['update_value'] = update_value
         
         return update_value

@@ -69,6 +69,7 @@ class DumpRecords:
         plt.xlabel('Time(s)', fontsize=15)
         plt.ylabel('Action', fontsize=15)
         plt.savefig(figure_dir + "/status.png")
+        print("save to", figure_dir + "/status.png")
 
     def plot_ui_graph(self, time, ui, figure_dir):
         plt.clf()
@@ -241,8 +242,8 @@ class DumpRecords:
         self.plot_status_graph(time, status_vector, opt_value, figure_dir)
         # self.plot_ui_graph(time[:-1], ui, figure_dir)
         # self.plot_estimation_graph(time, status_vector, estimate_vector, opt_value, figure_dir)
-        # self.plot_error_graph(time, status_vector, opt_value, figure_dir)
-        # self.plot_assemble_error_graph(time, status_vector, opt_value, figure_dir)
+        self.plot_error_graph(time, status_vector, opt_value, figure_dir)
+        self.plot_assemble_error_graph(time, status_vector, opt_value, figure_dir)
         # self.plot_assembl_estimate_graph(time, status_vector, estimate_vector, opt_value, figure_dir)
         # self.get_settle_result(time, opt_value, status_vector, abs_error, result_dir)
     

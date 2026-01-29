@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 # import socketio  # 新增
+import multiprocessing # 引入多进程库
 import random
 np.random.seed(42)  # 确保每次运行的随机数相同
 # 1. 全局配置
@@ -92,21 +93,11 @@ config = {
             }
         }
     },
-<<<<<<< HEAD
-
-
-    "r_r_dr": {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
-        "agent_config": {
-            "time_delta": 1e-4, # 初始步长
-=======
     "r_r_d1": {
-        "simulation_time": 5, # 总仿真时长 (秒)
+        "simulation_time": 4, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 5e-5, # 初始步长
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -119,58 +110,20 @@ config = {
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
                 'private': {
-                '0': { 'c1': 2, 'c2': 2, 'delta': 2, 'varphi':  2, 'sigma':  2,'eta':  2, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 7.0},
+                '0': { 'c1': 40, 'c2': 40, 'delta': 6.2, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  40, 'c2': 40,'delta':  6.2,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  40, 'c2': 40,'delta':  6.2,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  40, 'c2': 40,'delta':  6.2,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  40, 'c2': 40,'delta':  6.2,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
                 },
             }
         }
     },
-<<<<<<< HEAD
-
-    "r_r_dr1": {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
-        "agent_config": {
-            "time_delta": 1e-4, # 初始步长
-            "model": "fixed4",
-            "record_interval": 50, # 每多少步记录一次数据
-            "record_flag": 1,
-            "model_config": {
-                "N": 5,
-                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
-                'share': {
-                    'init_value': np.array([[4.5], [3.5], [2.5], [1.5], [1.0]]),
-                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
-                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
-                },
-                'private': {
-                '0': { 'c1': 2, 'c2': 2, 'delta': 6, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
-                },
-            }
-        }
-    },
-
-   "r_r1":
-    {
-        "simulation_time" : 40,
-        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
-        "agent_config":
-        {  
-            "time_delta": 1e-3,
-=======
     "r_r_d2": {
-        "simulation_time": 5, # 总仿真时长 (秒)
+        "simulation_time": 4, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 5e-5, # 初始步长
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -183,11 +136,11 @@ config = {
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
                 'private': {
-                '0': { 'c1': 40, 'c2': 40, 'delta': 2.1, 'varphi':  2, 'sigma':  2,'eta':  2, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  40, 'c2': 40,'delta':  2.1,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  40, 'c2': 40,'delta':  2.1,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  40, 'c2': 40,'delta':  2.1,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  40, 'c2': 40,'delta':  2.1,'varphi':  2, 'sigma':  2, 'eta':  2, 'epsilon': 0, 'r': 7.0},
+                '0': { 'c1': 10, 'c2': 10, 'delta': 6, 'varphi':  40, 'sigma':  40,'eta':  6.2, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  40, 'sigma':  40, 'eta':  6.2, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  40, 'sigma':  40, 'eta':  6.2, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  40, 'sigma':  40, 'eta':  6.2, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  10, 'c2': 10,'delta':  6,'varphi':  40, 'sigma':  40, 'eta':  6.2, 'epsilon': 0, 'r': 7.0},
                 },
             }
         }
@@ -209,11 +162,11 @@ config = {
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
                 },
                 'private': {
-                '0': { 'c1': 2, 'c2': 2, 'delta': 2, 'varphi':  2, 'sigma':  2,'eta':  2.1, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2.1, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2.1, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2.1, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  2, 'c2': 2,'delta':  2,'varphi':  2, 'sigma':  2, 'eta':  2.1, 'epsilon': 0, 'r': 7.0},
+                '0': { 'c1': 10, 'c2': 10, 'delta': 3, 'varphi':  10, 'sigma':  10,'eta':  3, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  10, 'c2': 10,'delta':  3,'varphi':  10, 'sigma':  10, 'eta':  3, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  10, 'c2': 10,'delta':  3,'varphi':  10, 'sigma':  10, 'eta':  3, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  10, 'c2': 10,'delta':  3,'varphi':  10, 'sigma':  10, 'eta':  3, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  10, 'c2': 10,'delta':  3,'varphi':  10, 'sigma':  10, 'eta':  3, 'epsilon': 0, 'r': 7.0},
                 },
             }
         }
@@ -235,18 +188,18 @@ config = {
                     'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 60,
                 },
                 'private': {
-                '0': { 'c1': 2, 'c2': 2, 'delta': 4, 'varphi':  2, 'sigma':  2,'eta':  4, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  2, 'c2': 2,'delta':  4,'varphi':  2, 'sigma':  2, 'eta':  4, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  2, 'c2': 2,'delta':  4,'varphi':  2, 'sigma':  2, 'eta':  4, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  2, 'c2': 2,'delta':  4,'varphi':  2, 'sigma':  2, 'eta':  4, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  2, 'c2': 2,'delta':  4,'varphi':  2, 'sigma':  2, 'eta':  4, 'epsilon': 0, 'r': 7.0},
+                '0': { 'c1': 10, 'c2': 10, 'delta': 12, 'varphi':  10, 'sigma':  10,'eta':  12, 'epsilon': 0, 'r':5.0},
+                '1': {'c1':  10, 'c2': 10,'delta':  12,'varphi':  10, 'sigma':  10, 'eta':  12, 'epsilon': 0, 'r': 5.5},
+                '2': {'c1':  10, 'c2': 10,'delta':  12,'varphi':  10, 'sigma':  10, 'eta':  12, 'epsilon': 0, 'r': 6.0},
+                '3': {'c1':  10, 'c2': 10,'delta':  12,'varphi':  10, 'sigma':  10, 'eta':  12, 'epsilon': 0, 'r': 6.5},
+                '4': {'c1':  10, 'c2': 10,'delta':  12,'varphi':  10, 'sigma':  10, 'eta':  12, 'epsilon': 0, 'r': 7.0},
                 },
             }
         }
     },
 
     "r_r_d5": {
-        "simulation_time": 5, # 总仿真时长 (秒)
+        "simulation_time": 20, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 10e-6, # 初始步长
@@ -273,11 +226,7 @@ config = {
     },
 }
 
-<<<<<<< HEAD
-config_index = "r_r_dr1"
-=======
-config_index = "r_r_d3"
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
+config_index = "r_r_d5"
 num_agents = 5
 
 class CentralizedModel:
@@ -406,12 +355,7 @@ class CentralizedModel:
             "trajectories": {
                 "x": [[] for _ in range(self.num_agents)],
                 "z": [[] for _ in range(self.num_agents)],
-                "v": [[] for _ in range(self.num_agents)],
-<<<<<<< HEAD
-                "ui": [[] for _ in range(self.num_agents)]
-=======
-                "u": [[] for _ in range(self.num_agents)]
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
+                "v": [[] for _ in range(self.num_agents)]
             }
         }
 
@@ -425,11 +369,6 @@ class CentralizedModel:
                 centralized_data["trajectories"]["x"][i].append(entry['x'])
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
-<<<<<<< HEAD
-                centralized_data["trajectories"]["ui"][i].append(entry['update_value'])
-=======
-                centralized_data["trajectories"]["u"][i].append(entry['update_value'])
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
 
         save_path = self.get_save_path()
         file_path = os.path.join(save_path, "all_agents_trajectories.json")
@@ -517,8 +456,8 @@ class CentralizedModel:
         while self.current_sim_time < self.total_sim_time:
             # 获取当前这一步的 dt
             current_dt = self.agntes[0].time_delta
-            self.update()
             self.record()
+            self.update()
             self.current_sim_time += current_dt
 
             if self.sio:
@@ -536,49 +475,70 @@ class CentralizedModel:
         print(f"Sim {self.sim_id} Done. Steps: {self.counts}")
 
 
-def run_single_simulation():
-    centralized_system = CentralizedModel(num_agents=num_agents, sim_id="single_run_101")
-    centralized_system.run()
+def simulation_worker(args):
+    """
+    args 是一个元组: (sim_id, init_value, enable_socket)
+    """
+    unique_sim_id, init_value, enable_socket = args
+    
+    # 每个进程内部创建自己的 SocketIO 客户端 (如果需要)
+    # 注意：如果跑 100 个进程同时连接 socketio，可能会把服务器搞崩。
+    # 建议大批量跑的时候 enable_socket 设置为 False
+    sio_client = None
+    if enable_socket:
+        try:
+            import socketio
+            sio_client = socketio.Client()
+            sio_client.connect('http://localhost:5000', wait_timeout=2)
+        except Exception as e:
+            # 连接失败就算了，不影响跑仿真
+            sio_client = None
+            
+    try:
+        model = CentralizedModel(
+            num_agents=num_agents, 
+            sim_id=unique_sim_id, 
+            init_value_override=init_value,
+            sio_client=sio_client
+        )
+        model.run()
+    except Exception as e:
+        print(f"Error in Sim {unique_sim_id}: {e}")
+    finally:
+        if sio_client and sio_client.connected:
+            sio_client.disconnect()
+
 
 if __name__ == "__main__":
-    run_single_simulation()
-<<<<<<< HEAD
-    # 初始化 Socket
-=======
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
-    # sio = None
-    # try:
-    #     sio.connect('http://localhost:5000')
-    # except:
-    #     sio = None
+    # 1. 准备全局参数
+    process_prefix = f"Batch_" 
+    print(f"Running Multi-Process Simulation...")
 
-    # # 【新增】生成一个进程唯一的 ID 前缀
-    # # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    # import os
-    # process_prefix = f"Proc{os.getpid()}_" 
-    # print(f"Running with Process Prefix: {process_prefix}")
-
-    # TOTAL_SIMULATIONS = 100
-    # magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
-
-    # for i, magnitude in enumerate(magnitudes):
-    #     # if i != 43:
-    #     #     continue
-    #     # 【修改】组合出全局唯一的 sim_id
-    #     # 前端收到的是字符串，这样就不会冲突了
-    #     unique_sim_id = f"{process_prefix}{i}"
-
-    #     random_vec = np.random.randn(num_agents, 1) 
-    #     init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
+    TOTAL_SIMULATIONS = 100
+    magnitudes = np.logspace(1, 4, TOTAL_SIMULATIONS)
+    
+    # 2. 预生成所有任务的参数列表 (在主进程生成随机数，保证确定性)
+    tasks = []
+    for i, magnitude in enumerate(magnitudes):
+        unique_sim_id = f"{process_prefix}{i}"
         
-    #     centralized_system = CentralizedModel(
-    #         num_agents=num_agents, 
-    #         sim_id=unique_sim_id,  # <--- 传入这个唯一 ID
-    #         init_value_override=init_value_large,
-    #         sio_client=sio
-    #     )
-    #     centralized_system.run()
+        random_vec = np.random.randn(num_agents, 1) 
+        init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
         
-    #     if sio: time.sleep(0.1)
+        # 参数: (ID, 初始值, 是否开启Socket)
+        # 建议设为 False，跑得更快
+        tasks.append((unique_sim_id, init_value_large, False)) 
 
-    # if sio: sio.disconnect()
+    # 3. 启动进程池
+    # cpu_count() 获取核心数，通常留一个核心给系统，或者用全部核心
+    core_num = max(1, multiprocessing.cpu_count() - 2) 
+    print(f"Using {core_num} CPU cores.")
+    
+    start_time = time.time()
+    
+    with multiprocessing.Pool(processes=core_num) as pool:
+        # map 会阻塞直到所有任务完成
+        pool.map(simulation_worker, tasks)
+        
+    end_time = time.time()
+    print(f"All {TOTAL_SIMULATIONS} simulations completed in {end_time - start_time:.2f} seconds.")

@@ -52,7 +52,7 @@
 # cd /app/ros2_ws/src/game
 # python3 ./utlis/main.py $config_name $config_index $draw_model
 
-config_index=p1
+config_index=r_1
 config_name="fixed2"
 draw_model="fixed"
 cd ros2_ws

@@ -92,21 +92,11 @@ config = {
             }
         }
     },
-<<<<<<< HEAD
-
-
-    "r_r_dr": {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
-        "agent_config": {
-            "time_delta": 1e-4, # 初始步长
-=======
     "r_r_d1": {
         "simulation_time": 5, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 5e-5, # 初始步长
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -128,49 +118,11 @@ config = {
             }
         }
     },
-<<<<<<< HEAD
-
-    "r_r_dr1": {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
-        "agent_config": {
-            "time_delta": 1e-4, # 初始步长
-            "model": "fixed4",
-            "record_interval": 50, # 每多少步记录一次数据
-            "record_flag": 1,
-            "model_config": {
-                "N": 5,
-                "memory": {"x": np.zeros((1)), "z": np.zeros((5)), "v": np.zeros((5))},
-                'share': {
-                    'init_value': np.array([[4.5], [3.5], [2.5], [1.5], [1.0]]),
-                    'c': 18, 'a': 0.2, 'b': 2.5, 'l': 0, 'u': 8.0,
-                    'p': 0.8, 'q': 1.2, 'min_c1': 40, 'min_delta': 2, 'gama': 40,
-                },
-                'private': {
-                '0': { 'c1': 2, 'c2': 2, 'delta': 6, 'varphi':  10, 'sigma':  10,'eta':  6, 'epsilon': 0, 'r':5.0},
-                '1': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 5.5},
-                '2': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.0},
-                '3': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 6.5},
-                '4': {'c1':  2, 'c2': 2,'delta':  6,'varphi':  10, 'sigma':  10, 'eta':  6, 'epsilon': 0, 'r': 7.0},
-                },
-            }
-        }
-    },
-
-   "r_r1":
-    {
-        "simulation_time" : 40,
-        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
-        "agent_config":
-        {  
-            "time_delta": 1e-3,
-=======
     "r_r_d2": {
         "simulation_time": 5, # 总仿真时长 (秒)
         "adjacency_matrix": [[0, 0, 0, 0, 1], [1, 0, 0, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], [0, 1, 1, 0, 0]],
         "agent_config": {
             "time_delta": 5e-5, # 初始步长
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
             "model": "fixed4",
             "record_interval": 50, # 每多少步记录一次数据
             "record_flag": 1,
@@ -273,11 +225,7 @@ config = {
     },
 }
 
-<<<<<<< HEAD
-config_index = "r_r_dr1"
-=======
 config_index = "r_r_d3"
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
 num_agents = 5
 
 class CentralizedModel:
@@ -407,11 +355,7 @@ class CentralizedModel:
                 "x": [[] for _ in range(self.num_agents)],
                 "z": [[] for _ in range(self.num_agents)],
                 "v": [[] for _ in range(self.num_agents)],
-<<<<<<< HEAD
-                "ui": [[] for _ in range(self.num_agents)]
-=======
                 "u": [[] for _ in range(self.num_agents)]
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
             }
         }
 
@@ -425,11 +369,7 @@ class CentralizedModel:
                 centralized_data["trajectories"]["x"][i].append(entry['x'])
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
-<<<<<<< HEAD
-                centralized_data["trajectories"]["ui"][i].append(entry['update_value'])
-=======
                 centralized_data["trajectories"]["u"][i].append(entry['update_value'])
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
 
         save_path = self.get_save_path()
         file_path = os.path.join(save_path, "all_agents_trajectories.json")
@@ -542,10 +482,7 @@ def run_single_simulation():
 
 if __name__ == "__main__":
     run_single_simulation()
-<<<<<<< HEAD
     # 初始化 Socket
-=======
->>>>>>> 1c6376247097e196c1dbbd35189594d5bdc06de6
     # sio = None
     # try:
     #     sio.connect('http://localhost:5000')

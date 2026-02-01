@@ -60,9 +60,57 @@ config = {
             }
         }
     },
+    "f2":
+    {
+        "simulation_time": 5, # 总仿真时长 (秒)
+        "epochs" : 300000,
+        "adjacency_matrix" : [[1, 1, 0, 0, 1], [1, 1, 1, 0, 0], [0, 1, 1, 1, 0], [0, 0, 1, 1, 1], [1, 0, 0, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 5e-4,
+            "model": "euler_constraint",
+            "record_interval": 50,
+            "record_flag": 1,
+            "model_config": 
+            {
+               
+                "N": 5,
+                "memory" : {"x": np.zeros((2)), "dot_x": np.zeros((2)), "y": np.full((2), 0), "z": np.zeros((5, 2)), "v": np.zeros((5, 2)), "gama": np.zeros((1))},
+                
+                'share': {
+                    "init_value_x": np.array([[-1, 1], [1, -1], [-1, 0], [1, 0], [1.5, 1.5]]),
+                    "init_value_dotx": np.array([[-2, -1], [-1, 2], [-2, 3], [1, 3], [2, 2]]),
+                    "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
+                                                  [1.41, 1.43, 1.45, 1.47, 1.5],
+                                                  [0.31, 0.33, 0.32, 0.34, 0.47],
+                                                  [1.78, 1.76, 1.74, 1.72, 1],
+                                                  [0.73, 0.76, 0.79, 0.72, 1]]).T,
+                    "pos": np.array([[-0.5, -0.5], [0.5, -0.5], [-0.5, 0], [0.5, 0], [0, 0.5]]),
+                    "eta_max": [2.7, 2.8, 1.9],
+                    "p": 0.65,
+                    "q": 1.35,
+                    "gama": 25,
+                    "lipsthitz": 1,
+                    "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
+                    "l": np.array([-2, -2]),
+                    "u": np.array([2, 2]),
+                    "c": np.array([0.4, 0.4]),
+                    "pos_c": np.array([0, 2.5])
+                },
+
+                'private': {
+                '0': { 'alpha': [10, 0, 10], 'beta':[10, 0, 10], 'eta': [1, 0, 1], 'h1': 2, 'h2': 2},
+                '1': { 'alpha': [10, 0, 10], 'beta':[10, 0, 10], 'eta': [1, 0, 1], 'h1': 2, 'h2': 2},
+                '2': { 'alpha': [10, 0, 10], 'beta':[10, 0, 10], 'eta': [1, 0, 1], 'h1': 2, 'h2': 2},
+                '3': { 'alpha': [10, 0, 10], 'beta':[10, 0, 10], 'eta': [1, 0, 1], 'h1': 2, 'h2': 2},
+                '4': { 'alpha': [10, 0, 10], 'beta':[10, 0, 10], 'eta': [1, 0, 1], 'h1': 2, 'h2': 2},
+                },
+            }
+        }
+    },
 }
 
-config_index = "f1"
+config_index = "f2"
 num_agents = 5
 
 class CentralizedModel:
@@ -297,7 +345,7 @@ if __name__ == "__main__":
     print(f"Running with Process Prefix: {process_prefix}")
 
     TOTAL_SIMULATIONS = 10
-    magnitudes = [5+i*10 for i in range(TOTAL_SIMULATIONS)]
+    magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
 
     for i, magnitude in enumerate(magnitudes):
         # if i != 43:

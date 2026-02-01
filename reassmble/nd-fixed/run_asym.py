@@ -299,7 +299,7 @@ if __name__ == "__main__":
     print(f"Running with Process Prefix: {process_prefix}")
 
     TOTAL_SIMULATIONS = 10
-    magnitudes = [5+i*10 for i in range(TOTAL_SIMULATIONS)]
+    magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
 
     for i, magnitude in enumerate(magnitudes):
         # if i != 43:

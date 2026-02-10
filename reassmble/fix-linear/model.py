@@ -11,12 +11,15 @@ class Model:
         self.memory = copy.deepcopy(self.model_config['memory'])
         self.time_delta = copy.deepcopy(model_config['time_delta'])
         self.initial_scale = self.model_config.get('initial_scale', 1.0)
+
+
         self.is_finite = self.model_config.get('is_finite', False)
         self.time = 0
         self.agent_id = self.model_config['agent_id']
         self.memory['x'] = copy.deepcopy(self.model_config['x0']) * self.initial_scale
-        self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
-        
+        # self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
+        # self.memory['x'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
+        self.memory['y'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
         self.reset_memroy_updation()
         self.topology_index = 0
         self.switching_time = 0

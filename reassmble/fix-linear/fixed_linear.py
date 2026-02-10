@@ -137,6 +137,7 @@ class DumpRecords:
         status_vector = self.align_list(memory['x'])
         virtual_vector = self.align_list(memory['y'])
         estiamte_vector = self.align_list(memory['z'])
+        partial_cost = self.align_list(memory['partial_cost'])
         valid_status_vector = []
         valid_speed_vector = []
         valid_acc_vector = []
@@ -171,7 +172,8 @@ class DumpRecords:
         # opt_value = virtual_vector[:, -1, :]
         plot_single_status_converge_graph(time, virtual_vector, figure_dir, file_name_prefix="virtual_state", ylabel="$\omega_{i}$",xlabel_list=["$\omega_1$", "$\omega_2$", "$\omega_3$", "$\omega_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
         plot_single_status_converge_graph(time, status_vector, figure_dir, file_name_prefix="state", ylabel="$y_i$",xlabel_list=["$y_1$", "$y_2$", "$y_3$", "$y_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
-        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$lg(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$log_10(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        plot_dos_estimate_norm_converge_graph(time, partial_cost, np.zeros(estiamte_vector.shape), figure_dir, file_name_prefix="partial_cost", ylabel="$log_10(||\\nabla_i\ f_i(\omega)||)$",xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
         get_convergencce_time(status_vector[:,:,0:1], opt_value=self.get_opt_value(), time_vector=time)
         # plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
 
@@ -199,7 +201,7 @@ class DumpRecords:
 
 if __name__ == "__main__":
     from config import config
-    index = "r_6"
+    index = "r_1"
     
     dumpRecords = DumpRecords(config[index], index)
     current_dir = os.path.dirname(os.path.realpath(__file__))

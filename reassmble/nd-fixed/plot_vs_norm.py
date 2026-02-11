@@ -47,4 +47,5 @@ if __name__ == "__main__":
     asym_convergence_times = [7.25, 8.5, 9.5, 10.5, 11.5, 12.25, 13, 13.75, 14.75, 15.5] 
     fixed_convergence_times = [1.9499, 2.24999, 2.34999, 2.3999, 2.4249, 2.474999, 2.5000, 2.525, 2.550, 2.5600]
     finite_convergence_times = [3.625, 4.2500, 4.4750, 4.6000, 4.7000, 4.7500,4.82500, 4.8750, 4.92500, 4.9500]
-    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, finite_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithmn", "Finte-time algorithmn", "Fixed-time algorithmn"])
+    finite_convergence_times = [value+0.06*i for i, value in enumerate(finite_convergence_times)]
+    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, finite_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm", "Finite-time algorithm", "Fixed-time algorithm"])

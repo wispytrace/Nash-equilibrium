@@ -9,6 +9,9 @@ print(a, type(a))
 b = json.loads(a)
 print(b, type(b))
 
+
+gama = 2.1*(2*np.sqrt(10)*2)**(0.65) + 2*2.1*(np.sqrt(10))*(13)**(0.35) + 2.1*2*np.sqrt(10)*2
+print(gama*np.sqrt(5)*0.59)
 # class Agent:
 #     def __init__(self,id,value) -> None:
 #         self.id = id

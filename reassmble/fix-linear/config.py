@@ -284,7 +284,7 @@ config["r_3"] = batch_modify_config(config["r_1"],
 
 config["r_4"] = batch_modify_config(config["r_1"],
     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
-    [[500, 0,0,0], [1, 0], 1, 1]
+    [[100, 0,0,0], [0.7, 0], 1, 1]
 )
 
 
@@ -492,8 +492,8 @@ def seek_optimal_dos(g1, epsilon, g2):
 if __name__ == "__main__":
     # Example usage
     index = "fixed_1"
-    try:
-        result = parameter_calculate(index)
-        print(f"Parameters for {index}: {result}")
-    except ValueError as e:
-        print(e)  # Handle the case where the index is not found
+    # try:
+    #     result = parameter_calculate(index)
+    #     print(f"Parameters for {index}: {result}")
+    # except ValueError as e:
+    #     print(e)  # Handle the case where the index is not found

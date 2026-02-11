@@ -20,6 +20,7 @@ class Model:
         # self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
         # self.memory['x'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
         self.memory['y'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
+        print(f"{self.agent_id}: init_value {self.memory['y']}")
         self.reset_memroy_updation()
         self.topology_index = 0
         self.switching_time = 0
@@ -132,7 +133,7 @@ class Model:
         A[1,1] = -1/TRi_hat
         A[1,2] = -1/(7.6*TGi)
         A[2,2] = -1/(TGi)
-        print("A:", A)
+        # print("A:", A)
         return np.matrix(A)
 
     def getInputMatrix(self):
@@ -146,19 +147,19 @@ class Model:
         B[0,0] = -1/(3.8*TGi)
         B[1,1]= 1/(7.6*TGi)
         B[2,2] = 1/(TGi)
-        print("B:", B)
+        # print("B:", B)
         return np.matrix(B)
 
     def getOutputMatrix(self):
         C = np.zeros((1, 3))
         C[0,0] = 1
-        print("C:", C)
+        # print("C:", C)
         return np.matrix(C)
 
     def getKiMatrix(self):
         K1 = np.array([1/self.B[0,0], 0, 0])
         K2 = np.linalg.inv(self.B)@self.A@self.B@K1
-        print("K1, K2:", K1, K2)
+        # print("K1, K2:", K1, K2)
         return np.matrix(K1), np.matrix(K2)
 
     # def getNormalMatrix(self):

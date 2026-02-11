@@ -262,7 +262,7 @@ if __name__ == "__main__":
     # run_single_simulation()
     # 【新增】生成一个进程唯一的 ID 前缀
     # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    config_list = ["r_1", "r_3", "r_4"]
+    config_list = ["r_4"]
     for i in range(len(config_list)):
         config_index = config_list[i]
         import os
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         print(f"Running with Process Prefix: {process_prefix}")
 
         TOTAL_SIMULATIONS = 10
-        magnitudes = [10+i*50 for i in range(TOTAL_SIMULATIONS)]
+        magnitudes = [20+i*200 for i in range(TOTAL_SIMULATIONS)]
 
         for i, magnitude in enumerate(magnitudes):
             # if i != 43:

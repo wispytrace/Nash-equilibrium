@@ -1,0 +1,11 @@
+Simulation,Status,Convergence_Time(s),File_Path
+sim_0,Converged,10.675000000001555,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_0/all_agents_trajectories.json
+sim_1,Converged,11.750000000002869,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_1/all_agents_trajectories.json
+sim_2,Converged,12.150000000003358,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_2/all_agents_trajectories.json
+sim_3,Converged,12.375000000003633,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_3/all_agents_trajectories.json
+sim_4,Converged,12.550000000003847,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_4/all_agents_trajectories.json
+sim_5,Converged,12.70000000000403,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_5/all_agents_trajectories.json
+sim_6,Converged,12.800000000004152,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_6/all_agents_trajectories.json
+sim_7,Converged,12.900000000004274,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_7/all_agents_trajectories.json
+sim_8,Converged,12.975000000004366,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_8/all_agents_trajectories.json
+sim_9,Converged,8.19999999999853,/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_9/all_agents_trajectories.json

@@ -8,13 +8,13 @@ import csv  # 新增：用于保存csv文件
 
 # ================= 配置区域 =================
 # DATA_DIR_PATTERN = "/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/nd-fixed/records/euler_constraint/f1/sim_*/all_agents_trajectories.json"
-DATA_DIR_PATTERN = "/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/fix-linear/records/fixed_linear/r_4/sim_*/all_agents_trajectories.json"
+DATA_DIR_PATTERN = "/app/reassmble/fix-linear/records/fixed_linear/r_4/sim_*/all_agents_trajectories.json"
 
 # 纳什均衡点
 NE_vector = np.array([5.748618334849947, 15.552539709004664, 25.35645648812881, 35.16037820240961]).reshape(-1, 1)
 
 # 收敛判定阈值
-CONVERGENCE_THRESHOLD = 5e-4 
+CONVERGENCE_THRESHOLD = 1e-4 
 
 # 输出结果的文件名
 RESULT_CSV_NAME = "convergence_times_fixed.csv"

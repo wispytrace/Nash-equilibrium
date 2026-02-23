@@ -262,7 +262,7 @@ if __name__ == "__main__":
     # run_single_simulation()
     # 【新增】生成一个进程唯一的 ID 前缀
     # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    config_list = ["r_4"]
+    config_list = ["r_1"]
     for i in range(len(config_list)):
         config_index = config_list[i]
         import os

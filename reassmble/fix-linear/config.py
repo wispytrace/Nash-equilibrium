@@ -91,7 +91,7 @@ config = {
         {  
             "time_delta": 5e-4,
             "model": "fixed_linear",
-            "record_interval": 50,
+            "record_interval": 10,
             "record_flag": 1,
             
             "model_config": 
@@ -116,7 +116,7 @@ config = {
                     "q": 1.25,
                     'alpha': [100, 100, 0, 0],
                     'beta':[1, 0.5],
-                    'tau': [1, 0.5],
+                    # 'tau': [1, 0.5],
                     'po': 5,
                     "a": 0.04
                 },
@@ -277,14 +277,20 @@ config["r_2"] = batch_modify_config(config["r_1"],
     ]
 )
 
+# config["r_3"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta"],
+#     [[100, 0,0,0], [1, 0]]
+# )
+
 config["r_3"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta"],
-    [[100, 0,0,0], [1, 0]]
+    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.q"],
+    [[100, 100, 0,0], [1, 0.5], 1]
 )
+
 
 config["r_4"] = batch_modify_config(config["r_1"],
     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
-    [[100, 0,0,0], [0.7, 0], 1, 1]
+    [[100, 0,0,0], [1, 0], 1, 1]
 )
 
 

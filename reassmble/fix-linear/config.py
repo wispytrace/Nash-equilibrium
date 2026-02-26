@@ -498,8 +498,8 @@ def seek_optimal_dos(g1, epsilon, g2):
 if __name__ == "__main__":
     # Example usage
     index = "fixed_1"
-    # try:
-    #     result = parameter_calculate(index)
-    #     print(f"Parameters for {index}: {result}")
-    # except ValueError as e:
-    #     print(e)  # Handle the case where the index is not found
+    try:
+        result = parameter_calculate(index)
+        print(f"Parameters for {index}: {result}")
+    except ValueError as e:
+        print(e)  # Handle the case where the index is not found

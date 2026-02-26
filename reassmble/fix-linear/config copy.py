@@ -211,7 +211,13 @@ def parameter_calculate(index):
 
     d1 = min(delta3, 2**(1/2-nu/2)*delta4)
     print(f"d1: {d1:.6f}")
+    
+    d2 = max(g1*2**(1/2-mu/2), g2, np.fabs(delta3)*2**(1/2-mu/2), np.fabs(delta4))
+    print(f"d2: {d2:.6f}")
 
+    v = d1 / (d1+d2)
+
+    print(f"v: {v:.6f}")
     
     rho1 = 2
     rho2 = 1

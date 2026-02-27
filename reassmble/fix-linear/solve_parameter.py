@@ -208,9 +208,9 @@ if __name__ == "__main__":
         'n':  4,    
         'mu': 0.85, 
         'nu': 1.15,
-        'theta': 2.200000/10, # 补充了公式下方出现的 theta
-        'phi': 2.040000/10,   # \varphi
-        'h_m': 2.081/10,
+        'theta': 2.200000/7, # 补充了公式下方出现的 theta
+        'phi': 2.040000/7,   # \varphi
+        'h_m': 2.081/7,
         'kappa': 0.92,
     }
 
@@ -224,7 +224,8 @@ if __name__ == "__main__":
     print(f"计算得到的 alpha1 = {alpha1:.4f}")
     print(f"计算得到的 alpha2 = {alpha2:.4f}")
 
-    rhod = optimal/ (optimal + final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)) +final_sigmas_2[1]) # 假设 rhod 是一个简单的函数，比如 (kappa * phi) / (kappa * phi + 1)
+    # rhod = optimal/ (optimal + final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)) +final_sigmas_2[1]) # 假设 rhod 是一个简单的函数，比如 (kappa * phi) / (kappa * phi + 1)
+    rhod = optimal/ (optimal + max(final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)), (2**(base_parameters['nu']/2-0.5))*final_sigmas_2[1])) # 假设 rhod 是一个简单的函数，比如 (kappa * phi) / (kappa * phi + 1)
     print(f"\n计算得到的 rhod = {rhod:.4f}")
     
     # 2. 设定你要达到的目标值 (假设你图片里 phi * varphi 算出来是某个具体的值，比如 2.5)

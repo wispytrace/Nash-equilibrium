@@ -531,46 +531,43 @@ def parameter_calculate(index):
     print(f"矩阵 M 的最小特征值: {min_eig_M:.6f}")
     print(f"矩阵 M 的最大特征值: {max_eig_M:.6f}")
     
-    rho1 = 0.003
-    rho2 = 0.003
-    rho3 = 0.003
-    rho4 = 0.003
-    rho5 = 0.003
-    rho6 = 0.003
-    rho7 = 0.003
+    rho1 = 0.006
+    rho2 = 0.004
+    rho3 = 0.008
+    rho4 = 0.01
 
     varepsilon = m_hat / 2
     beta1 = 3.5
     beta2 = 0.5
-    alpha1 = 220
+    alpha1 = 200
     alpha2 = 250
-    alpha3 = 1100
-    alpha4 = 1100
+    alpha3 = 320
+    alpha4 = 1200
 
-    p = 0.5
-    q = 1.2
+    p = 3/5
+    q = 9/7
 
-    rho1 = 0.006
-    rho2 = 0.005
-    rho3 = 0.01
-    rho4 = 0.02
+    # rho1 = 0.006
+    # rho2 = 0.005
+    # rho3 = 0.01
+    # rho4 = 0.02
 
-    c1 = np.sqrt(N)*beta1* 2 **(1-p) * (l_hat**p) * (min_eig_M**(-p)) * ((m*N)**(1-p))
+    c1 = beta1* 2 **(1-p) * (l_hat**p) * (min_eig_M**(-p)) * (N**(1-p/2)) * (m**(1/2-p/2)) 
     print(f"c1: {c1:.6f}")
-    c2 = np.sqrt(N)*beta2 * (min_eig_M**(-q)) * (2**(q-2)+2) * (q*l_hat**q*phi(m*N, q)+rho1**(1-q)*l_hat*phi(m, q-1))
+    c2 = np.sqrt(N)*beta2 * (min_eig_M**(-q)) * (2**(q-2)+2) * (q*l_hat**q + rho1**(1-q)*l_hat* (m**(1-q/2)))
     print(f"c2: {c2:.6f}")
-    c3 = np.sqrt(N)*(2**(q-2)+2)*rho1*l_hat*(q-1)*phi(m,q-1)* m**(q-1)
+    c3 = np.sqrt(N)*(2**(q-2)+2)*rho1*l_hat*(q-1)* m**(q/2-1/2)* (m**(1-q/2))
     print(f"c3: {c3:.6f}")
 
-    sigma1 = m_hat - h_m*(c1*rho3 + c2*rho4 + c3)/(2*np.sqrt(N)) - rho2*(c3+1)/2
+    sigma1 = m_hat - h_m*(c1*rho3 + c2*rho4 + c3)/(2*np.sqrt(N)) - rho2*(c3+np.sqrt(N))/2
     print(f"sigma1: {sigma1:.6f}")
     sigma2 = alpha1 - c1 - (c3+np.sqrt(N))/(4*rho2)
     print(f"sigma2: {sigma2:.6f}")
     sigma3 = alpha2 * (m*N)**(1/2 - q/2) - c2 - (c3+np.sqrt(N))/(4*rho3)
     print(f"sigma3: {sigma3:.6f}")
-    sigma4 = alpha3 - c1*h_m/(2*rho3) - (c3+np.sqrt(N))/(4*rho2)
+    sigma4 = alpha3 - c1*h_m/(2*rho3*np.sqrt(N)) - (c3+np.sqrt(N))/(4*rho2)
     print(f"sigma4: {sigma4:.6f}")
-    sigma5 = alpha4 * (m*N)**(1-q) - c2*h_m/(2*rho4) - (c3+np.sqrt(N))/(4*rho2)
+    sigma5 = alpha4 * (m*N)**(1-q) - c2*h_m/(2*rho4*np.sqrt(N)) - (c3+np.sqrt(N))/(4*rho2)
     print(f"sigma5: {sigma5:.6f}")
 
     # w1 = (2**(1-p))*(l_hat**(p))*(min_eig_M**(-p))*((m*N)**(1-p))

@@ -234,6 +234,90 @@ config = {
         }
     },
 
+    "c_1":
+    {
+        "epochs" : 100000,
+        "simulation_time": 50, # 总仿真时长 (秒)
+        "adjacency_matrix" : [[1, 1, 1, 1 ],
+                                [1, 1, 1, 1],
+                                [1, 1, 1, 1 ],
+                                [1, 1, 1, 1 ]], 
+        "agent_config":
+        {  
+            "time_delta": 5e-4,
+            "model": "fixed_linear",
+            "record_interval": 25,
+            "record_flag": 1,
+            
+            "model_config": 
+            {
+                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
+                "scale_dict": {},
+                "N": 4,
+
+                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
+                # "cost_scale": 0.1,
+                # "epsilon": 0.1,
+                "DoS_interval":{
+                    "1":[[0.3, 0.4], [10, 10.2], [26.1, 26.6]],
+
+                    "2":[[0.4, 0.5], [10.2, 10.5], [33, 33.2]],
+
+                    "3":[[0.5, 0.6], [11.5, 12], [33.2, 33.5]],
+
+                    "4":[[0.6, 0.7], [25, 25.3], [36.0, 36.5]],
+
+                    "5":[[0.7, 0.8], [25.3, 25.5], [40.5, 41.0]]
+                },
+
+                'share': {
+                    "p": 0.75,
+                    "q": 1.25,
+                    'alpha': [400, 400, 0, 0],
+                    'beta':[5, 1],
+                    # 'tau': [1, 0.5],
+                    'po': 5,
+                    "a": 0.04
+                },
+
+                'private': {
+                '0': { 
+                        'xi': 10,
+                        'parameters': np.array([1, 5, 0.2]),
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3],
+                        'x0': np.array([20, 10, 6]),
+                        'y0': np.array([10])
+                        },
+                '1': {
+                        'xi': 20,
+                        'parameters': np.array([1.2, 5, 0.2]),
+                        'gama': [0.85, 1.3],
+                        'ki': [4, 3],
+                        'x0': np.array([10, 8, 7]),
+                        'y0': np.array([12])
+                        },
+                '2': { 
+                        'xi': 30,
+                        'parameters':np.array([1.2, 4.8, 0.2]),
+                        'gama': [0.8, 1.3],
+                        'ki': [5, 4],
+                        'x0': np.array([12, 7, 2]),
+                        'y0': np.array([6])
+                        },
+                '3': { 
+                        'xi': 40,
+                        'parameters': np.array([1, 4.8, 0.21]),
+                        'gama': [0.75, 1.25],
+                        'ki': [3, 3],
+                        'x0': np.array([3, 6, 8]),
+                        'y0': np.array([8])
+                        },
+                },
+            }
+        }
+    },
+
 }
 
 

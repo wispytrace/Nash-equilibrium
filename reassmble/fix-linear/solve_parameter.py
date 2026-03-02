@@ -29,17 +29,17 @@ def calculate_sigmas_with_intermediates(rho, params):
     c1 = (N**(1 - mu/2)) * (n**(1 - mu)) * (2**(1 - mu)) * (theta**mu)
     
     # c2 = N^{1/2} * (2^{\nu - 2} + 2) * \nu * \theta^\nu
-    c2 = sqrt_N * (2**(nu - 2) + 2) * nu * (theta**nu)
+    c2 = sqrt_N * 1 * nu * (theta**nu)
     
     # max_val = \max\{1, n^{1 - \nu/2}\}
     # 使用 np.maximum 保证即使传入数组也能安全计算
-    max_val = np.maximum(1, n**(1 - nu/2)) 
+    max_val = 1
     
     # c3 = N^{1/2} * (2^{\nu - 2} + 2) * \theta * \max\{1, n^{1 - \nu/2}\}
-    c3 = sqrt_N * (2**(nu - 2) + 2) * theta * max_val
+    c3 = sqrt_N * 1 * theta * max_val * (n**(1 - nu/2))
     
     # c4 = N^{1/2} * n^{\nu - 1} * (2^{\nu - 2} + 2) * \theta * (\nu - 1) * \max\{1, n^{1 - \nu/2}\}
-    c4 = sqrt_N * (n**(nu - 1)) * (2**(nu - 2) + 2) * theta * (nu - 1) * max_val
+    c4 = sqrt_N * 1 * theta * (nu - 1) * max_val * (n**(1 - nu/2))
     
     # 保存中间变量，方便返回查看
     c_vars = {'c1': c1, 'c2': c2, 'c3': c3, 'c4': c4}
@@ -206,27 +206,41 @@ if __name__ == "__main__":
     base_parameters = {
         'N':  4, 
         'n':  4,    
-        'mu': 0.85, 
-        'nu': 1.15,
-        'theta': 2.200000/7, # 补充了公式下方出现的 theta
-        'phi': 2.040000/7,   # \varphi
-        'h_m': 2.081/7,
-        'kappa': 0.92,
+        'mu': 0.7, 
+        'nu': 1.3,
+        'theta': 2.200000/4, # 补充了公式下方出现的 theta
+        'phi': 2.040000/4,   # \varphi
+        'h_m': 2.081/4,
+        'kappa': 0.91
     }
+    beta1 = 5
+    beta2 = 1
 
     final_sigmas_1, optimal_rho_1 = calculate_delta(base_parameters)
     final_sigmas_2, optimal_rho_2 = calculate_eta(base_parameters)
     optimal = base_parameters['kappa'] * base_parameters['phi']
 
-    alpha1 = (final_sigmas_1[0] + optimal)*2/((2*0.267949)**(0.5+base_parameters['mu']/2)) # 这里的 0.267949 是 (sqrt(3)-1)/2 的近似值
+    alpha1 = beta1*(final_sigmas_1[0] + optimal)*2/((2*0.267949)**(0.5+base_parameters['mu']/2)) # 这里的 0.267949 是 (sqrt(3)-1)/2 的近似值
     b = (base_parameters['N']**2*(base_parameters['n']+1))**(1/2-base_parameters['nu']/2) * 2**((2*(1-base_parameters['nu']))/((base_parameters['nu']+1)**2))
-    alpha2 = (final_sigmas_1[1] + optimal)*2/((2*0.267949)**(0.5+base_parameters['nu']/2))/b
+    alpha2 = beta2*(final_sigmas_1[1] + optimal)*2/((2*0.267949)**(0.5+base_parameters['nu']/2))/b
     print(f"计算得到的 alpha1 = {alpha1:.4f}")
     print(f"计算得到的 alpha2 = {alpha2:.4f}")
 
     # rhod = optimal/ (optimal + final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)) +final_sigmas_2[1]) # 假设 rhod 是一个简单的函数，比如 (kappa * phi) / (kappa * phi + 1)
     rhod = optimal/ (optimal + max(final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)), (2**(base_parameters['nu']/2-0.5))*final_sigmas_2[1])) # 假设 rhod 是一个简单的函数，比如 (kappa * phi) / (kappa * phi + 1)
     print(f"\n计算得到的 rhod = {rhod:.4f}")
+
+
+    rhod_s = 0.1
+    vard_s = 0.5
+    d_s = max(final_sigmas_2[0]*(2**(0.5-base_parameters['mu']/2)), (2**(base_parameters['nu']/2-0.5))*final_sigmas_2[1]) / optimal
+    d1 = beta1*optimal
+    d2 = beta2*optimal*(2**(0.5-base_parameters['nu']/2))
+    print(d2)
+    T1 = (d_s+1)*vard_s + 2/(d1*(1-base_parameters['mu'])) + 2/(d2*(base_parameters['nu']-1))
+    print((d_s+1)*vard_s, 2/(d1*(1-base_parameters['mu'])), 2/(d2*(base_parameters['nu']-1)), d_s, (1-rhod_s*(d_s+1)))
+    T1 = T1 / (1-rhod_s*(d_s+1))
+    print(f"\n计算得到的 T1 = {T1:.4f}")
     
     # 2. 设定你要达到的目标值 (假设你图片里 phi * varphi 算出来是某个具体的值，比如 2.5)
     

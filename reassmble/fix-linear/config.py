@@ -236,17 +236,17 @@ config = {
 
     "c_1":
     {
-        "epochs" : 100000,
-        "simulation_time": 50, # 总仿真时长 (秒)
+        "epochs" : 250000,
+        "simulation_time": 30, # 总仿真时长 (秒)
         "adjacency_matrix" : [[1, 1, 1, 1 ],
                                 [1, 1, 1, 1],
                                 [1, 1, 1, 1 ],
                                 [1, 1, 1, 1 ]], 
         "agent_config":
         {  
-            "time_delta": 5e-4,
+            "time_delta": 2e-4,
             "model": "fixed_linear",
-            "record_interval": 25,
+            "record_interval": 10,
             "record_flag": 1,
             
             "model_config": 
@@ -259,22 +259,22 @@ config = {
                 # "cost_scale": 0.1,
                 # "epsilon": 0.1,
                 "DoS_interval":{
-                    "1":[[0.3, 0.4], [10, 10.2], [26.1, 26.6]],
+                    "1":[[0.2, 0.4], [8, 8.2], [16.1, 16.3]],
 
-                    "2":[[0.4, 0.5], [10.2, 10.5], [33, 33.2]],
+                    "2":[[0.4, 0.6], [9.2, 9.5], [17.1, 17.3]],
 
-                    "3":[[0.5, 0.6], [11.5, 12], [33.2, 33.5]],
+                    "3":[[1, 1.3], [14.0, 14.2], [18.1, 18.3]],
 
-                    "4":[[0.6, 0.7], [25, 25.3], [36.0, 36.5]],
+                    "4":[[1.3, 1.5], [14.2, 14.4], [19.1, 19.3]],
 
-                    "5":[[0.7, 0.8], [25.3, 25.5], [40.5, 41.0]]
+                    "5":[[2, 2.3], [14.4, 14.5], [20.1, 20.3]]
                 },
 
                 'share': {
-                    "p": 0.75,
-                    "q": 1.25,
-                    'alpha': [400, 400, 0, 0],
-                    'beta':[5, 1],
+                    "p": 0.7,
+                    "q": 1.3,
+                    'alpha': [300, 400, 0, 0],
+                    'beta':[3, 0.8],
                     # 'tau': [1, 0.5],
                     'po': 5,
                     "a": 0.04
@@ -377,6 +377,17 @@ config["r_4"] = batch_modify_config(config["r_1"],
     [[100, 0,0,0], [1, 0], 1, 1]
 )
 
+
+config["c_3"] = batch_modify_config(config["c_1"],
+    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.q"],
+    [[300, 400, 0,0], [3, 0.8], 1]
+)
+
+
+config["c_4"] = batch_modify_config(config["c_1"],
+    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
+    [[300, 0,0,0], [3, 0], 1, 1]
+)
 
 config["r_5"] = batch_modify_config(config["r_1"],
     ["agent_config.model_config.DoS_interval"],

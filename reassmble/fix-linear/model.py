@@ -68,10 +68,11 @@ class Model:
             self.memory_updation['z'] -= alpha[1]* self.get_estimate_update_value(self.memory, memory, q, adj_agent_id)
             self.memory_updation['z'] -= alpha[2]* self.get_estimate_update_value(self.memory, memory, 2*p-1, adj_agent_id)
             self.memory_updation['z'] -= alpha[3]* self.get_estimate_update_value(self.memory, memory, 2*q-1, adj_agent_id)
+            # self.memory_updation['z'] -= alpha[3]* self.get_estimate_update_value(self.memory, memory, 0, adj_agent_id)
 
     def power(self, value, a):
         if len(value.shape) == 0:
-            if np.fabs(value) < 1e-6:
+            if np.fabs(value) < 5.1e-6:
                 return 0
             else:
                 return np.power(np.fabs(value), a) * self.approximate_sign(value)
@@ -79,7 +80,7 @@ class Model:
         powered_value = np.zeros(value.shape)
         for i in range(len(value)):
             fabs_value = np.fabs(value[i])
-            if fabs_value < 1e-10:
+            if fabs_value < 5.1e-6:
                 powered_value[i] = 0
             else:
                 powered_value[i] = np.power(np.fabs(value[i]),a) * self.approximate_sign(value[i])
@@ -89,7 +90,7 @@ class Model:
     def sign(self, value):
         sign_value = np.zeros(value.shape)
         for i in range(len(value)):
-            if np.fabs(value[i]) < 1e-10:
+            if np.fabs(value[i]) < 5.1e-6:
                 sign_value[i] = 0
             else:
                 sign_value[i] = self.approximate_sign(value[i])
@@ -97,7 +98,7 @@ class Model:
         return sign_value
 
     def approximate_sign(self, value):
-        extra = 1e-2
+        extra = 5e-3
         value = value/(np.fabs(value)+extra)
         return value
     
@@ -205,7 +206,7 @@ class Model:
         cost = (action - xi)**2 + price*action
 
 
-        return cost
+        return cost/4
 
     def partial_cost(self):
         delta = 1e-4

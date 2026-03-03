@@ -515,7 +515,7 @@ def plot_single_status_converge_graph(
         time=time,
         status_vector=status_vector,
         dim=dim,
-        zoom_xlim=(0, 2),
+        zoom_xlim=(0, 4),
         zoom_loc='upper left'  # 可改为 'upper left' 等
     )
 
@@ -678,32 +678,32 @@ def plot_dos_estimate_norm_converge_graph(
             # 这里建议加个极小值防止 log(0) 报错，虽然你的数据可能不会
             norms[t] = np.log10(norm + 1e-16) 
 
-        # --- 第二步：对 43s 后的尾部进行修饰 ---
-        dt = 0.025
-        t_start = 40.5
-        t_target = 42.5
+        # # --- 第二步：对 43s 后的尾部进行修饰 ---
+        # dt = 0.025
+        # t_start = 40.5
+        # t_target = 42.5
         
-        # 计算对应的索引
-        idx_start = int(t_start / dt)   # 43s 对应的 index
-        idx_target = int(t_target / dt) # 45s 对应的 index
+        # # 计算对应的索引
+        # idx_start = int(t_start / dt)   # 43s 对应的 index
+        # idx_target = int(t_target / dt) # 45s 对应的 index
 
-        # 确保索引不越界
-        if idx_start < T and idx_target < T:
-            # 获取关键点的值
-            val_start = norms[idx_start]   # 起点值 (43s)
-            val_end = norms[idx_target]    # 终点目标值 (45s) - 即我们要渐进的值
+        # # 确保索引不越界
+        # if idx_start < T and idx_target < T:
+        #     # 获取关键点的值
+        #     val_start = norms[idx_start]   # 起点值 (43s)
+        #     val_end = norms[idx_target]    # 终点目标值 (45s) - 即我们要渐进的值
 
-            # 对 43s 之后的所有点应用“指数衰减”平滑
-            # 公式原理： y(t) = 目标值 + (起点值 - 目标值) * e^(-k * delta_time)
-            # k 控制衰减快慢，k越大，曲线越快接近目标值
-            decay_rate = 1.0  # 你可以调整这个值：1.0 较缓，3.0 较陡
+        #     # 对 43s 之后的所有点应用“指数衰减”平滑
+        #     # 公式原理： y(t) = 目标值 + (起点值 - 目标值) * e^(-k * delta_time)
+        #     # k 控制衰减快慢，k越大，曲线越快接近目标值
+        #     decay_rate = 1.0  # 你可以调整这个值：1.0 较缓，3.0 较陡
 
-            for t in range(idx_start, T):
-                # 计算从 43s 开始过去的时间
-                time_passed = (t - idx_start) * dt
+        #     for t in range(idx_start, T):
+        #         # 计算从 43s 开始过去的时间
+        #         time_passed = (t - idx_start) * dt
                 
-                # 应用平滑公式
-                norms[t] = val_end + (val_start - val_end) * np.exp(-decay_rate * time_passed)
+        #         # 应用平滑公式
+        #         norms[t] = val_end + (val_start - val_end) * np.exp(-decay_rate * time_passed)
 
         # --- 绘图 ---
         color = colors[i % len(colors)]
@@ -730,6 +730,67 @@ def plot_dos_estimate_norm_converge_graph(
     plt.close()
     print(f"Saved figure: {path}")
 
+
+
+def plot_dos_status_norm_converge_graph(
+    time,
+    status_vector,
+    figure_dir,
+    ylabel,
+    xlabel_list,
+    file_name_prefix=None,
+    n_cols=2,
+    dos_interval=None,
+):
+    os.makedirs(figure_dir, exist_ok=True)
+
+    is_draw_Dos = False
+    if dos_interval is not None:
+        for interval in dos_interval:
+            if is_draw_Dos is False:
+                plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2, label='DoS')
+                is_draw_Dos = True
+            else:
+                plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2)
+
+    status_vector = np.array(status_vector)
+    N, T, D = status_vector.shape
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    y_max = 0
+    is_first = True
+
+    for i in range(N):
+        norms = np.zeros(T)
+        
+        # --- 第一步：完整计算原始 norms ---
+        for t in range(T):
+            norm = np.linalg.norm(status_vector[i, t, :])
+            # 这里建议加个极小值防止 log(0) 报错，虽然你的数据可能不会
+            norms[t] = np.log10(norm + 1e-16) 
+        # --- 绘图 ---
+        color = colors[i % len(colors)]
+        plt.plot(time, norms, color=color, label=xlabel_list[i])
+        
+        if np.max(norms) > y_max:
+            y_max = np.max(norms)
+
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
+    plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
+    plt.xlim(left=0, right=time[-1])
+    plt.tight_layout()
+
+    # plt.ylim(0, top=y_max*1.5)
+    
+    # 保存图片
+    if file_name_prefix:
+        fname = f"{file_name_prefix}.png"
+    else:
+        fname = f"estimate.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
 
 
 def plot_value_converge_graph(

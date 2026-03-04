@@ -14,7 +14,7 @@ DATA_DIR_PATTERN = "/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/fix-linear
 NE_vector = np.array([5.748618334849947, 15.552539709004664, 25.35645648812881, 35.16037820240961]).reshape(-1, 1)
 
 # 收敛判定阈值
-CONVERGENCE_THRESHOLD = 1e-4 
+CONVERGENCE_THRESHOLD = 1e-3
 
 # 输出结果的文件名
 RESULT_CSV_NAME = "convergence_times_fixed.csv"
@@ -49,11 +49,11 @@ def find_convergence_time(time_steps, error_dist, threshold):
             if not is_converged:
                 is_converged = True
                 convergence_time = time_steps[i]
-        else:
-            # 如果当前点大于阈值，说明之前的收敛不稳定（反弹了），重置状态
-            if is_converged:
-                is_converged = False
-                convergence_time = None
+        # else:
+        #     # 如果当前点大于阈值，说明之前的收敛不稳定（反弹了），重置状态
+        #     if is_converged:
+        #         is_converged = False
+        #         convergence_time = None
                 
     return convergence_time if is_converged else None
 

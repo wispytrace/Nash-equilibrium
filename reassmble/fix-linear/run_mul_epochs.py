@@ -262,7 +262,7 @@ if __name__ == "__main__":
     # run_single_simulation()
     # 【新增】生成一个进程唯一的 ID 前缀
     # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    config_list = ["c_4"]
+    config_list = ["c_3"]
     for i in range(len(config_list)):
         config_index = config_list[i]
         import os
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         print(f"Running with Process Prefix: {process_prefix}")
 
         TOTAL_SIMULATIONS = 10
-        magnitudes = [20+i*200 for i in range(TOTAL_SIMULATIONS)]
+        magnitudes = [50+i*50 for i in range(TOTAL_SIMULATIONS)]
 
         for i, magnitude in enumerate(magnitudes):
             # if i != 43:
@@ -279,9 +279,9 @@ if __name__ == "__main__":
             # 前端收到的是字符串，这样就不会冲突了
             unique_sim_id = f"{process_prefix}{i}"
             
-            random_vec = [6.0, 5.0,2.0,7.0]
-            init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
-            # init_value_large = np.array(random_vec)
+            random_vec = [6.0+ magnitude, 5.0+ magnitude,2.0+ magnitude,7.0+ magnitude] 
+            # init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
+            init_value_large = np.array(random_vec)
             centralized_system = CentralizedModel(
                 num_agents=num_agents, 
                 sim_id=unique_sim_id,  # <--- 传入这个唯一 ID

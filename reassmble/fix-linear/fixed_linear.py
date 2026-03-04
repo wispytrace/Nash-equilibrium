@@ -112,7 +112,7 @@ class DumpRecords:
 
         plot_single_status_converge_graph(time, virtual_vector, figure_dir, file_name_prefix="virtual_state", ylabel="$\omega_{i}$",xlabel_list=["$\omega_1$", "$\omega_2$", "$\omega_3$", "$\omega_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
         plot_single_status_converge_graph(time, status_vector, figure_dir, file_name_prefix="state", ylabel="$y_i$",xlabel_list=["$y_1$", "$y_2$", "$y_3$", "$y_4$"], opt_label_list=["$y_1^*$", "$y_2^*$", "$y_3^*$", "$y_4^*$"])
-        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$log_10(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        plot_dos_estimate_norm_converge_graph(time, virtual_vector,  estiamte_vector, figure_dir, file_name_prefix="estimate_norm", ylabel="$log_{10}(||z_i$-$\omega||)$", xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
         
         partial_cost = np.zeros(virtual_vector.shape)
         print(partial_cost.shape, virtual_vector.shape)
@@ -121,12 +121,12 @@ class DumpRecords:
                 partial_cost_value = self.cal_partial_cost(virtual_vector[:,j,:].flatten())
                 # print(partial_cost_value)
                 partial_cost[:,j,0] = partial_cost_value
-        plot_dos_status_norm_converge_graph(time, partial_cost, figure_dir, file_name_prefix="partial_cost", ylabel="$log_10(||\\nabla_i\ f_i(\omega)||)$",xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
+        plot_dos_status_norm_converge_graph(time, partial_cost, figure_dir, file_name_prefix="partial_cost", ylabel="$log_{10}(||\\nabla_i\ f_i(\omega)||)$",xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"], dos_interval=dos_interval)
         get_convergencce_time(status_vector[:,:,0:1], opt_value=self.get_opt_value(), time_vector=time)
 
 if __name__ == "__main__":
     from config import config
-    index = "c_1"
+    index = "c_6"
     
     dumpRecords = DumpRecords(config[index], index)
     current_dir = os.path.dirname(os.path.realpath(__file__))

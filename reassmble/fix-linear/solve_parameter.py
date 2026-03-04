@@ -213,8 +213,8 @@ if __name__ == "__main__":
         'h_m': 2.081/4,
         'kappa': 0.91
     }
-    beta1 = 5
-    beta2 = 1
+    beta1 = 3
+    beta2 = 0.8
 
     final_sigmas_1, optimal_rho_1 = calculate_delta(base_parameters)
     final_sigmas_2, optimal_rho_2 = calculate_eta(base_parameters)

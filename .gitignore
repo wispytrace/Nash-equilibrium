@@ -9,3 +9,6 @@ ros2_ws/log/*
 
 reassmble/tcns-fixed/records
 reassmble/nd-fixed/records
+
+pdf_folder/pdf
+pdf_folder/images

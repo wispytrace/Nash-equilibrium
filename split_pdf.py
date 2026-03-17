@@ -44,7 +44,7 @@ def pdf_to_images(pdf_path, output_dir, zoom=2.0):
 # --- 测试运行 ---
 if __name__ == "__main__":
     # 请将下面两个路径替换为您自己的实际路径
-    source_pdf_file = "pdf_folder/pdf/25_Automatica_Resilient_fixed_time_distributed_Nash_equilibrium_seeking_algorithm__0228__ (4).pdf"  
+    source_pdf_file = "pdf_folder/25_Automatica_Resilient_fixed_time_distributed_Nash_equilibrium_seeking_algorithm__0228__.pdf"  
     output_image_folder = "pdf_folder/images"
     
     pdf_to_images(source_pdf_file, output_image_folder)

@@ -7,7 +7,6 @@ import json
 import time
 # 1. 配置参数
 
-
 # 2. 集中式算法框架
 class CentralizedModel:
     def __init__(self, num_agents, config_index):
@@ -103,29 +102,18 @@ class CentralizedModel:
 
     def run(self):
         for i in range(self.epochs):
-            # for agent in self.agntes:
-            #     if i > self.epochs * 0.2:
-            #         agent.time_delta = agent.model_config['time_delta']*10
-                # agent.memory['time'] = self.counts * self.agent_config['time_delta']
             self.update()
             self.record()
-            
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
                 print(f"status: {self.agntes[0].memory['y']}" )
 
             self.counts += 1
-
-            # action_values = []
-            # # 每个智能体返回的action value 是一个2x2的numpy 数组 如 [[1,2], [3,4]], 其中1和2表示更新后的x坐标和y坐标, 3 和 4 分别代表 更新后的 x轴速度 和y轴速度
-            # for i in range(num_agents):
-            #     action_values.append(self.agntes[i].get_action_value())
         self.done()
 
 
 if __name__ == "__main__":
     config_list = ["r_0"]
-    # config_index = "r_0"
     num_agents = 5
 
 # 3. 运行集中式算法

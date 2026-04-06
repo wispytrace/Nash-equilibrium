@@ -8,6 +8,7 @@ import scipy.special as sp
 from collections import defaultdict
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import sys
 
 plt.rcParams['figure.dpi'] = 600 
 plt.rcParams['lines.linewidth'] = 0.5
@@ -15,12 +16,208 @@ plt.rcParams['lines.linewidth'] = 0.5
 plt.rcParams.update({
     'font.size': 16,              # 根据需要设置适当的大小
 })
+
+config = {
+    "0":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.001,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+    "1":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.01,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+    "2":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.1,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+    "3":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.3,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+        "4":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.5,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+        "5":
+    {
+        "epochs" : 250000 ,
+        "adjacency_matrix" : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+        "agent_config":
+        {  
+            "time_delta": 4e-5,
+            "model": "fixed_switch",
+            "record_interval": 1,
+            "record_flag": 1,
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((1)), "z": np.zeros((5))},
+                'share': {
+                'mu' : 0.6,
+                'nu' : 1.4,
+                'epsilon': 0.7,
+                'a': 0.01,
+                'b': 0.125,
+                },
+
+                'private': {
+                '0': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.5},
+                '1': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.55},
+                '2': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.60},
+                '3': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.65},
+                '4': { 'alpha': 100, 'beta':50, 'delta': 10, 'eta': 2, 'r': 0.70},
+                },
+            }
+        }
+    },
+}
 class DumpRecords:
     charater = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
     
     def __init__(self, config, index) -> None:
         self.config = config
         self.index = index
+        print(self.config)
         self.agent_nums = self.config['agent_config']['model_config']['N']
     
     def read_records(self, model, index):
@@ -164,6 +361,70 @@ class DumpRecords:
     #     plt.savefig(figure_dir+"/assemble_estimation.jpeg".format(i+1))
 
 
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import os
+
+    # 将此方法添加到你的类中
+    def plot_3d_trajectory(self, status_vector, figure_dir, filename="3d_trajectory.png"):
+        """
+        绘制智能体的三维轨迹图
+        :param status_vector: 形状为 [N, time, 3] 的向量 (list 或 numpy array)
+        :param figure_dir: 图像保存目录
+        :param filename: 保存的文件名
+        """
+        # 确保输入是 numpy 数组以便于切片
+        status_vector = np.array(status_vector)
+        N = status_vector.shape[0]
+        
+        # 创建画布和 3D 坐标轴
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection='3d')
+        
+        # 定义颜色列表，与参考图对应（红、绿、蓝等）
+        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
+        
+        for i in range(N):
+            # 如果智能体数量超过颜色种类，循环使用颜色
+            color = colors[i % len(colors)]
+            
+            # 提取第 i 个智能体的 X, Y, Z 序列
+            print(status_vector.shape)
+            x = status_vector[i, :, 0]
+            y = status_vector[i, :, 1]
+            z = status_vector[i, :, 2]
+            
+            # 1. 绘制轨迹线
+            ax.plot(x, y, z, color=color, label=f'Agent {i+1}')
+            
+            # 2. 绘制起点和终点的散点 (圆点标记)
+            ax.scatter(x[0], y[0], z[0], color=color, marker='o')
+            ax.scatter(x[-1], y[-1], z[-1], color=color, marker='o')
+            
+            # 3. 添加起点和终点的坐标文本标签
+            # 格式化为保留两位小数，并稍微偏移一点位置防止和点重合
+            ax.text(x[0], y[0], z[0], f'({x[0]:.2f}, {y[0]:.2f}, {z[0]:.2f})', color=color)
+            ax.text(x[-1], y[-1], z[-1], f'({x[-1]:.2f}, {y[-1]:.2f}, {z[-1]:.2f})', color=color)
+
+        # 设置坐标轴标签
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        
+        # 添加图例
+        ax.legend()
+        
+        # 调整初始视角以获得更好的 3D 观感 (你可以根据需要修改 elev 和 azim 的值)
+        ax.view_init(elev=30, azim=-45)
+        
+        # 确保保存目录存在并保存图像
+        os.makedirs(figure_dir, exist_ok=True)
+        save_path = os.path.join(figure_dir, filename)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"三维轨迹图已保存至: {save_path}")
+
     def plot_graph(self):
         record_path = f"/app/records/{self.config['agent_config']['model']}/{self.index}"
         figure_dir = record_path + "/figure"
@@ -182,11 +443,19 @@ class DumpRecords:
         time = np.array(memory['time'][-1][:len(status_vector[0])])
                 
         
-        self.plot_matrix_graph(figure_dir)
+        # self.plot_matrix_graph(figure_dir)
         self.plot_status_graph(time, status_vector, status_vector, figure_dir, "Transient responses of Players 1-6", ytop=6)
         self.plot_assembl_estimate_graph(time, status_vector, estimate_vector, opt_value, figure_dir, 0.5)
 
         time = time[:len(cost[0])]
         self.plot_status_graph(time, cost, cost, figure_dir, "cost", "Cost Function",xlabel="f", ytop=400)
+        self.plot_3d_trajectory(status_vector, figure_dir, filename="agent_3d_trajectories.png")
         # self.plot_assembl_estimate_graph(time, estimate_vector, opt_value, figure_dir)
         # self.plot_estimation_graph(time, estimate_vector, opt_value, figure_dir)
+    
+
+if __name__=='__main__':
+    plot  = DumpRecords(config['2'], 2)
+    
+
+    plot.plot_graph()

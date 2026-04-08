@@ -4,14 +4,14 @@ import copy
 config = {
     "r_0":
     {
-        "epochs" : 200000,
-        "adjacency_matrix" : [[0, 1, 0, 1 ],
-                                [1, 0, 1, 0],
-                                [0, 1, 0, 1 ],
-                                [1, 0, 1, 0 ]], 
+        "epochs" : 20000,
+        "adjacency_matrix" : [[1, 1, 1, 1 ],
+                                [1, 1, 1, 1],
+                                [1, 1, 1, 1 ],
+                                [1, 1, 1, 1 ]], 
         "agent_config":
         {  
-            "time_delta": 1e-4,
+            "time_delta": 2e-4,
             "model": "jssc",
             "record_interval": 50,
             "record_flag": 1,
@@ -19,19 +19,18 @@ config = {
             "model_config": 
             {
                 "N": 5,
-                "memory" : {"x": np.zeros((1,3)), "y": np.zeros((1,3)), "z": np.zeros((4,3)), "vr": np.zeros((1,3))},
+                "memory" : {"x": np.zeros((3)), "y": np.zeros((3)), "z": np.zeros((4,3)), "vr": np.zeros((3))},
                 'share': {
-                    "p": 0.6,
-                    "q": 1.3,
-                    'alpha': [150, 250, 100, 100],
+                    "p": 0.7,
+                    "q": 1.2,
+                    'alpha': [700, 800, 100, 100],
                     'beta':[1, 0.5],
                     'ri': [12, 12, 10, 8],
                     'mu': 0.5,
                     'nu': 1.5,
-                    'pi': []
+                    'gama': 12,
                 },
             },
-            
         }
     },
 }

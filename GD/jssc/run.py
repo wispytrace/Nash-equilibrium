@@ -9,8 +9,9 @@ import time
 
 # 2. 集中式算法框架
 class CentralizedModel:
-    def __init__(self, num_agents, config_index):
+    def __init__(self, num_agents, config_index, init_value=None):
         self.num_agents = num_agents
+        self.init_value = init_value
         self.config_index = config_index
         self.config = config[self.config_index]
         self.agent_config = config[self.config_index]['agent_config']
@@ -43,6 +44,9 @@ class CentralizedModel:
             model_config = self.get_model_config(i)
             agent = Model(model_config)
             agents.append(agent)
+            if self.init_value is not None:
+                for key, value in self.init_value.items():
+                    agent.set_init_value(key, value[i])
         return agents
 
     def update(self):
@@ -106,7 +110,8 @@ class CentralizedModel:
             self.record()
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"status: {self.agntes[0].memory['y']}" )
+                print(f"status: {self.agntes[0].memory['vr']}" )
+                print(0.5*self.counts*self.agent_config['time_delta'])
 
             self.counts += 1
         self.done()
@@ -114,10 +119,12 @@ class CentralizedModel:
 
 if __name__ == "__main__":
     config_list = ["r_0"]
-    num_agents = 5
+    num_agents = 4
+    init_value = {"vr": [[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], "y": np.array([[0,4,0.5], [-4, 0 ,0.5], [0, -4, 0.5], [4, 0, 0.5]])}
 
 # 3. 运行集中式算法
     for config_index in config_list:
         print(f"Running configuration: {config_index}")
-        centralized_system = CentralizedModel(num_agents=num_agents, config_index=config_index)
+        
+        centralized_system = CentralizedModel(num_agents=num_agents, config_index=config_index, init_value=init_value)
         centralized_system.run()

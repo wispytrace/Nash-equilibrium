@@ -15,7 +15,6 @@ mpl.rcParams['figure.dpi'] = 600
 # mpl.rcParams['lines.linewidth'] = 1
 current_dir = os.path.dirname(os.path.abspath(__file__))
 font_path = os.path.join(current_dir, 'resource/font/Times New Roman.ttf')
-font_path = '/app/reassmble/Times New Roman.ttf'
 plt.rcParams['mathtext.fontset'] = 'stix'
 
 from matplotlib.font_manager import FontProperties, fontManager
@@ -24,6 +23,43 @@ prop = FontProperties(fname=font_path)
 mpl.rcParams['font.family'] = prop.get_name()
 fontManager.addfont(font_path)
 
+
+def align_list(irregular_list):
+    min_length = min(len(lst) for lst in irregular_list)
+    uniform_array = np.array([lst[:min_length] for lst in irregular_list])
+    return uniform_array
+
+def get_records_memory(record_path, agent_nums):
+    """
+    读取指定路径下的 agent 记录，并将其提取整合为 memory 字典。
+    
+    :param record_path: 记录文件所在的目录路径
+    :param agent_nums: agent 的数量 (N)
+    :return: 包含所有 agent 数据的 memory 字典
+    """
+    # 1. 读取记录 (对应原 read_records)
+    records = []
+    for i in range(agent_nums):
+        file_path = f'{record_path}/agent_{i}.txt'
+        with open(file_path, 'r', encoding='utf-8') as f:
+            record_str = f.read()
+            records.append(json.loads(record_str))
+            
+    # 2. 提取并整合记录 (对应原 extract_records)
+    memory = defaultdict(list)
+
+    for record in records:
+        vector = defaultdict(list)
+        for item in record:
+            for k, v in item.items():
+                vector[k].append(v)
+        
+        # 将当前 agent 的 vector 归集到全局 memory 中
+        for k, v in vector.items():
+            memory[k].append(v)
+
+    # 转换为普通 dict 返回（如果您后续严格需要 defaultdict，可以直接返回 memory）
+    return dict(memory)
 
 def plot_status_converge_graph(
     time,
@@ -164,9 +200,10 @@ def plot_status_graph(
                 max_y_value = np.max(y)
             color = colors[i % len(colors)]
             plt.plot(time, y, color=color, label=xlabel_list[i], linewidth=1.5)
-        plt.hlines(
-            0, xmin=time[0], xmax=time[-1],
-            colors='black', linestyles='dashed', linewidth=0.8)
+            
+        # plt.hlines(
+        #     0, xmin=time[0], xmax=time[-1],
+        #     colors='black', linestyles='dashed', linewidth=0.8)
         plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
         
         if ylabel_list is not None and len(ylabel_list) == D:
@@ -518,8 +555,7 @@ def plot_estimate_norm_converge_graph(
     print(f"Saved figure: {path}")
 
 
-    figure_dir,
-def plot_initial_convergence_line__graph(initial_values, convergence_times, xlable, legneds, figure_dir):
+def plot_initial_convergence_line_graph(initial_values, convergence_times, xlable, legneds, figure_dir):
     plt.clf()
     colors = list(mcolors.TABLEAU_COLORS.values())
     N = len(convergence_times)
@@ -553,3 +589,121 @@ def plot_initial_convergence_line__graph(initial_values, convergence_times, xlab
     plt.savefig(path)
     plt.close()
     print(f"Saved figure: {path}")
+
+
+def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x'):
+    """
+    status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
+    figure_dir: 保存图片的目录，MATLAB风格绘图
+    """
+    os.makedirs(figure_dir, exist_ok=True)
+    # MATLAB默认颜色序列
+    matlab_colors = [
+        '#0072BD',  # 蓝色
+        '#D95319',  # 橙色
+        '#EDB120',  # 黄色
+        '#7E2F8E',  # 紫色
+        '#77AC30',  # 绿色
+        '#4DBEEE',  # 淡蓝
+        '#A2142F',  # 红褐色
+    ]
+
+    status_vector = np.array(status_vector)
+    N = status_vector.shape[0]
+
+    # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
+    plt.figure(figsize=(10, 8))
+    ax = plt.subplot(111, projection='3d')
+
+    # 设置背景色为白色，MATLAB风格
+    ax.set_facecolor('white')
+    ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
+
+    # 绘制轨迹，使用MATLAB样式
+    for i in range(N):
+        x = status_vector[i, :, 0]
+        y = status_vector[i, :, 1]
+        z = status_vector[i, :, 2]
+        color = matlab_colors[i % len(matlab_colors)]
+        
+        # MATLAB风格的线条更粗
+        ax.plot(x, y, z,
+                color=color,
+                linestyle='-',
+                linewidth=2.0,
+                label=f'Player {i+1}')
+                
+        # 起点和终点标记，更像MATLAB的默认标记大小
+        ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
+        ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
+    
+    if p_center is not None:
+        ax.scatter(p_center[0], p_center[1], p_center[2], color=matlab_colors[-1], s=80, marker="*", label="Global target")
+
+    # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
+    ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=14, labelpad=10)
+    ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=14, labelpad=10)
+    ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=14, labelpad=15)  # z轴增加更多间距
+
+    # 轴刻度字体大小，MATLAB风格
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
+
+    # 设置轴边框颜色，MATLAB风格
+    ax.xaxis.pane.set_edgecolor('#D9D9D9')
+    ax.yaxis.pane.set_edgecolor('#D9D9D9')
+    ax.zaxis.pane.set_edgecolor('#D9D9D9')
+
+    # 设置坐标面板填充颜色为白色或透明
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+
+
+    # 坐标范围等比例+留白，MATLAB通常保持更均匀的空间分布
+    def set_equal_3d(ax, X, Y, Z, margin=0.1):
+        x_middle = 0.5*(np.max(X)+np.min(X))
+        y_middle = 0.5*(np.max(Y)+np.min(Y))
+        z_middle = 0.5*(np.max(Z)+np.min(Z))
+        max_range = 0.5*max(np.ptp(X), np.ptp(Y), np.ptp(Z)) * (1+margin)
+        ax.set_xlim(x_middle - max_range, x_middle + max_range)
+        ax.set_ylim(y_middle - max_range, y_middle + max_range)
+        ax.set_zlim(0, z_middle + max_range)
+
+    set_equal_3d(
+        ax,
+        status_vector[:, :, 0].flatten(),
+        status_vector[:, :, 1].flatten(),
+        status_vector[:, :, 2].flatten(),
+        margin=0.15
+    )
+
+    # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
+    ax.view_init(elev=30, azim=45)
+
+    # MATLAB风格图例
+    legend = ax.legend(
+        loc='best',
+        fontsize=12,
+        frameon=True,
+        framealpha=1.0,
+        edgecolor='k',
+        facecolor='white',
+        ncol=1
+    )
+
+    # 添加MATLAB风格的边框
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+
+    # 调整布局以确保标签可见
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+    
+    # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
+    plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
+                dpi=600, 
+                bbox_inches='tight',
+                pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+    plt.close()
+    print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
+

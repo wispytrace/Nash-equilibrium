@@ -61,6 +61,100 @@ def get_records_memory(record_path, agent_nums):
     # 转换为普通 dict 返回（如果您后续严格需要 defaultdict，可以直接返回 memory）
     return dict(memory)
 
+def plot_multi_dimension_status_converge_dynamic_graph(
+    time,
+    status_vector,
+    figure_dir,
+    opt_value,
+    y_title="x",
+    label_opt="x",
+    label = "x",
+    file_name_prefix="dynamic_convergence",
+):
+    os.makedirs(figure_dir, exist_ok=True)
+
+    status_vector = np.array(status_vector)
+    N, T, D = status_vector.shape
+
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    
+    for d in range(D):
+        plt.figure(figsize=(8, 5))
+        for i in range(N):
+            y = status_vector[i, :, d]
+            color = colors[i % len(colors)]
+            label_string = r'$%s_{%d%d}$' % (label, i+1, d+1)
+            opt_label_string = r'$%s_{%d%d}^{\star}$' % (label_opt, i+1, d+1)
+            plt.plot(time, y, color=color, label=label_string)
+            plt.plot(time, opt_value[i,:, d], color=color, linestyle='dashed', label=opt_label_string)
+                    
+        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+        y_title_string = r'$%s_{i%d}$' % (y_title, d+1)
+        plt.ylabel(y_title_string, fontsize=15, fontproperties=prop)
+
+        plt.legend(fontsize=12, loc='upper right', ncol=2)
+        plt.xlim(left=0, right=time[-1])
+        plt.tight_layout()
+
+        y_min = np.min(status_vector[:, :, d])
+        y_max = np.max(status_vector[:, :, d])
+        # 增加 30% 的顶部空间
+        padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
+        plt.ylim(y_min - padding * 0.1, y_max + padding)    
+
+        fname = f"{file_name_prefix}_dim{d+1}.png"
+        path = os.path.join(figure_dir, fname)
+        plt.savefig(path)
+        plt.close()
+        print(f"Saved figure: {path}")
+
+
+
+def plot_error_value_graph(
+    time,
+    status_vector,
+    target_vector,
+    figure_dir,
+    file_name_prefix='absolute_error',
+    ylabel_list=None,
+    y_title='||x - x*||',
+    xlim=None
+):
+    plt.figure(figsize=(8, 5))
+    os.makedirs(figure_dir, exist_ok=True)
+    status_vector = np.array(status_vector)
+    N, T, D = status_vector.shape[:3]
+    
+    colors = list(mcolors.TABLEAU_COLORS.values())
+
+    for i in range(N):
+        error_value = np.zeros(T)
+        for j in range(T):
+            error_value[j] = np.linalg.norm((status_vector[i, j, :] - target_vector[i, j, :]).flatten(), ord=2)
+
+        color = colors[i % len(colors)]
+        plt.plot(time, error_value, color=color, label=ylabel_list[i] if ylabel_list is not None else f"Player {i+1}", linewidth=1)
+        plt.hlines(
+        0, xmin=time[0], xmax=time[-1],
+        colors='black', linestyles='dashed', linewidth=0.8)
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    plt.ylabel(y_title, fontsize=15, fontproperties=prop)
+
+    plt.legend(fontsize=12, loc='upper right')
+    if xlim is not None:
+        plt.xlim(xlim)
+    else:
+        plt.xlim(left=0, right=time[-1])
+    plt.tight_layout()
+
+    fname = f"{file_name_prefix}.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
+
+
+
 def plot_status_converge_graph(
     time,
     status_vector,
@@ -104,65 +198,6 @@ def plot_status_converge_graph(
         plt.tight_layout()
         
         # 保存图片
-        if file_name_prefix:
-            fname = f"{file_name_prefix}_dim{d+1}.png"
-        else:
-            fname = f"status_dim{d+1}.png"
-        path = os.path.join(figure_dir, fname)
-        plt.savefig(path)
-        plt.close()
-        print(f"Saved figure: {path}")
-
-
-def plot_status_error_graph(
-    time,
-    status_vector,
-    figure_dir,
-    file_name_prefix=None,
-    var_name='x',
-    ylabel_list=None,
-    opt_value=None,
-    xlim=None
-):
-    os.makedirs(figure_dir, exist_ok=True)
-
-    status_vector = np.array(status_vector)
-    N, T, D = status_vector.shape
-
-    colors = list(mcolors.TABLEAU_COLORS.values())
-    max_y_value = -100
-    for d in range(D):
-        for i in range(N):
-            y = status_vector[i, :, d]
-            if opt_value is None:
-                final_value = y[-1]
-            else:
-                final_value = opt_value[i, d]
-            diff_trajectory = y - final_value
-            
-            color = colors[i % len(colors)]
-            if np.max(diff_trajectory) > max_y_value:
-                max_y_value = np.max(diff_trajectory)
-            plt.plot(time, diff_trajectory, color=color, label=f"Player {i+1}", linewidth=1.5)
-        plt.hlines(
-            0, xmin=time[0], xmax=time[-1],
-            colors='black', linestyles='dashed', linewidth=0.8)
-        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
-        
-        if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14)
-        else:
-            lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
-            plt.ylabel(lable_bottom, fontsize=15,  fontproperties=prop)
-            
-        plt.legend(fontsize=12, loc='upper right')
-        plt.ylim(top=np.fabs(max_y_value)*1.5)
-        if xlim is not None:
-            plt.xlim(xlim)
-        else:
-            plt.xlim(left=0, right=time[-1])
-        plt.tight_layout()
-
         if file_name_prefix:
             fname = f"{file_name_prefix}_dim{d+1}.png"
         else:

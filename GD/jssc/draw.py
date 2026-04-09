@@ -29,9 +29,10 @@ def plot_graph(memory, record_path):
     result_dir = record_path + "/result"
     
     status_vector = align_list(memory['vr'])
-    virtual_vector = align_list(memory['y'])
+    y_vector = align_list(memory['y'])
+    z_vector = align_list(memory['z'])
 
-    time = np.array(memory['time'][-1][:len(virtual_vector[0])])
+    time = np.array(memory['time'][-1][:len(y_vector[0])])
     # ui = self.align_list(memory['ui'])
 
 
@@ -48,27 +49,29 @@ def plot_graph(memory, record_path):
     # plot_status_error_graph(time, virtual_vector, figure_dir, ylabel_list=["$\omega_{i1} - y_{i1}^*$", "$\omega_{i2} - y_{i2}^*$", "$\omega_{i3} - y_{i3}^*$"], opt_value=opt_value)
     # plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='y', file_name_prefix='actual', opt_value=opt_value)
     # plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y')
-    plot_3d_trajectory_graph(status_vector, figure_dir, "virtual_status")
-    plot_status_graph(time, status_vector, figure_dir, "virtual_status", ylabel_list=["$y_{i1}$", "$y_{i2}$", "$y_{i3}$"], xlabel_list=["Player 1", "Player 2", "Player 3", "Player 4"])
+    opt_value = np.zeros(status_vector.shape)
+    for i in range(len(time)):
+        for j in range(status_vector.shape[0]):
+            opt_value[j, i, :] = np.array([2*np.cos(2*time[i] + j*np.pi/2)+np.cos(0.5*time[i]), 2*np.sin(2*time[i] + j*np.pi/2)+np.sin(0.5*time[i]), 0.5*time[i]])
+    
+    y_opt_value = np.zeros(y_vector.shape)
+    for i in range(len(time)):
+        for j in range(y_vector.shape[0]):
+            y_sum = 0
+            for k in range(y_vector.shape[0]):
+                y_sum += np.array([-4*np.sin(2*time[i] + k*np.pi/2), 4*np.cos(2*time[i] + k*np.pi/2), 0.5])
+            y_opt_value[j, i, :] = y_sum/y_vector.shape[0]
+    
+    z_opt_value = np.zeros(z_vector.shape)
+    for i in range(len(time)):
+        for j in range(z_vector.shape[0]):
+            z_opt_value[j, i, :] = status_vector[:, i, :]
+
+    # plot_3d_trajectory_graph(status_vector, figure_dir, "virtual_status")
+    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title='\omega', label_opt='\omega', label='\omega',file_name_prefix='virtual_status_convergence')
+    plot_error_value_graph(time, y_vector,y_opt_value, figure_dir, ylabel_list=[r"$y_1 - \bar{y}$", r"$y_2 - \bar{y}$", r"$y_3 - \bar{y}$", r"$y_4 - \bar{y}$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.5))
+    plot_error_value_graph(time, z_vector,z_opt_value, figure_dir, ylabel_list=[r"$z_1 - \omega$", r"$z_2 - \omega$", r"$z_3 - \omega$", r"$z_4 - \omega$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 1))
     # plot_status_graph(time, valid_speed_vector[2:, :], figure_dir, file_name_prefix="speed", ylabel_list=["$x_{i21}$", "$x_{i22}$", "$x_{i23}$"],xlabel_list=["Player 3", "Player 4", "Player 5", "Player 6"])
-    # plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
-
-    # self.plot_compared_graph(["3", "3_14", "3_15", "3_11", "3_12", "3_13"])
-    # self.plot_status_graph(time, virtual_vector, virtual_vector,figure_dir, "virtual_status", 'y')
-    # time = np.array(memory['time'][-1][:len(ui[0])])
-    # self.plot_status_graph(time, ui, ui,figure_dir, "ui", "u", "Control torque vector")
-    # self.plot_trajectory_graph(status_vector, figure_dir)
-    # print(self.index)
-    # self.plot_compared_graph(['3', '3_1', '3_2', '3_3'], )
-    # self.plot_status_graph(time, oi, oi,figure_dir, "oi", "oi", "Control torque vector")
-    # self.plot_status_graph(time, track_error, track_error,figure_dir, "track_error", "track_error", "Control torque vector")
-    # self.plot_status_graph(time, dot_track_error, dot_track_error,figure_dir, "dot_track_error", "dot_track_error", "Control torque vector")
-    # self.plot_status_graph(time, dot_y, dot_y,figure_dir, "dot_y", "dot_y", "Control torque vector")
-
-    # time = np.array(memory['time'][-1][:len(dot_x[0])])
-    # self.plot_status_graph(time, dot_x, dot_x,figure_dir, "dot_x", "dot_x", "Control torque vector")
-
-    # self.plot_status_graph(time, partial_cost, partial_cost,figure_dir, "partial_cost", "partial_cost", "Control torque vector")
 
 
 

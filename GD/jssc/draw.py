@@ -31,7 +31,7 @@ def plot_graph(memory, record_path):
     status_vector = align_list(memory['vr'])
     y_vector = align_list(memory['y'])
     z_vector = align_list(memory['z'])
-
+    x_vector = align_list(memory['x'])
     time = np.array(memory['time'][-1][:len(y_vector[0])])
     # ui = self.align_list(memory['ui'])
 
@@ -67,8 +67,9 @@ def plot_graph(memory, record_path):
         for j in range(z_vector.shape[0]):
             z_opt_value[j, i, :] = status_vector[:, i, :]
 
-    # plot_3d_trajectory_graph(status_vector, figure_dir, "virtual_status")
+    plot_3d_trajectory_graph(x_vector, figure_dir, "status")
     plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title='\omega', label_opt='\omega', label='\omega',file_name_prefix='virtual_status_convergence')
+    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
     plot_error_value_graph(time, y_vector,y_opt_value, figure_dir, ylabel_list=[r"$y_1 - \bar{y}$", r"$y_2 - \bar{y}$", r"$y_3 - \bar{y}$", r"$y_4 - \bar{y}$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.5))
     plot_error_value_graph(time, z_vector,z_opt_value, figure_dir, ylabel_list=[r"$z_1 - \omega$", r"$z_2 - \omega$", r"$z_3 - \omega$", r"$z_4 - \omega$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 1))
     # plot_status_graph(time, valid_speed_vector[2:, :], figure_dir, file_name_prefix="speed", ylabel_list=["$x_{i21}$", "$x_{i22}$", "$x_{i23}$"],xlabel_list=["Player 3", "Player 4", "Player 5", "Player 6"])

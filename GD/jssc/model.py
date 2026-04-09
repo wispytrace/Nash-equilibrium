@@ -1,6 +1,41 @@
 import numpy as np
 import copy
 
+
+def g1(x):
+    """
+    计算 g1(x) = -0.5*x + 2 * [sin(x2), cos(x3), sin(x1)]^T
+    注意：索引从0开始，所以 x1=x[0], x2=x[1], x3=x[2]
+    """
+    x = np.asanyarray(x)
+    trig_part = np.array([np.sin(x[1]), np.cos(x[2]), np.sin(x[0])])
+    return -0.5 * x + 2 * trig_part
+
+def g2(x):
+    """
+    计算 g2(x) = -1.2*x + 0.8 * [sin(3*x2), cos(3*x3), sin(3*x1)]^T
+    """
+    x = np.asanyarray(x)
+    trig_part = np.array([np.sin(3 * x[1]), np.cos(3 * x[2]), np.sin(3 * x[0])])
+    return -1.2 * x + 0.8 * trig_part
+
+def g3(x):
+    """
+    计算 g3(x) = -0.2*x + 3.5 * [sin(0.5*x2), cos(0.5*x3), sin(0.5*x1)]^T
+    """
+    x = np.asanyarray(x)
+    trig_part = np.array([np.sin(0.5 * x[1]), np.cos(0.5 * x[2]), np.sin(0.5 * x[0])])
+    return -0.2 * x + 3.5 * trig_part
+
+def g4(x):
+    """
+    计算 g4(x) = -0.8*x + 1.5 * [sin(x2), cos(x3), sin(x1)]^T + [1, -1, 0.5]^T
+    """
+    x = np.asanyarray(x)
+    trig_part = np.array([np.sin(x[1]), np.cos(x[2]), np.sin(x[0])])
+    constant_part = np.array([1, -1, 0.5])
+    return -0.8 * x + 1.5 * trig_part + constant_part
+
 class Model:
     
     DESC = "High-order systems"
@@ -125,6 +160,21 @@ class Model:
         return cost
 
 
+    def status_updation(self):
+        gx_list = [g1, g2, g3, g4]
+        xi = self.memory['x']
+        ei = xi - self.memory['vr']
+        ris = copy.deepcopy(self.model_config['ri'])
+        for i in range(len(ris)):
+            ris[i] = self.agent_id + ris[i]
+        mu = self.model_config['mu']
+        nu = self.model_config['nu']
+        ui = -ris[0] * self.power(ei, mu) - ris[1]*self.power(ei, nu) - ris[2]*ei - ris[3]*self.sign(ei)
+        gi = gx_list[self.agent_id](xi)
+        update_value = ui + gi
+        return update_value
+
+
     def partial_cost(self):
         """
         使用解析解 (Analytical Gradient) 直接计算梯度
@@ -155,6 +205,7 @@ class Model:
         self.memory_updation['vr'] = self.virtual_signal_update_function()
         self.memory_updation['z'] = self.estimation_update_function()
         self.memory_updation['y'] = self.y_update_function()
+        self.memory_updation['x'] = self.status_updation()
 
         for k in self.memory.keys():
             if k in self.memory_updation.keys():

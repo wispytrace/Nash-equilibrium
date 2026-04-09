@@ -110,7 +110,7 @@ class CentralizedModel:
             self.record()
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"status: {self.agntes[0].memory['vr']}" )
+                print(f"status: {self.agntes[0].memory['x']}" )
                 print(0.5*self.counts*self.agent_config['time_delta'])
 
             self.counts += 1
@@ -120,7 +120,7 @@ class CentralizedModel:
 if __name__ == "__main__":
     config_list = ["r_0"]
     num_agents = 4
-    init_value = {"vr": [[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], "y": np.array([[0,4,0.5], [-4, 0 ,0.5], [0, -4, 0.5], [4, 0, 0.5]])}
+    init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "y": np.array([[0,4,0.5], [-4, 0 ,0.5], [0, -4, 0.5], [4, 0, 0.5]])}
 
 # 3. 运行集中式算法
     for config_index in config_list:

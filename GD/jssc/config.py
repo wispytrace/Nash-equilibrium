@@ -33,6 +33,38 @@ config = {
             },
         }
     },
+
+    "r_1":
+    {
+        "epochs" : 40000,
+        "adjacency_matrix" : [[1, 1, 1, 1 ],
+                                [1, 1, 1, 1],
+                                [1, 1, 1, 1 ],
+                                [1, 1, 1, 1 ]], 
+        "agent_config":
+        {  
+            "time_delta": 2e-4,
+            "model": "jssc",
+            "record_interval": 50,
+            "record_flag": 1,
+
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros((3)), "y": np.zeros((3)), "z": np.zeros((4,3)), "vr": np.zeros((3))},
+                'share': {
+                    "p": 1,
+                    "q": 1,
+                    'alpha': [700, 0, 100, 100],
+                    'beta':[1, 0],
+                    'ri': [4, 5, 6, 8],
+                    'mu': 1,
+                    'nu': 1,
+                    'gama': 4,
+                },
+            },
+        }
+    },
 }
 
 

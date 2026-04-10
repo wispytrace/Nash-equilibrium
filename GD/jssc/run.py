@@ -9,10 +9,11 @@ import time
 
 # 2. 集中式算法框架
 class CentralizedModel:
-    def __init__(self, num_agents, config_index, init_value=None):
+    def __init__(self, num_agents, config_index, init_value=None, simu_id=None):
         self.num_agents = num_agents
         self.init_value = init_value
         self.config_index = config_index
+        self.simu_id = simu_id
         self.config = config[self.config_index]
         self.agent_config = config[self.config_index]['agent_config']
         self.agntes = self.load_agents()
@@ -76,12 +77,19 @@ class CentralizedModel:
     def done(self):
         current_path = os.path.dirname(os.path.realpath(__file__))
         for i in range(self.num_agents):
-            record_path = current_path+f"/records/{self.config['agent_config']['model']}/" +config_index
+            # 基础路径
+            base_record_path = current_path + f"/records/{self.config['agent_config']['model']}/{self.config_index}"
+            
+            # 如果传入了 simu_id，则在配置目录下增加 simu_x 子目录
+            if self.simu_id is not None:
+                record_path = os.path.join(base_record_path, f"simu_{self.simu_id}")
+            else:
+                record_path = base_record_path
+                
             os.makedirs(record_path, exist_ok=True)
-            with open(record_path+"/"+f"agent_{i}.txt", "w") as f:
+            with open(record_path + "/" + f"agent_{i}.txt", "w") as f:
                 f.write(json.dumps(self.records[i]))
                 f.flush()
-
 
     def seconds_to_hms_string(self, seconds):
         hours, remainder = divmod(seconds, 3600)
@@ -117,14 +125,73 @@ class CentralizedModel:
         self.done()
 
 
+def run_batch_simulations(config_list, num_agents, init_values_list):
+    """
+    批量运行相同配置下的不同初始条件
+    """
+    for config_index in config_list:
+        print(f"========== Starting batch runs for configuration: {config_index} ==========")
+        
+        for simu_id, init_val in enumerate(init_values_list):
+            print(f"\n--- Running simulation {simu_id} ---")
+            
+            # 实例化系统，传入对应的 simu_id
+            centralized_system = CentralizedModel(
+                num_agents=num_agents, 
+                config_index=config_index, 
+                init_value=init_val,
+                simu_id=simu_id  # 传入 ID 用于创建对应的文件夹
+            )
+            
+            # 运行算法
+            centralized_system.run()
+            
+        print(f"========== Finished batch runs for configuration: {config_index} ==========\n")
+
+
+def run_single_simulation(config_index, num_agents, init_value):
+    print(f"Running single simulation for configuration: {config_index}")
+    
+    # 实例化系统
+    centralized_system = CentralizedModel(
+        num_agents=num_agents, 
+        config_index=config_index, 
+        init_value=init_value
+    )
+    
+    # 运行算法
+    centralized_system.run()
+
 if __name__ == "__main__":
-    config_list = ["r_0"]
+    config_list = ["r_1"]
     num_agents = 4
     init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "y": np.array([[0,4,0.5], [-4, 0 ,0.5], [0, -4, 0.5], [4, 0, 0.5]])}
+    # run_single_simulation(config_list[0], num_agents, init_value)
 
-# 3. 运行集中式算法
-    for config_index in config_list:
-        print(f"Running configuration: {config_index}")
+# 设定 8 种不同的初始幅度大小（从小到大，测试算法对极大初始偏差的收敛鲁棒性）
+    amplitudes = [5, 25, 45, 65, 85, 105, 125, 145.0]
+    
+    # 设定智能体初始分布的基础方向矩阵（分布在四个象限）
+    base_position = np.array([
+        [ 1.0,  1.0, -0.5],
+        [-1.0,  1.0, -0.5],
+        [-1.0, -1.0, -0.5],
+        [ 1.0, -1.0, -0.5]
+    ], dtype=float)
+
+    init_values_list = []
+    
+    # 自动生成 8 组不同幅度的初始条件
+    for amp in amplitudes:
+        # 将基础方向乘以当前的幅度放大倍数
+        scaled_pos = base_position * amp
         
-        centralized_system = CentralizedModel(num_agents=num_agents, config_index=config_index, init_value=init_value)
-        centralized_system.run()
+        init_values_list.append({
+            "x": scaled_pos.copy(),
+            "vr": scaled_pos.copy(),
+            # y 的初始值保持不变（如果是静态博弈，这里其实写 np.zeros((4,3)) 也可以）
+            "y": np.array([[0, 4, 0.5], [-4, 0, 0.5], [0, -4, 0.5], [4, 0, 0.5]], dtype=float)
+        })
+        
+    # 调用批量运行函数
+    run_batch_simulations(config_list, num_agents, init_values_list)

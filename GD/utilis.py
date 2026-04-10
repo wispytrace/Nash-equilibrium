@@ -430,19 +430,21 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
 
 
-def get_convergencce_time(status_vectors, opt_value, time_vector, error=1e-4, result_dir="/app/records/compared/convergence_time"):
+def get_convergence_time(status_vectors, opt_value, time_vector, error=1e-4):
     status_vectors = np.array(status_vectors)
     N,T,D = status_vectors.shape
+    convergence_time = -1
     for i in range(T):
-        status_error = status_vectors[:,i,:]-opt_value
-        status_error = np.linalg.norm(status_error)
+        status_error = status_vectors[:,i,:]-opt_value[:,i,:]
+        status_error = np.linalg.norm(status_error.flatten(), ord=2)
         if i==T-1:
             print("last_error:", status_error)
         if status_error <= error:
             print("convergence time:", time_vector[i])
-            return time_vector[i]
+            convergence_time = time_vector[i]
+            break
     
-    return None
+    return convergence_time
 
 
 def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_name='x', labels=None, ylabel=None, file_name_prefix=None,

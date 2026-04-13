@@ -72,31 +72,35 @@ def plot_graph(memory, record_path):
                 y_sum += np.array([-4*np.sin(2*time[i] + k*np.pi/2), 4*np.cos(2*time[i] + k*np.pi/2), 0.5])
             y_opt_value[j, i, :] = y_sum/y_vector.shape[0]
     
+    pg_opt_value = np.zeros((y_vector.shape[1], y_vector.shape[2]))
+    for i in range(len(time)):
+        pg_opt_value[i, :] = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0.5*time[i]])
+
     z_opt_value = np.zeros(z_vector.shape)
     for i in range(len(time)):
         for j in range(z_vector.shape[0]):
             z_opt_value[j, i, :] = status_vector[:, i, :]
 
-    plot_3d_trajectory_graph(x_vector, figure_dir, "status")
+    plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
     plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
     plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
     plot_error_value_graph(time, y_vector,y_opt_value, figure_dir, ylabel_list=[r"$y_1 - \bar{y}$", r"$y_2 - \bar{y}$", r"$y_3 - \bar{y}$", r"$y_4 - \bar{y}$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.5))
-    plot_error_value_graph(time, z_vector,z_opt_value, figure_dir, ylabel_list=[r"$z_1 - \omega$", r"$z_2 - \omega$", r"$z_3 - \omega$", r"$z_4 - \omega$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 1))
+    plot_error_value_graph(time, z_vector,z_opt_value, figure_dir, ylabel_list=[r"$z_1 - \omega$", r"$z_2 - \omega$", r"$z_3 - \omega$", r"$z_4 - \omega$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 0.5))
 
 
 if __name__ == "__main__":
     from config import config
-    config_list = [ "r_0", "r_1"]
+    config_list = [ "r_0"]
     # config_index = "r_0"
     model = "jssc"
     num_agents = 4
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     
-    # for config_index in config_list:
-    #     print(f"Running configuration: {config_index}")
-    #     record_path = record_root_path + config_index
-    #     memory = get_records_memory(record_path, num_agents)
-    #     plot_graph(memory, record_path)
+    for config_index in config_list:
+        print(f"Running configuration: {config_index}")
+        record_path = record_root_path + config_index
+        memory = get_records_memory(record_path, num_agents)
+        plot_graph(memory, record_path)
 
-    get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)
+    # get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)

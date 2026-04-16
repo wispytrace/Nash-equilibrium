@@ -109,7 +109,6 @@ def plot_multi_dimension_status_converge_dynamic_graph(
         print(f"Saved figure: {path}")
 
 
-
 def plot_error_value_graph(
     time,
     status_vector,
@@ -158,10 +157,11 @@ def plot_error_value_graph(
 def plot_status_converge_graph(
     time,
     status_vector,
+    opt_value,
     figure_dir,
     file_name_prefix=None,
     var_name='x',
-    ylabel_list=None,
+    ylabel=None,
 ):
     os.makedirs(figure_dir, exist_ok=True)
 
@@ -169,45 +169,35 @@ def plot_status_converge_graph(
     N, T, D = status_vector.shape
 
     colors = list(mcolors.TABLEAU_COLORS.values())
+
+    for i in range(N):
+        color = colors[i % len(colors)]
+        plt.plot(time, status_vector[i, :, :], color=color, label=f"${var_name}_{i+1}$")
+        plt.plot(time, opt_value[i, :, :], color=color, linestyle='dashed', label=f"${var_name}_{i+1}^*$")
+        
     
-    for d in range(D):
-        # plt.figure(figsize=(8, 5))
-        legends = []
-        for i in range(N):
-            y = status_vector[i, :, d]
-            color = colors[i % len(colors)]
-            plt.plot(time, y, color=color, label='$x_{i'+ str(i+1) + '}$')
-            
-            # 绘制收敛点虚线
-            plt.hlines(
-                y[-1], xmin=time[0], xmax=time[-1],
-                colors=color, linestyles='dashed', linewidth=1.2,
-                label='$x_{i'+ str(i+1) + '}^{\star}$'
-            )
-            legends.append(f"{var_name}_{i+1}")
-        
-        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
-        # y轴标题
-        if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14, fontproperties=prop)
-        else:
-            lable_bottom = "$x_{i" + str(d+1) + "}(m)$"
-            plt.ylabel(lable_bottom, fontsize=15, fontproperties=prop)
-        plt.legend(fontsize=12, loc='upper right')
-        plt.xlim(left=0, right=time[-1])
-        plt.tight_layout()
-        
-        # 保存图片
-        if file_name_prefix:
-            fname = f"{file_name_prefix}_dim{d+1}.png"
-        else:
-            fname = f"status_dim{d+1}.png"
-        path = os.path.join(figure_dir, fname)
-        plt.savefig(path)
-        plt.close()
-        print(f"Saved figure: {path}")
-
-
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    if ylabel is not None:
+        plt.ylabel(ylabel, fontsize=15, fontproperties=prop)
+    else:
+        plt.ylabel(f"${var_name}_i$", fontsize=15, fontproperties=prop)
+    
+    plt.legend(fontsize=12, loc='upper right', ncol=2)
+    plt.xlim(left=0, right=time[-1])
+    plt.tight_layout()
+    y_min = np.min(status_vector)
+    y_max = np.max(status_vector)
+    # 增加 30% 的顶部空间
+    padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
+    plt.ylim(y_min - padding * 0.1, y_max + padding)
+    if file_name_prefix:
+        fname = f"{file_name_prefix}.png"
+    else:
+        fname = f"status_convergence.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
 
 def plot_status_graph(
     time,
@@ -215,58 +205,188 @@ def plot_status_graph(
     figure_dir,
     file_name_prefix=None,
     var_name='x',
-    ylabel_list=None,
+    ylabel=None,
+    x_labels = None,
     xlim=None,
     ylim=None,
-    xlabel_list=None,
+    equilibrium_value=None,
 ):
     os.makedirs(figure_dir, exist_ok=True)
 
     status_vector = np.array(status_vector)
     N, T, D = status_vector.shape
-    if xlabel_list is None:
-        xlabel_list = [f"Player {i+1}" for i in range(N)]
     colors = list(mcolors.TABLEAU_COLORS.values())
-    max_y_value = -100
-    for d in range(D):
-        for i in range(N):
-            y = status_vector[i, :, d]
-            if np.max(y) > max_y_value:
-                max_y_value = np.max(y)
-            color = colors[i % len(colors)]
-            plt.plot(time, y, color=color, label=xlabel_list[i], linewidth=1.5)
-            
-        # plt.hlines(
-        #     0, xmin=time[0], xmax=time[-1],
-        #     colors='black', linestyles='dashed', linewidth=0.8)
-        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    for i in range(N):
+        color = colors[i % len(colors)]
+        if x_labels is None:
+            plt.plot(time, status_vector[i, :, :], color=color, label=f"${var_name}_{i+1}$")
+        else:
+            plt.plot(time, status_vector[i, :, :], color=color, label=x_labels[i])
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    if ylabel is not None:
+        plt.ylabel(ylabel, fontsize=15, fontproperties=prop)
+    else:
+        plt.ylabel(f"${var_name}_i$", fontsize=15, fontproperties=prop)
+    plt.legend(fontsize=12, loc='upper right')
+    if xlim is not None:
+        plt.xlim(xlim)
+    else:
+        plt.xlim(left=0, right=time[-1])
+    if ylim is not None:
+        plt.ylim(ylim)
+    if equilibrium_value is not None:
+        plt.hlines(
+        equilibrium_value, xmin=time[0], xmax=time[-1],
+        colors='black', linestyles='dashed', linewidth=0.8)
+    plt.tight_layout()
+    y_min = np.min(status_vector)
+    y_max = np.max(status_vector)
+    # 增加 30% 的顶部空间
+    padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
+    plt.ylim(y_min - padding * 0.1, y_max + padding)
+    if file_name_prefix:
+        fname = f"{file_name_prefix}.png"
+    else:
+        fname = f"status.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
+
+
+
+
+def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, file_tag="", p_center=None, var_name='x'):
+    """
+    status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
+    figure_dir: 保存图片的目录，MATLAB风格绘图
+    """
+    os.makedirs(figure_dir, exist_ok=True)
+    # MATLAB默认颜色序列
+    matlab_colors = [
+        '#0072BD',  # 蓝色
+        '#77AC30',  # 绿色
+        '#EDB120',  # 黄色
+        '#7E2F8E',  # 紫色
+        '#D95319',  # 橙色
+        '#77AC30',  # 绿色
+        '#4DBEEE',  # 淡蓝
+        "#FC0733",  # 红褐色
+    ]
+
+    status_vector = np.array(status_vector)
+    N = status_vector.shape[0]
+
+    # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
+    plt.figure(figsize=(16, 12))
+    ax = plt.subplot(111, projection='3d')
+
+    # 设置背景色为白色，MATLAB风格
+    ax.set_facecolor('white')
+    ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
+
+    # 绘制轨迹，使用MATLAB样式
+    for i in range(N):
+        x = status_vector[i, :, 0]
+        y = status_vector[i, :, 1]
+        z = status_vector[i, :, 2]
+        # z = np.zeros((status_vector.shape[1]))
+        color = matlab_colors[i % len(matlab_colors)]
         
-        if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14, fontproperties=prop)
-        else:
-            lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
-            plt.ylabel(lable_bottom, fontsize=15, fontproperties=prop)
-            
-        plt.legend(fontsize=12)
-        plt.ylim(top=np.fabs(max_y_value)*1.5)
-        if xlim is not None:
-            plt.xlim(xlim)
-        else:
-            plt.xlim(left=0, right=time[-1])
+        # MATLAB风格的线条更粗
+        ax.plot(x, y, z,
+                color=color,
+                linestyle='-',
+                linewidth=2.0,
+                label=f'Player {i+1}')
+                
+        # 起点和终点标记，更像MATLAB的默认标记大小
+        ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
+        ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
+    
+    px = global_target[:, 0]
+    py = global_target[:, 1]
+    pz = global_target[:, 2]
+    # pz = np.zeros((status_vector.shape[1]))
+    color = matlab_colors[-1]
+    ax.plot(px, py, pz, color=color, linestyle='--', linewidth=2.0, label="Global target")
 
-        if ylim is not None:
-            plt.ylim(ylim)
+    ax.scatter(px[0], py[0], pz[0], 
+            color=color,    # 边缘颜色（或者设为 'k' 黑色边框）
+            marker='o',          # 五角星形状
+            s=80,               # 尺寸调大一点
+            zorder=5)
 
-        plt.tight_layout()
+    # 2. 绘制【实心五角星】（作为终点）
+    # 关键设置: color=color 直接填充，edgecolors='k' 加一圈黑边增加立体感
+    ax.scatter(px[-1], py[-1], pz[-1], 
+            color=color,         # 内部实心填充
+            edgecolors='k',      # 黑色描边（与你的圆形/方形风格保持一致）
+            marker='*',          # 五角星形状
+            s=200,               # 尺寸调大一点
+            zorder=5)
 
-        if file_name_prefix:
-            fname = f"{file_name_prefix}_dim{d+1}.png"
-        else:
-            fname = f"status_dim{d+1}.png"
-        path = os.path.join(figure_dir, fname)
-        plt.savefig(path)
-        plt.close()
-        print(f"Saved figure: {path}")
+    # print("global target:", global_target[-1])
+    # print("individual target:", status_vector[:, -1, :])
+
+    ring_x = [status_vector[i, -1, 0] for i in range(N)]
+    ring_y = [status_vector[i, -1, 1] for i in range(N)]
+    ring_z = [status_vector[i, -1, 2] for i in range(N)]
+
+    # 为了让线条形成一个闭合的环 (Agent 1 -> 2 -> 3 -> 4 -> 1)
+    # 我们把第一个智能体的坐标再次加到列表末尾
+    ring_x.append(ring_x[0])
+    ring_y.append(ring_y[0])
+    ring_z.append(ring_z[0])
+
+    # 绘制这层“保护网”
+    ax.plot(ring_x, ring_y, ring_z, 
+            color='black',        # 使用灰色，高级且不喧宾夺主
+            linestyle='--',      # 虚线样式
+            linewidth=1.5,       # 线宽稍微细一点，作为辅助线
+            alpha=0.8,           # 增加透明度，体现出“虚拟拓扑连接”的质感
+            zorder=4)            # 图层放在点(5)下面，主线上面
+
+    # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
+    ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=16, labelpad=10)
+    ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=16, labelpad=10)
+    ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=16, labelpad=15)  # z轴增加更多间距
+
+    # 轴刻度字体大小，MATLAB风格
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
+
+    # 设置轴边框颜色，MATLAB风格
+    ax.xaxis.pane.set_edgecolor('#D9D9D9')
+    ax.yaxis.pane.set_edgecolor('#D9D9D9')
+    ax.zaxis.pane.set_edgecolor('#D9D9D9')
+
+    # 设置坐标面板填充颜色为白色或透明
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+
+
+
+    # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
+    ax.view_init(elev=25, azim=65)
+    # MATLAB风格图例
+
+    # 添加MATLAB风格的边框
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+
+    # 调整布局以确保标签可见
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+    plt.legend(fontsize=18)
+    # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
+    plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
+                dpi=600, 
+                bbox_inches='tight',
+                pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+
+    plt.close()
+    print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
 
 
 def plot_2d_trajectory_graph(status_vector, figure_dir):
@@ -628,115 +748,42 @@ def plot_initial_convergence_line_graph(initial_values, convergence_times, xlabl
     print(f"Saved figure: {path}")
 
 
-def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, file_tag="", p_center=None, var_name='x'):
-    """
-    status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
-    figure_dir: 保存图片的目录，MATLAB风格绘图
-    """
-    os.makedirs(figure_dir, exist_ok=True)
-    # MATLAB默认颜色序列
-    matlab_colors = [
-        '#0072BD',  # 蓝色
-        '#D95319',  # 橙色
-        '#EDB120',  # 黄色
-        '#7E2F8E',  # 紫色
-        '#77AC30',  # 绿色
-        '#4DBEEE',  # 淡蓝
-        '#A2142F',  # 红褐色
-    ]
 
-    status_vector = np.array(status_vector)
-    N = status_vector.shape[0]
-
-    # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
-    plt.figure(figsize=(10, 8))
-    ax = plt.subplot(111, projection='3d')
-
-    # 设置背景色为白色，MATLAB风格
-    ax.set_facecolor('white')
-    ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
-
-    # 绘制轨迹，使用MATLAB样式
+def plot_initial_convergence_line__graph(initial_values, convergence_times, xlable, legneds):
+    
+    plt.figure(figsize=(8, 4.5), dpi=300)
+    plt.clf()
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    N = len(convergence_times)
+    marker = ['o', 's', '^', 'D', 'v', '*', 'P', 'X', 'h', '8']
+    y_max = -1
     for i in range(N):
-        x = status_vector[i, :, 0]
-        y = status_vector[i, :, 1]
-        z = status_vector[i, :, 2]
-        color = matlab_colors[i % len(matlab_colors)]
-        
-        # MATLAB风格的线条更粗
-        ax.plot(x, y, z,
-                color=color,
-                linestyle='-',
-                linewidth=2.0,
-                label=f'Player {i+1}')
-                
-        # 起点和终点标记，更像MATLAB的默认标记大小
-        ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
-        ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
+        x = initial_values
+        y = convergence_times[i]
+        plt.plot(x, y, 
+                color=colors[i],           # 自定义颜色
+                linewidth=1,               # 线宽
+                linestyle='-',             # 线型: '-', '--', '-.', ':'
+                marker=marker[i],                # 标记点: 'o', 's', '^', 'v', 'D'等
+                markersize=8,              # 标记大小
+                # markerfacecolor='red',     # 标记填充色
+                markeredgecolor=colors[i],   # 标记边缘色
+                markeredgewidth=2,         # 标记边缘宽度
+                label=legneds[i]  # 图例标签
+                )
+        if np.max(y) > y_max:
+            y_max = np.max(y)
     
-    px = global_target[:, 0]
-    py = global_target[:, 1]
-    pz = global_target[:, 2]
-    color = matlab_colors[-1]
-    ax.scatter(px, py, pz, color=color, s=80, marker="*", label="Global target")
-
-    # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
-    ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=14, labelpad=10)
-    ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=14, labelpad=10)
-    ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=14, labelpad=15)  # z轴增加更多间距
-
-    # 轴刻度字体大小，MATLAB风格
-    ax.tick_params(axis='both', which='major', labelsize=12)
-    ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
-
-    # 设置轴边框颜色，MATLAB风格
-    ax.xaxis.pane.set_edgecolor('#D9D9D9')
-    ax.yaxis.pane.set_edgecolor('#D9D9D9')
-    ax.zaxis.pane.set_edgecolor('#D9D9D9')
-
-    # 设置坐标面板填充颜色为白色或透明
-    ax.xaxis.pane.fill = False
-    ax.yaxis.pane.fill = False
-    ax.zaxis.pane.fill = False
-
-
-    # 坐标范围等比例+留白，MATLAB通常保持更均匀的空间分布
-    def set_equal_3d(ax, X, Y, Z, margin=0.1):
-        x_middle = 0.5*(np.max(X)+np.min(X))
-        y_middle = 0.5*(np.max(Y)+np.min(Y))
-        z_middle = 0.5*(np.max(Z)+np.min(Z))
-        max_range = 0.5*max(np.ptp(X), np.ptp(Y), np.ptp(Z)) * (1+margin)
-        ax.set_xlim(x_middle - max_range, x_middle + max_range)
-        ax.set_ylim(y_middle - max_range, y_middle + max_range)
-        ax.set_zlim(0, z_middle + max_range)
-
-    set_equal_3d(
-        ax,
-        status_vector[:, :, 0].flatten(),
-        status_vector[:, :, 1].flatten(),
-        status_vector[:, :, 2].flatten(),
-        margin=0.15
-    )
-
-    # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
-    ax.view_init(elev=30, azim=45)
-
-    # MATLAB风格图例
-
-    # 添加MATLAB风格的边框
-    ax.spines['top'].set_visible(True)
-    ax.spines['right'].set_visible(True)
-
-    # 调整布局以确保标签可见
-    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-    
-    # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
-    plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
-                dpi=600, 
-                bbox_inches='tight',
-                pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+    plt.xlabel(xlable, fontsize=15)
+    plt.ylabel("Convergence Time(sec)", fontsize=15)
+    plt.legend(fontsize=12, loc='upper right')
+    plt.xlim(left=0, right=max(initial_values)*1.1)
+    plt.ylim(bottom=0, top=y_max*1.4)
+    plt.tight_layout()
+    path = "initial_convergence_time.png"
+    plt.savefig(path)
     plt.close()
-    print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
+    print(f"Saved figure: {path}")
 
 def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x'):
     """

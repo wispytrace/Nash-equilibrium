@@ -4,7 +4,7 @@ import copy
 config = {
     "r_0":
     {
-        "epochs" : 200000,
+        "epochs" : 30000,
         "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
                               [1, 0, 1, 0, 0],
                               [0, 1, 0, 1, 0],
@@ -20,15 +20,82 @@ config = {
             "model_config": 
             {
                 "N": 5,
-                "memory" : {"y": np.zeros(1), "z": np.zeros((5))},
+                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
                 'A': np.array([
                     
                 ]),
                 'share': {
-                    "p": 0.6,
-                    "q": 1.4,
-                    'alpha': [150, 250, 250, 200],
+                    "p": 0.8,
+                    "q": 1.2,
+                    'alpha': [150, 250, 520, 600],
                     'beta':[1, 0.5],
+                },
+            },
+            
+        }
+    },
+
+    "r_1":
+    {
+        "epochs" : 50000,
+        "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
+                              [1, 0, 1, 0, 0],
+                              [0, 1, 0, 1, 0],
+                              [0, 0, 1, 0, 1],
+                              [1, 0, 0, 1, 0]], 
+        "agent_config":
+        {  
+            "time_delta": 1e-4,
+            "model": "fixed_high_order",
+            "record_interval": 50,
+            "record_flag": 1,
+
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
+                'A': np.array([
+                    
+                ]),
+                'share': {
+                    "p": 0.8,
+                    "q": 0.5,
+                    'alpha': [500, 0, 0, 100],
+                    'beta':[5, 0.5],
+                },
+                'is_finite': True,
+            },
+            
+        }
+    },
+
+    "r_2":
+    {
+        "epochs" : 30000,
+        "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
+                              [1, 0, 1, 0, 0],
+                              [0, 1, 0, 1, 0],
+                              [0, 0, 1, 0, 1],
+                              [1, 0, 0, 1, 0]], 
+        "agent_config":
+        {  
+            "time_delta": 1e-4,
+            "model": "fixed_high_order",
+            "record_interval": 50,
+            "record_flag": 1,
+
+            "model_config": 
+            {
+                "N": 5,
+                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
+                'A': np.array([
+                    
+                ]),
+                'share': {
+                    "p": 1,
+                    "q": 1,
+                    'alpha': [150, 0, 0, 0],
+                    'beta':[1, 0],
                 },
             },
             

@@ -165,7 +165,7 @@ def run_single_simulation(config_index, num_agents, init_value):
 if __name__ == "__main__":
     config_list = ["r_0"]
     num_agents = 4
-    init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "y": np.array([[0,4,0.5], [-4, 0 ,0.5], [0, -4, 0.5], [4, 0, 0.5]])}
+    init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "y": np.array([[0,5.5,0.5], [-4, 1.5 ,0.5], [0, -3.5, 0.5], [4, 1.5, 0.5]])}
     run_single_simulation(config_list[0], num_agents, init_value)
 
 # 设定 8 种不同的初始幅度大小（从小到大，测试算法对极大初始偏差的收敛鲁棒性）

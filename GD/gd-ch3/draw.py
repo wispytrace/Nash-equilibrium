@@ -53,30 +53,18 @@ def plot_graph(memory, record_path):
     figure_dir = record_path + "/figure"
     result_dir = record_path + "/result"
     
-    status_vector = align_list(memory['vr'])
-    y_vector = align_list(memory['y'])
     z_vector = align_list(memory['z'])
     x_vector = align_list(memory['x'])
-    time = np.array(memory['time'][-1][:len(y_vector[0])])
+    partial_cost = align_list(memory['partial_cost'])
+    update_value = align_list(memory['update_value'])
+    time = np.array(memory['time'][-1][:len(x_vector[0])])
 
-    opt_value = np.zeros(status_vector.shape)
+    opt_value = np.zeros(x_vector.shape)
+    NE_point = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
     for i in range(len(time)):
-        for j in range(status_vector.shape[0]):
-            opt_value[j, i, :] = np.array([
-                3 * np.cos(0.5 * time[i]) + 2 * np.cos(2 * time[i] + j * np.pi / 2)-0.4, 
-                3 * np.sin(0.5 * time[i]) + 2 * np.sin(2 * time[i] + j * np.pi / 2)-0.4, 
-                0.5 * time[i]
-            ])
+        for j in range(x_vector.shape[0]):
+            opt_value[j, i, :] = NE_point[j]
     
-    y_opt_value = np.zeros(y_vector.shape)
-    for i in range(len(time)):
-        for j in range(y_vector.shape[0]):
-            y_sum = 0
-            for k in range(y_vector.shape[0]):
-                y_sum += np.array(y_vector[k, i, :])
-            y_opt_value[j, i, :] = y_sum/y_vector.shape[0]
- 
-
     # y_opt_value = np.zeros_like(y_vector)
     # N = y_vector.shape[0]
 
@@ -92,38 +80,32 @@ def plot_graph(memory, record_path):
     #     y_opt_value[j, :, 1] = opt_y
     #     y_opt_value[j, :, 2] = opt_z
     
-    pg_opt_value = np.zeros((y_vector.shape[1], y_vector.shape[2]))
-    for i in range(len(time)):
-        pg_opt_value[i, :] = np.array([
-            3 * np.cos(0.5 * time[i]), 
-            3 * np.sin(0.5 * time[i]), 
-            0.5 * time[i]
-        ])
     z_opt_value = np.zeros(z_vector.shape)
     for i in range(len(time)):
         for j in range(z_vector.shape[0]):
-            z_opt_value[j, i, :] = status_vector[:, i, :]
+            z_opt_value[j, i, :] = x_vector[:, i, :]
 
-    plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
-    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
-    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
-    plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
-    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - \omega||$", r"$||z_2 - \omega||$", r"$||z_3 - \omega||$", r"$||z_4 - \omega||$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
+    # plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
+    plot_status_converge_graph(time, x_vector, opt_value, figure_dir, file_name_prefix='status_convergence', ylabel=r"$x_i$")
+    plot_status_graph(time, partial_cost, figure_dir, file_name_prefix='partial_cost', ylabel=r"$\nabla_if_i(x)$", x_labels=[r"$\nabla_1f_1(x)$", r"$\nabla_2f_2(x)$", r"$\nabla_3f_3(x)$", r"$\nabla_4f_4(x)$", r"$\nabla_5f_5(x)$"], equilibrium_value=0)
+    plot_status_graph(time, update_value, figure_dir, file_name_prefix='update_value', var_name='u', equilibrium_value=0)
+    # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
+    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$", r"$||z_5 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.3))
 
-    initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
-    asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
-    fixed_convergence_times = [3.12, 3.57, 3.68, 3.73, 3.77, 3.81, 3.83, 3.85]
-    # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
-    # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
-    asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
-    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
+    # initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
+    # asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
+    # fixed_convergence_times = [3.12, 3.57, 3.68, 3.73, 3.77, 3.81, 3.83, 3.85]
+    # # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
+    # # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
+    # asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
+    # plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
 
 if __name__ == "__main__":
     from config import config
-    config_list = [ "r_0"]
+    config_list = [ "r_1"]
     # config_index = "r_0"
-    model = "jssc"
-    num_agents = 4
+    model = "fixed_high_order"
+    num_agents = 5
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     

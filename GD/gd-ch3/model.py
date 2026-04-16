@@ -6,7 +6,7 @@ class Model:
     DESC = "High-order systems"
     
     def __init__(self, model_config) -> None:
-        self.model_config = model_config
+        self.model_config = copy.deepcopy(model_config)
         self.memory = copy.deepcopy(self.model_config['memory'])
         self.time_delta = copy.deepcopy(model_config['time_delta'])
         self.initial_scale = model_config.get('initial_scale', 1.0)
@@ -23,9 +23,15 @@ class Model:
     
     def receieve_msg(self, adj_agent_id, memory):
         self.memory_updation['z'] += (self.memory['z'] - memory['z'])
-        self.memory_updation['z'][adj_agent_id] += (self.memory['z'][adj_agent_id] - memory['y'])
+        self.memory_updation['z'][adj_agent_id] += (self.memory['z'][adj_agent_id] - memory['x'])
         
-        
+
+    def set_init_value(self, key, init_value):
+        self.memory[key] = copy.deepcopy(init_value)
+        # 【修改点 3】：当初始化虚拟信号 vr 时，顺便把观测器里关于自己的状态初始化，大幅减小初始误差
+        if key == 'x':
+            self.memory['z'][self.agent_id] = copy.deepcopy(init_value)
+
     def power(self, value, a):
         if len(value.shape) == 0:
             if np.fabs(value) < 1e-10:
@@ -67,6 +73,8 @@ class Model:
 
         partial_cost = self.partial_cost()
         update_value = -1*(beta[0]*self.power(partial_cost, p) + beta[1]*self.power(partial_cost, q))
+        if self.model_config.get('is_finite', False):
+            update_value = -1*beta[0]*self.power(partial_cost, 0)
         # print(partial_cost, update_value, beta[0]*self.power(partial_cost[i], p), beta[1]*self.power(partial_cost[i], q))
         self.memory['update_value'] = update_value
         
@@ -141,7 +149,7 @@ class Model:
     
     def update(self):
         
-        self.memory_updation['y'] = self.virtual_signal_update_function()
+        self.memory_updation['x'] = self.virtual_signal_update_function()
         self.memory_updation['z'] = self.estimation_update_function()
 
         for k in self.memory.keys():

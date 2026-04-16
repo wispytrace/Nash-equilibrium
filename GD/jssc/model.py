@@ -102,8 +102,13 @@ class Model:
         return value
 
     def y_update_function(self):
-        ddotpi  = np.array([-8*np.cos(2*self.time+self.agent_id*np.pi/2), -8*np.sin(2*self.time+self.agent_id*np.pi/2), 0])
-        y_update_value = -1*self.memory_updation['y'] + ddotpi
+        # 完整的二阶导数：全局目标的加速度 + 相对旋转的加速度
+        ddotpi = np.array([
+            -0.75 * np.cos(0.5 * self.time) - 8 * np.cos(2 * self.time + self.agent_id * np.pi / 2), 
+            -0.75 * np.sin(0.5 * self.time) - 8 * np.sin(2 * self.time + self.agent_id * np.pi / 2), 
+            0
+        ])
+        y_update_value = -1 * self.memory_updation['y'] + ddotpi
         return y_update_value
 
 
@@ -114,8 +119,19 @@ class Model:
 
         partial_cost = self.partial_cost()
         N = self.memory['z'].shape[0]
-        dot_pi = np.array([-4*np.sin(2*self.time+self.agent_id*np.pi/2), 4*np.cos(2*self.time+self.agent_id*np.pi/2), 0.5])
-        dot_pg = np.array([-2.5*np.sin(0.5*self.time), 2.5*np.cos(0.5*self.time), 0.5])
+        # 目标轨迹的导数 (常数偏移量 +4 求导后消失)
+        dot_pg = np.array([
+            -1.5 * np.sin(0.5 * self.time), 
+             1.5 * np.cos(0.5 * self.time), 
+             0.5
+        ])
+
+        # 私有目标的导数 (包含了 T(t) 的导数项，以及编队旋转的导数项)
+        dot_pi = np.array([
+            -1.5 * np.sin(0.5 * self.time) - 4 * np.sin(2 * self.time + self.agent_id * np.pi / 2), 
+             1.5 * np.cos(0.5 * self.time) + 4 * np.cos(2 * self.time + self.agent_id * np.pi / 2), 
+             0.5
+        ])
         # 
         # if self.time > 1:
         #     print(partial_cost, self.memory['y'], dot_pi, dot_pg)
@@ -184,13 +200,25 @@ class Model:
         i = self.agent_id
         
         # 1. 转化为 numpy array
-        pi = np.array([2*np.cos(2*self.time+i*np.pi/2), 2*np.sin(2*self.time+i*np.pi/2), 0.5*self.time])
-        pg = np.array([5*np.cos(0.5*self.time), 5*np.sin(0.5*self.time), 0.5*self.time])
+        # 修改后的全局目标 pg (向正方向偏移 4)
+        pg = np.array([
+            3 * np.cos(0.5 * self.time), 
+            3 * np.sin(0.5 * self.time), 
+            0.5 * self.time
+        ])
+
+        # 修改后的私有目标 pi (包含 T(t) 的基准、向反方向偏移 1、以及相对编队旋转)
+        pi = np.array([
+            3 * np.cos(0.5 * self.time) - 0.5 + 2 * np.cos(2 * self.time + self.agent_id * np.pi / 2), 
+            3 * np.sin(0.5 * self.time) - 0.5 + 2 * np.sin(2 * self.time + self.agent_id * np.pi / 2), 
+            0.5 * self.time
+        ])
         # print(pg)
         
         # 2. 获取当前智能体状态与全局均值
         zi = self.memory['z'][i]
-        status_mean = np.mean(self.memory['z'], axis=0) 
+        status_sum = np.sum(self.memory['z'], axis=0)
+        status_mean = status_sum / N 
         
         # 3. 严格按照代价函数求导的精确解析解公式计算梯度
         # f_i(z_i) = ||z_i - p_i||^2 + || (1/N)*sum(z_j) - p_g ||^2

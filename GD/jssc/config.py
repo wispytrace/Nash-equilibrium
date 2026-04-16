@@ -4,14 +4,14 @@ import copy
 config = {
     "r_0":
     {
-        "epochs" : 20000,
+        "epochs" : 40000,
         "adjacency_matrix" : [[1, 1, 1, 1 ],
                                 [1, 1, 1, 1],
                                 [1, 1, 1, 1 ],
                                 [1, 1, 1, 1 ]], 
         "agent_config":
         {  
-            "time_delta": 2e-4,
+            "time_delta": 1e-4,
             "model": "jssc",
             "record_interval": 50,
             "record_flag": 1,
@@ -28,7 +28,7 @@ config = {
                     'ri': [4, 5, 6, 8],
                     'mu': 0.5,
                     'nu': 1.5,
-                    'gama': 2,
+                    'gama': 12,
                 },
             },
         }
@@ -178,14 +178,14 @@ def parameter_calculate(index):
     rho3 = 0.005
     rho4 = 0.02
 
-    beta1 = 0.6
-    beta2 = 0.3
+    beta1 = 1
+    beta2 = 0.35
     alpha1 = 1500
-    alpha2 = 1800
+    alpha2 = 2000
     # alpha3 = 520
     # alpha4 = 800
 
-    mu = 0.7
+    mu = 0.75
     nu = 1.20
 
     # ==========================================

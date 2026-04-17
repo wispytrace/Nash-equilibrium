@@ -116,7 +116,7 @@ def plot_graph(memory, record_path):
     # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
     # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
     asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
-    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
+    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_\omega(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
 
 if __name__ == "__main__":
     from config import config

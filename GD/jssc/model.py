@@ -52,8 +52,8 @@ class Model:
     def set_init_value(self, key, init_value):
         self.memory[key] = copy.deepcopy(init_value)
         # 【修改点 3】：当初始化虚拟信号 vr 时，顺便把观测器里关于自己的状态初始化，大幅减小初始误差
-        if key == 'vr':
-            self.memory['z'][self.agent_id] = copy.deepcopy(init_value)
+        # if key == 'vr':
+        #     self.memory['z'][self.agent_id] = copy.deepcopy(init_value)
 
     def reset_memroy_updation(self):
         self.memory_updation = {}

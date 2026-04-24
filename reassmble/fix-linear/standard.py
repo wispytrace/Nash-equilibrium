@@ -529,6 +529,69 @@ def plot_single_status_converge_graph(
     plt.close()
     print(f"Saved figure: {path}")
 
+
+
+
+def plot_single_status_graph(
+    time,
+    status_vector,
+    figure_dir,
+    ylabel,
+    xlabel_list,
+    opt_label_list,
+    file_name_prefix=None,
+    dim = 0,
+    n_cols=2,
+    y_bottom = None,
+):
+    os.makedirs(figure_dir, exist_ok=True)
+
+    status_vector = np.array(status_vector)
+    N, T, D = status_vector.shape
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    
+    for i in range(N):
+        y = status_vector[i, :, dim]
+        color = colors[i % len(colors)]
+        plt.plot(time, y, color=color, label=xlabel_list[i])
+        
+        # 绘制收敛点虚线
+        plt.hlines(
+            [0]*len(time), xmin=time[0], xmax=time[-1],
+            colors=color, linestyles='dashed', linewidth=1.2
+        )
+        # legends.append(f"{var_name}_{i+1}")
+    y_max = np.max(status_vector[:, :, dim])
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
+    plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
+    plt.xlim(left=0, right=time[-1])
+    plt.tight_layout()
+    # if y_bottom is not None:
+    #     plt.ylim(bottom=y_bottom, top=y_max*1.1)
+    # else:
+    #     plt.ylim(0, top=y_max*2)
+        
+    ax = plt.gca()
+    add_zoom_inset(
+        ax_main=ax,
+        time=time,
+        status_vector=status_vector,
+        dim=dim,
+        zoom_xlim=(0, 4),
+        zoom_loc='upper left'  # 可改为 'upper left' 等
+    )
+
+    # 保存图片
+    if file_name_prefix:
+        fname = f"{file_name_prefix}.png"
+    else:
+        fname = f"status.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
+
 def matrix_flatten_l2norm(M):
     return np.linalg.norm(M.flatten(), ord=2)
 

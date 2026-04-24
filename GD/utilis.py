@@ -119,7 +119,6 @@ def plot_error_value_graph(
     y_title='||x - x*||',
     xlim=None
 ):
-    plt.figure(figsize=(8, 5))
     os.makedirs(figure_dir, exist_ok=True)
     status_vector = np.array(status_vector)
     N, T, D = status_vector.shape[:3]

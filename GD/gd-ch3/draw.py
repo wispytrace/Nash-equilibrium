@@ -23,7 +23,7 @@ mpl.rcParams['xtick.labelsize'] = 10
 mpl.rcParams['ytick.labelsize'] = 10
 
 
-def get_multi_initi_value_convergence_time(base_path, num_agents):
+def get_multi_initi_value_convergence_time(base_path, num_agents, opt_value=None):
     convergence_time_dict = {}
     for simu_folder in sorted(os.listdir(base_path)):
         simu_path = os.path.join(base_path, simu_folder)
@@ -34,12 +34,14 @@ def get_multi_initi_value_convergence_time(base_path, num_agents):
                 continue
             convergence_time_dict[simu_id] = {"convergence_time": None, "init_value": None}
             memory = get_records_memory(simu_path, num_agents)
-            status_vector = align_list(memory['vr'])
+            status_vector = align_list(memory['x'])
             time = np.array(memory['time'][-1][:len(status_vector[0])])
-            opt_value = np.zeros(status_vector.shape)
-            for i in range(len(time)):
-                for j in range(status_vector.shape[0]):
-                    opt_value[j, i, :] = np.array([2*np.cos(2*time[i] + j*np.pi/2)+np.cos(0.5*time[i]), 2*np.sin(2*time[i] + j*np.pi/2)+np.sin(0.5*time[i]), 0.5*time[i]])
+            if opt_value is None:
+                opt_value = np.zeros(status_vector.shape)
+                NE_point = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
+                for i in range(len(time)):
+                    for j in range(status_vector.shape[0]):
+                        opt_value[j, i, :] = NE_point[j]
 
             convergence_time_dict[simu_id]["convergence_time"] = get_convergence_time(status_vector, opt_value, time, error=1e-2)
             convergence_time_dict[simu_id]["init_value"] = np.linalg.norm(status_vector[:, 0, :].flatten())  # 假设 x 的初始值在这里
@@ -90,7 +92,7 @@ def plot_graph(memory, record_path):
     plot_status_graph(time, partial_cost, figure_dir, file_name_prefix='partial_cost', ylabel=r"$\nabla_if_i(x)$", x_labels=[r"$\nabla_1f_1(x)$", r"$\nabla_2f_2(x)$", r"$\nabla_3f_3(x)$", r"$\nabla_4f_4(x)$", r"$\nabla_5f_5(x)$"], equilibrium_value=0)
     plot_status_graph(time, update_value, figure_dir, file_name_prefix='update_value', var_name='u', equilibrium_value=0)
     # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
-    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$", r"$||z_5 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.3))
+    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$", r"$||z_5 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
 
     # initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
     # asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
@@ -109,10 +111,10 @@ if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     
-    for config_index in config_list:
-        print(f"Running configuration: {config_index}")
-        record_path = record_root_path + config_index
-        memory = get_records_memory(record_path, num_agents)
-        plot_graph(memory, record_path)
+    # for config_index in config_list:
+    #     print(f"Running configuration: {config_index}")
+    #     record_path = record_root_path + config_index
+    #     memory = get_records_memory(record_path, num_agents)
+    #     plot_graph(memory, record_path)
 
-    # get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)
+    get_multi_initi_value_convergence_time(record_root_path + config_list[0], num_agents)

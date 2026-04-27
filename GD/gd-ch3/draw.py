@@ -104,7 +104,7 @@ def plot_graph(memory, record_path):
 
 if __name__ == "__main__":
     from config import config
-    config_list = [ "r_1"]
+    config_list = [ "r_0"]
     # config_index = "r_0"
     model = "fixed_high_order"
     num_agents = 5

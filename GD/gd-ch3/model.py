@@ -74,7 +74,7 @@ class Model:
         partial_cost = self.partial_cost()
         update_value = -1*(beta[0]*self.power(partial_cost, p) + beta[1]*self.power(partial_cost, q))
         if self.model_config.get('is_finite', False):
-            update_value = -1*beta[0]*self.power(partial_cost, 0)
+            update_value = -1*self.power(partial_cost, 0)-0.25*beta[0]*self.power(partial_cost, 1)
         # print(partial_cost, update_value, beta[0]*self.power(partial_cost[i], p), beta[1]*self.power(partial_cost[i], q))
         self.memory['update_value'] = update_value
         

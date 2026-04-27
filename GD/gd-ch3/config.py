@@ -12,7 +12,7 @@ config = {
                               [1, 0, 0, 1, 0]], 
         "agent_config":
         {  
-            "time_delta": 1e-4,
+            "time_delta": 8e-5,
             "model": "fixed_high_order",
             "record_interval": 50,
             "record_flag": 1,
@@ -37,7 +37,7 @@ config = {
 
     "r_1":
     {
-        "epochs" : 50000,
+        "epochs" : 40000,
         "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
                               [1, 0, 1, 0, 0],
                               [0, 1, 0, 1, 0],

@@ -197,14 +197,15 @@ def run_single_simulation(config_index, num_agents, init_value):
     centralized_system.run()
 
 if __name__ == "__main__":
-    config_list = ["r_1"]
+    config_list = ["r_0"]
     num_agents = 5
     init_value = {"x": np.array([5, -5, -3, -3, 1], dtype=float)}
     # run_single_simulation(config_list[0], num_agents, init_value)
 
 # 设定 8 种不同的初始幅度大小（从小到大，测试算法对极大初始偏差的收敛鲁棒性）
-    amplitudes = [5, 15, 25, 35, 45, 55, 65, 75]
-    
+    # amplitudes = [5, 15, 25, 35, 45, 55, 65, 75]
+    amplitudes = [5, 15]
+
     # 设定智能体初始分布的基础方向矩阵（分布在四个象限）
     import numpy as np
 

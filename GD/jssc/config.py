@@ -43,7 +43,7 @@ config = {
                                 [1, 1, 1, 1 ]], 
         "agent_config":
         {  
-            "time_delta": 2e-4,
+            "time_delta": 1e-4,
             "model": "jssc",
             "record_interval": 50,
             "record_flag": 1,

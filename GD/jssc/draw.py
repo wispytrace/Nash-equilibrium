@@ -118,19 +118,83 @@ def plot_graph(memory, record_path):
     asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
     plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_\omega(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
 
-if __name__ == "__main__":
-    from config import config
-    config_list = [ "r_0"]
-    # config_index = "r_0"
-    model = "jssc"
+
+def plot_compare_graph(config_list):
     num_agents = 4
+    model = "jssc"
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
+    print(record_root_path)
+    # 定义比对图的保存路径，可以放在 records/model 根目录下
+    figure_dir = f"{current_dir}/records/{model}/compare_figures"
+    os.makedirs(figure_dir, exist_ok=True)
     
-    for config_index in config_list:
-        print(f"Running configuration: {config_index}")
-        record_path = record_root_path + config_index
-        memory = get_records_memory(record_path, num_agents)
-        plot_graph(memory, record_path)
+    error_vectors = []
+    labels = []
+    common_time = None
 
+    for config_index in config_list:
+        record_path = record_root_path + str(config_index)
+        memory = get_records_memory(record_path, num_agents)
+        
+        # 提取状态变量 x 和 time
+        # 如果您想比较的是 vr，可以将 'x' 改为 'vr'
+        x_vector = np.array(align_list(memory['x']))
+        time = np.array(memory['time'][-1][:len(x_vector[0])])
+        print(len(time))
+        
+        if common_time is None:
+            common_time = time
+            
+        # 生成对应的最优理论轨迹 opt_value
+        opt_value = np.zeros(x_vector.shape)
+        for i in range(len(time)):
+            for j in range(x_vector.shape[0]):
+                opt_value[j, i, :] = np.array([
+                    3 * np.cos(0.5 * time[i]) + 2 * np.cos(2 * time[i] + j * np.pi / 2) - 0.4, 
+                    3 * np.sin(0.5 * time[i]) + 2 * np.sin(2 * time[i] + j * np.pi / 2) - 0.4, 
+                    0.5 * time[i]
+                ])
+                
+        # 计算该 config 下，每个时间步的全局误差 ||x - x*||
+        diff_value_array = np.zeros(len(time))
+        for i in range(len(time)):
+            # x_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
+            # np.linalg.norm 计算 Frobenius 范数，即所有智能体误差的平方和再开根号
+            diff_matrix = x_vector[:, i, :] - opt_value[:, i, :]
+            diff_value_array[i] = np.linalg.norm(diff_matrix)
+            
+        error_vectors.append(diff_value_array)
+        labels.append(f"Config {config_index}")
+        
+    # 调用之前编写的多组误差直接绘制函数
+    plot_compare_direct_errors_graph(
+        time=common_time,
+        error_vectors=error_vectors,
+        figure_dir=figure_dir,
+        labels=["Fixed-time algorithm", "Asymptotic algorithm"],
+        ylabel=r"$||\mathbf{x} - \mathbf{x}^\star||$",
+        file_name_prefix="x_status"
+    )
+
+if __name__ == "__main__":
+    # 1
+    # from config import config
+    # config_list = [ "r_0"]
+    # # config_index = "r_0"
+    # model = "jssc"
+    # num_agents = 4
+    # current_dir = os.path.dirname(os.path.realpath(__file__))
+    # record_root_path = f"{current_dir}/records/{model}/"
+    
+    # for config_index in config_list:
+    #     print(f"Running configuration: {config_index}")
+    #     record_path = record_root_path + config_index
+    #     memory = get_records_memory(record_path, num_agents)
+    #     plot_graph(memory, record_path)
+    
+    # 2
     # get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)
+
+    # 3
+    plot_compare_graph(config_list=["r_0", "r_1"])

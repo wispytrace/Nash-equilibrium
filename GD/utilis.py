@@ -79,14 +79,14 @@ def plot_multi_dimension_status_converge_dynamic_graph(
     colors = list(mcolors.TABLEAU_COLORS.values())
     
     for d in range(D):
-        plt.figure(figsize=(8, 5))
         for i in range(N):
             y = status_vector[i, :, d]
             color = colors[i % len(colors)]
             label_string = r'$%s_{%d%d}$' % (label, i+1, d+1)
             opt_label_string = r'$%s_{%d%d}^{\star}$' % (label_opt, i+1, d+1)
             plt.plot(time, y, color=color, label=label_string)
-            plt.plot(time, opt_value[i,:, d], color=color, linestyle='dashed', label=opt_label_string)
+            if opt_value is not None:
+                plt.plot(time, opt_value[i,:, d], color=color, linestyle='dashed', label=opt_label_string)
                     
         plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
         y_title_string = r'$%s_{i%d}$' % (y_title, d+1)
@@ -606,7 +606,7 @@ def plot_compare_direct_errors_graph(time, error_vectors, figure_dir, labels=Non
     
     # 动态设置 X 轴边界为时间的起止点
     plt.xlim(left=time[0] if len(time) > 0 else 0, right=time[-1] if len(time) > 0 else 8)
-    plt.ylim(bottom=0)
+    # plt.ylim(bottom=0)
     
     plt.tight_layout()
 

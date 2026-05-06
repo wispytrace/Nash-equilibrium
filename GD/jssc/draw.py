@@ -57,6 +57,7 @@ def plot_graph(memory, record_path):
     y_vector = align_list(memory['y'])
     z_vector = align_list(memory['z'])
     x_vector = align_list(memory['x'])
+    ui = align_list(memory['update_value'])
     time = np.array(memory['time'][-1][:len(y_vector[0])])
 
     opt_value = np.zeros(status_vector.shape)
@@ -107,8 +108,9 @@ def plot_graph(memory, record_path):
     plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
     plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
     plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
+    plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
     plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
-    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - \omega||$", r"$||z_2 - \omega||$", r"$||z_3 - \omega||$", r"$||z_4 - \omega||$"], y_title=r"$||z_i - \omega||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
+    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
 
     initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
     asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
@@ -179,22 +181,22 @@ def plot_compare_graph(config_list):
 
 if __name__ == "__main__":
     # 1
-    # from config import config
-    # config_list = [ "r_0"]
-    # # config_index = "r_0"
-    # model = "jssc"
-    # num_agents = 4
-    # current_dir = os.path.dirname(os.path.realpath(__file__))
-    # record_root_path = f"{current_dir}/records/{model}/"
+    from config import config
+    config_list = [ "r_0"]
+    # config_index = "r_0"
+    model = "jssc"
+    num_agents = 4
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    record_root_path = f"{current_dir}/records/{model}/"
     
-    # for config_index in config_list:
-    #     print(f"Running configuration: {config_index}")
-    #     record_path = record_root_path + config_index
-    #     memory = get_records_memory(record_path, num_agents)
-    #     plot_graph(memory, record_path)
+    for config_index in config_list:
+        print(f"Running configuration: {config_index}")
+        record_path = record_root_path + config_index
+        memory = get_records_memory(record_path, num_agents)
+        plot_graph(memory, record_path)
     
     # 2
     # get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)
 
     # 3
-    plot_compare_graph(config_list=["r_0", "r_1"])
+    # plot_compare_graph(config_list=["r_0", "r_1"])

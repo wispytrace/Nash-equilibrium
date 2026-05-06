@@ -198,7 +198,8 @@ if __name__ == "__main__":
         ]
     ])
     num_agents = 4
-    init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[1, 1, -3], [-1, 1, -2], [-2, -2, -1], [3, -3, -2]], dtype=float), "y": np.array([[0,5.5,0.5], [-4, 1.5 ,0.5], [0, -3.5, 0.5], [4, 1.5, 0.5]]),
+    # "vr": np.array([[1, 1, -3], [-1, 1, -2], [-2, -2, -1], [3, -3, -2]]
+    init_value = {"x": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "vr": np.array([[5, 5, -3], [-5, 5, -3], [-5, -5, -3], [5, -5, -3]], dtype=float), "y": np.array([[0,5.5,0.5], [-4, 1.5 ,0.5], [0, -3.5, 0.5], [4, 1.5, 0.5]]),
                   "z": z}
     
     run_single_simulation(config_list[0], num_agents, init_value)

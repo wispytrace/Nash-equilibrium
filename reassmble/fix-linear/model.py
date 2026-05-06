@@ -17,9 +17,9 @@ class Model:
         self.time = 0
         self.agent_id = self.model_config['agent_id']
         self.memory['x'] = copy.deepcopy(self.model_config['x0']) * self.initial_scale
-        # self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
+        self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
         # self.memory['x'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
-        self.memory['y'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
+        # self.memory['y'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
         print(f"{self.agent_id}: init_value {self.memory['y']}")
         self.reset_memroy_updation()
         self.topology_index = 0

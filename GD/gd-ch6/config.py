@@ -20,83 +20,47 @@ config = {
             "model_config": 
             {
                 "N": 5,
-                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
-                'A': np.array([
-                    
-                ]),
+                "memory" : {"omega": np.zeros(2), "z": np.zeros((5,1)), "x": np.zeros(2), "dotx": np.zeros(2), "x_v": np.zeros(2,3)},
+                "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
+                                                [1.41, 1.43, 1.45, 1.47, 1.5],
+                                                [0.31, 0.33, 0.32, 0.34, 0.47],
+                                                [1.78, 1.76, 1.74, 1.72, 1],
+                                                [0.73, 0.76, 0.79, 0.72, 1]]).T,
                 'share': {
                     "p": 0.8,
                     "q": 1.2,
                     'alpha': [150, 250, 520, 600],
                     'beta':[1, 0.5],
+                    "pg": np.array([2.0, 2.0])
                 },
-            },
-            
-        }
-    },
-
-    "r_1":
-    {
-        "epochs" : 40000,
-        "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0],
-                              [0, 1, 0, 1, 0],
-                              [0, 0, 1, 0, 1],
-                              [1, 0, 0, 1, 0]], 
-        "agent_config":
-        {  
-            "time_delta": 8e-5,
-            "model": "fixed_high_order",
-            "record_interval": 50,
-            "record_flag": 1,
-
-            "model_config": 
-            {
-                "N": 5,
-                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
-                'A': np.array([
-                    
-                ]),
-                'share': {
-                    "p": 0.8,
-                    "q": 1,
-                    'alpha': [150, 250, 300, 400],
-                    'beta':[1, 0.3],
-                },
-                # 'is_finite': True,
-            },
-            
-        }
-    },
-
-    "r_2":
-    {
-        "epochs" : 40000,
-        "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0],
-                              [0, 1, 0, 1, 0],
-                              [0, 0, 1, 0, 1],
-                              [1, 0, 0, 1, 0]], 
-        "agent_config":
-        {  
-            "time_delta": 8e-5,
-            "model": "fixed_high_order",
-            "record_interval": 50,
-            "record_flag": 1,
-
-            "model_config": 
-            {
-                "N": 5,
-                "memory" : {"x": np.zeros(1), "z": np.zeros((5,1))},
-                'A': np.array([
-                    
-                ]),
-                'share': {
-                    "p": 1,
-                    "q": 1,
-                    'alpha': [150, 0, 0, 0],
-                    'beta':[1, 0],
-                },
+                'private':{
+                    '2': { 
+                            'parameters': np.array([1, 5, 0.2]),
+                            'gama': [0.7, 1.3],
+                            'ki': [2, 3],
+                            },
+                    '3': {
+                            'parameters': np.array([1.2, 5, 0.2]),
+                            'gama': [0.85, 1.3],
+                            'ki': [4, 3],
+                            },
+                    '0': {
+                        'zeta': 5,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 4, 5],
+                        'order': 2,
+                        },
+                    '1': {
+                        'zeta': 5,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [3, 4, 5],
+                        'k_i_tilde': [5, 6, 5],
+                        'order': 2,
+                        },                    
+                }
             },
             
         }

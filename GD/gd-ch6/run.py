@@ -118,7 +118,7 @@ class CentralizedModel:
             self.record()
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"status: {self.agntes[0].memory['x']}" )
+                print(f"status: {self.agntes[5].memory['omega']}" )
 
             self.counts += 1
         self.done()
@@ -197,30 +197,30 @@ def run_single_simulation(config_index, num_agents, init_value):
     centralized_system.run()
 
 if __name__ == "__main__":
-    config_list = ["r_2"]
-    num_agents = 5
-    init_value = {"x": np.array([5, -5, -3, -3, 1], dtype=float)}
-    # run_single_simulation(config_list[0], num_agents, init_value)
+    config_list = ["r_0"]
+    num_agents = 6
+    # init_value = {"x": np.array([5, -5, -3, -3, 1], dtype=float)}
+    run_single_simulation(config_list[0], num_agents, None)
 
 # 设定 8 种不同的初始幅度大小（从小到大，测试算法对极大初始偏差的收敛鲁棒性）
     # amplitudes = [5, 15, 25, 35, 45, 55, 65, 75]
-    amplitudes = [5, 15]
+    # amplitudes = [5, 15]
 
-    # 设定智能体初始分布的基础方向矩阵（分布在四个象限）
-    import numpy as np
+    # # 设定智能体初始分布的基础方向矩阵（分布在四个象限）
+    # import numpy as np
 
-    base_position = np.array([1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents)], dtype=float)
+    # base_position = np.array([1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents), 1/np.sqrt(num_agents)], dtype=float)
 
-    init_values_list = []
+    # init_values_list = []
     
-    # 自动生成 8 组不同幅度的初始条件
-    for amp in amplitudes:
-        # 将基础方向乘以当前的幅度放大倍数
-        scaled_pos = base_position * amp
+    # # 自动生成 8 组不同幅度的初始条件
+    # for amp in amplitudes:
+    #     # 将基础方向乘以当前的幅度放大倍数
+    #     scaled_pos = base_position * amp
         
-        init_values_list.append({
-            "x": scaled_pos.copy(),
-        })
+    #     init_values_list.append({
+    #         "x": scaled_pos.copy(),
+    #     })
         
-    # 调用批量运行函数
-    run_batch_simulations(config_list, num_agents, init_values_list)
+    # # 调用批量运行函数
+    # run_batch_simulations(config_list, num_agents, init_values_list)

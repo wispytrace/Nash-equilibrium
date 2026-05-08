@@ -4,28 +4,29 @@ import copy
 config = {
     "r_0":
     {
-        "epochs" : 40000,
-        "adjacency_matrix" : [[0, 1, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0],
-                              [0, 1, 0, 1, 0],
-                              [0, 0, 1, 0, 1],
-                              [1, 0, 0, 1, 0]], 
+        "epochs" : 60000,
+        "adjacency_matrix" : [[0, 1, 0, 0, 0, 1 ],
+                              [1, 0, 1, 0, 0, 0],
+                              [0, 1, 0, 1, 0, 0],
+                              [0, 0, 1, 0, 1, 0],
+                              [0, 0, 0, 1, 0, 1],
+                              [1, 0, 0, 0, 1, 0]], 
         "agent_config":
         {  
-            "time_delta": 6e-5,
+            "time_delta": 1e-4,
             "model": "fixed_high_order",
             "record_interval": 50,
             "record_flag": 1,
 
             "model_config": 
             {
-                "N": 5,
-                "memory" : {"omega": np.zeros(2), "z": np.zeros((5,1)), "x": np.zeros(2), "x_hl": np.zeros(2, 2), "x_li": np.zeros(2,3), "x_el": np.zeros(2, 2)},
+                "N": 6,
+                "memory" : {"omega": np.zeros(2), "z": np.zeros((6,2)), "x": np.zeros(2), "x_hl": np.zeros((2, 2)), "x_li": np.zeros((3,2)), "x_el": np.zeros((2, 2))},
                 'share': {
                     "p": 0.8,
                     "q": 1.2,
                     'alpha': [150, 250, 520, 600],
-                    'beta':[1, 0.5],
+                    'beta':[2, 2],
                 },
                 'private':{
                     '0': {

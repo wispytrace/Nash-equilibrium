@@ -1,0 +1,11 @@
+Simulation,Status,Convergence_Time(s),File_Path
+sim_0,Converged,3.625000000000378,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_0/all_agents_trajectories.json
+sim_1,Converged,4.250000000000364,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_1/all_agents_trajectories.json
+sim_2,Converged,4.4750000000002395,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_2/all_agents_trajectories.json
+sim_3,Converged,4.60000000000017,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_3/all_agents_trajectories.json
+sim_4,Converged,4.700000000000115,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_4/all_agents_trajectories.json
+sim_5,Converged,4.750000000000087,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_5/all_agents_trajectories.json
+sim_6,Converged,4.8250000000000455,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_6/all_agents_trajectories.json
+sim_7,Converged,4.875000000000018,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_7/all_agents_trajectories.json
+sim_8,Converged,4.92499999999999,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_8/all_agents_trajectories.json
+sim_9,Converged,4.949999999999976,/app/reassmble/nd-fixed/records/euler_constraint/f2/sim_9/all_agents_trajectories.json

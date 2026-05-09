@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from tube_mode_fixed import Model
+from tube_mode_asym_1 import Model
 # from config import config # 假设config就在本文件中定义
 import os
 import json
@@ -25,14 +25,14 @@ config = {
         "agent_config":
         {  
             "time_delta": 5e-4,
-            "model": "euler_constraint",
+            "model": "euler_constraint_tube_1",
             "record_interval": 50,
             "record_flag": 1,
             "model_config": 
             {
                
                 "N": 6,
-                "memory" : {"x": np.zeros((1)), "dot_x": np.zeros((1)), "y": np.full((1), 0), "z": np.zeros((6, 1)), "v": np.zeros((6, 1)), "gama": np.zeros((1))},
+                "memory" : {"x": np.zeros((1)), "dot_x": np.zeros((1)), "y": np.full((1), 0), "z": np.zeros((6, 1)), "v": np.zeros((6, 1)), 'z_aux': np.zeros((1)), 'y_aux': np.zeros((1))},
                 'T_m': [1.1, 1.2, 1.0, 1.1, 1.0, 1.2],
                 'T_e': [0.8, 0.9, 0.8, 0.9, 0.8, 0.9],
                 'K_m': [1.2, 1.3, 1.2, 1.3, 1.2, 1.3],
@@ -63,113 +63,9 @@ config = {
             }
         }
     },
-
-    "a_1":
-    {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "epochs" : 20000,
-        "adjacency_matrix" : [[0, 1, 0, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0, 0],
-                              [0, 1, 0, 1, 0, 0],
-                              [0, 0, 1, 0, 1, 0],
-                              [0, 0, 0, 1, 0, 1],
-                              [1, 0, 0, 0, 1, 0]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-4,
-            "model": "euler_constraint",
-            "record_interval": 50,
-            "record_flag": 1,
-            "model_config": 
-            {
-               
-                "N": 6,
-                "memory" : {"x": np.zeros((1)), "dot_x": np.zeros((1)), "y": np.full((1), 0), "z": np.zeros((6, 1)), "v": np.zeros((6, 1)), "gama": np.zeros((1))},
-                'T_m': [1.1, 1.2, 1.0, 1.1, 1.0, 1.2],
-                'T_e': [0.8, 0.9, 0.8, 0.9, 0.8, 0.9],
-                'K_m': [1.2, 1.3, 1.2, 1.3, 1.2, 1.3],
-                'share': {
-                    "init_value_x": np.array([0, 0.5, 1, 1.5, 2, 2.5]),
-                    "init_value_dotx": np.array([-2, -1, -2, 1, 2, 1]),
-                    "eta_max": [2.7, 2.8, 1.9],
-                    "p": 0.65,
-                    "q": 1.35,
-                    "gama": 25,
-                    "lipsthitz": 1,
-                    # "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
-                    "l": np.array([0]),
-                    "u": np.array([4]),
-                    "c": np.array([0]),
-                    'a': 0.1,
-                    'po': 25,
-                },
-
-                'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':3},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':4},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':5},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':6},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':7},
-                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':8}
-                },
-            }
-        }
-    },
-
-    "a_2":
-    {
-        "simulation_time": 5, # 总仿真时长 (秒)
-        "epochs" : 20000,
-        "adjacency_matrix" : [[0, 1, 0, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0, 0],
-                              [0, 1, 0, 1, 0, 0],
-                              [0, 0, 1, 0, 1, 0],
-                              [0, 0, 0, 1, 0, 1],
-                              [1, 0, 0, 0, 1, 0]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-4,
-            "model": "euler_constraint",
-            "record_interval": 50,
-            "record_flag": 1,
-            "model_config": 
-            {
-               
-                "N": 6,
-                "memory" : {"x": np.zeros((1)), "dot_x": np.zeros((1)), "y": np.full((1), 0), "z": np.zeros((6, 1)), "v": np.zeros((6, 1)), "gama": np.zeros((1))},
-                'T_m': [1.1, 1.2, 1.0, 1.1, 1.0, 1.2],
-                'T_e': [0.8, 0.9, 0.8, 0.9, 0.8, 0.9],
-                'K_m': [1.2, 1.3, 1.2, 1.3, 1.2, 1.3],
-                'share': {
-                    "init_value_x": np.array([0, 0.5, 1, 1.5, 2, 2.5]),
-                    "init_value_dotx": np.array([-2, -1, -2, 1, 2, 1]),
-                    "eta_max": [2.7, 2.8, 1.9],
-                    "p": 0.65,
-                    "q": 1.35,
-                    "gama": 25,
-                    "lipsthitz": 1,
-                    # "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
-                    "l": np.array([0]),
-                    "u": np.array([5]),
-                    "c": np.array([0]),
-                    'a': 0.1,
-                    'po': 25,
-                },
-
-                'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':3},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':4},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':5},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':6},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':7},
-                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':8}
-                },
-            }
-        }
-    },
 }
 
-config_index = "a_1"
+config_index = "r_0"
 num_agents = 6
 
 class CentralizedModel:

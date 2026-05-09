@@ -98,14 +98,13 @@ class Model:
         """
         # 固定的博弈交互矩阵 A (非对称)
         pg = self.model_config['pg']
-        
         zi = self.memory['z'][self.agent_id]
 
         cost = 0.5 * np.linalg.norm(zi - pg)
 
         pre_agent = (self.agent_id - 1) % self.model_config['N'] if self.agent_id > 1 else self.model_config['N'] - 1
         next_agent = (self.agent_id + 1) % self.model_config['N'] if self.agent_id < self.model_config['N'] - 1 else 0
-        cost += 0.5 * np.linalg.norm(zi - self.memory['z'][pre_agent]) + (0.25*np.linalg.norm(zi - self.memory['z'][next_agent])+  0.25*np.linalg.norm(zi - self.memory['z'][pre_agent]))
+        cost += 0.5 * np.linalg.norm(zi - self.memory['z'][pre_agent]) + 0.5*np.linalg.norm(zi - self.memory['z'][next_agent])
         return cost
 
 
@@ -131,11 +130,11 @@ class Model:
             else:
                 gama_i[order-i-1] = gama_i[order-i]*gama_i[order-i+1]/(2*gama_i[order-i+1]-gama_i[order-i])
                 gama_i_tilde[order-i-1] = gama_i_tilde[order-i]*gama_i_tilde[order-i+1]/(2*gama_i_tilde[order-i+1]-gama_i_tilde[order-i])
-        x_i = self.memory['x']
+        x_i = self.memory['x_hl']
         eij = np.zeros(x_i.shape)
         for i in range(order):
             if i == 0:
-                eij[i] = x_i[i]-self.memory['y']
+                eij[i] = x_i[i]-self.memory['omega']
             else:
                 eij[i] = x_i[i]
 
@@ -204,21 +203,28 @@ class Model:
         return np.matrix(K1), np.matrix(K2)
 
     def linear_status_update_function(self):
+        self.A = self.getStateMatrix()
+        self.B = self.getInputMatrix()
+        self.C = self.getOutputMatrix()
+        self.K1, self.K2 = self.getKiMatrix()
         ki = self.model_config['ki']
-        xi = self.memory['x']
-        gama = self.model_config['gama']
-        yi = np.matrix(self.memory['y']).T
-        dot_yi = np.matrix(self.memory['update_value']).T
-        epsilon_i = xi - np.array(self.B@self.K1.T@yi).flatten()
-        Omega_i = -1*(ki[0] * self.power(epsilon_i, gama[0]) + ki[1]*self.power(epsilon_i, gama[1]))
-        self.memory['Omega_i'] = Omega_i
-        ui_hat =  np.linalg.inv(self.B)@(np.matrix(Omega_i).T-self.A@np.matrix(epsilon_i).T)
-        ui = -self.K2.T@yi+ self.K1.T@dot_yi + ui_hat
-        self.memory['ui'] = np.array(ui).flatten()
-        
-        status_update = self.A @ np.matrix(xi).T + (self.B @ ui)
+        xis = self.memory['x_li']
+        status_update = np.zeros(xis.shape)
+        for i in range(xis.shape[0]):
+            xi = xis[i]
+            gama = self.model_config['gama']
+            yi = np.matrix(self.memory['y']).T
+            dot_yi = np.matrix(self.memory['update_value']).T
+            epsilon_i = xi - np.array(self.B@self.K1.T@yi).flatten()
+            Omega_i = -1*(ki[0] * self.power(epsilon_i, gama[0]) + ki[1]*self.power(epsilon_i, gama[1]))
+            self.memory['Omega_i'] = Omega_i
+            ui_hat =  np.linalg.inv(self.B)@(np.matrix(Omega_i).T-self.A@np.matrix(epsilon_i).T)
+            ui = -self.K2.T@yi+ self.K1.T@dot_yi + ui_hat
+            self.memory['ui'] = np.array(ui).flatten()
+            
+            status_update[i] = self.A @ np.matrix(xi).T + (self.B @ ui)
 
-        status_update = np.array(status_update).flatten()
+            status_update[i] = np.array(status_update[i]).flatten()
 
         return status_update
 
@@ -241,14 +247,14 @@ class Model:
         return np.array(Mi), np.array(Ci), np.array(Gi)
     
     
-    def status_update_function(self):
+    def euler_status_update_function(self):
         p = self.model_config['p']
         q = self.model_config['q']
         h1 = self.model_config['h1']
         h2 = self.model_config['h2']
 
-        x = self.memory['x']
-        dot_x = self.memory['dot_x']
+        x = self.memory['x_el'][0]
+        dot_x = self.memory['x_el'][1]
         dot_y = self.virtual_signal_update_function()
         
         track_error = x - self.memory['y']
@@ -266,8 +272,11 @@ class Model:
         self.memory['ui'] = ui
         ddot_x = np.linalg.inv(Mi)@(ui - Ci@dot_x-Gi)
         
+        update_value = np.zeros(self.memory['x_el'].shape)
+        update_value[0] = dot_x
+        update_value[1] = ddot_x
          
-        return dot_x, ddot_x 
+        return update_value
 
     def partial_cost(self):
         delta = 1e-5
@@ -283,7 +292,7 @@ class Model:
 
     def update(self):
         
-        self.memory_updation['x'] = self.virtual_signal_update_function()
+        self.memory_updation['omega'] = self.virtual_signal_update_function()
         self.memory_updation['z'] = self.estimation_update_function()
 
         for k in self.memory.keys():

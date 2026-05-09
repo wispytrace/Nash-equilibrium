@@ -65,7 +65,7 @@ def plot_multi_dimension_status_converge_dynamic_graph(
     time,
     status_vector,
     figure_dir,
-    opt_value,
+    opt_value=None,
     y_title="x",
     label_opt="x",
     label = "x",

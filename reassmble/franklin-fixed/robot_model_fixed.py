@@ -14,6 +14,7 @@ class Model:
         self.memory['x'] = self.model_config['init_value_x'][self.agent_id]
         self.memory['y'] = self.model_config['init_value_x'][self.agent_id]
         self.memory['dot_x'] = self.model_config['init_value_dotx'][self.agent_id]
+        self.time = 0
         self.load_scaled_config()
         self.reset_memroy_updation()
     
@@ -41,7 +42,7 @@ class Model:
         self.memory_updation['v'][adj_agent_id] += (self.memory['v'][adj_agent_id] - memory['partial_cost'])
         
     def approximate_sign(self, value):
-        extra = 1e-3
+        extra = 1e-2
         value = value/(np.fabs(value)+extra)
         return value
 
@@ -65,7 +66,7 @@ class Model:
     def sign(self, value):
         sign_value = np.zeros(value.shape)
         for i in range(len(value)):
-            if np.fabs(value[i]) < 1e-9:
+            if np.fabs(value[i]) < 1e-8:
                 sign_value[i] = 0
             else:
                 sign_value[i] = self.approximate_sign(value[i])
@@ -104,17 +105,17 @@ class Model:
         for i in range(len(track_error)):
             sign_track_error[i] = self.approximate_sign(track_error[i])
         dot_track_error = np.multiply(dot_x - dot_y, sign_track_error)
-        
+        disturbance = [self.model_config['b1']*np.cos(10*self.time), self.model_config['b2']*np.sin(10*self.time)]
         Mi, Ci, Gi = self.get_Matrix()
         
         oi = dot_x + h1*(self.power(track_error,p) + self.power(track_error, q) + track_error)
         self.memory['oi'] = oi
         ui = Gi + Ci@dot_x - h2*Mi@(self.power(oi, p)+self.power(oi, q)) - h1*Mi@(p*np.multiply(self.power(track_error, p-1),dot_track_error)+ q*np.multiply(
-            self.power(track_error, q-1), dot_track_error)+ dot_track_error)
+            self.power(track_error, q-1), dot_track_error)+ dot_track_error) - 5*self.sign(oi)
         self.memory['ui'] = ui
-        ddot_x = np.linalg.inv(Mi)@(ui - Ci@dot_x-Gi)
+        self.memory['b'] = np.array(disturbance)
+        ddot_x = np.linalg.inv(Mi)@(ui + disturbance - Ci@dot_x-Gi)
         
-         
         return dot_x, ddot_x 
     
     def virtual_signal_update_function(self):
@@ -256,7 +257,7 @@ class Model:
         self.memory_updation['z'] = self.estimation_update_function()
         self.memory_updation['v'] = self.partial_value_estimation_update_function()
         self.memory_updation['x'], self.memory_updation['dot_x'] = self.status_update_function()
-
+        self.time += self.time_delta
         for k, v in self.memory.items():
             if k in self.memory_updation.keys():
                 self.memory[k] = self.memory[k].astype(float)

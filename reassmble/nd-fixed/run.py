@@ -87,8 +87,8 @@ config = {
                                                   [0.73, 0.76, 0.79, 0.72, 1]]).T,
                     "pos": np.array([[-0.5, -0.5], [0.5, -0.5], [-0.5, 0], [0.5, 0], [0, 0.5]]),
                     "eta_max": [2.7, 2.8, 1.9],
-                    "p": 0.65,
-                    "q": 1.35,
+                    "p": 1,
+                    "q": 1,
                     "gama": 25,
                     "lipsthitz": 1,
                     "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
@@ -110,7 +110,7 @@ config = {
     },
 }
 
-config_index = "f2"
+config_index = "f1"
 num_agents = 5
 
 class CentralizedModel:
@@ -344,7 +344,7 @@ if __name__ == "__main__":
     process_prefix = f"Proc{os.getpid()}_" 
     print(f"Running with Process Prefix: {process_prefix}")
 
-    TOTAL_SIMULATIONS = 10
+    TOTAL_SIMULATIONS = 2
     magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
 
     for i, magnitude in enumerate(magnitudes):

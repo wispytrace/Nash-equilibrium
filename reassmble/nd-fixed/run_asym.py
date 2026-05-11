@@ -298,8 +298,8 @@ if __name__ == "__main__":
     process_prefix = f"Proc{os.getpid()}_" 
     print(f"Running with Process Prefix: {process_prefix}")
 
-    TOTAL_SIMULATIONS = 10
-    magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
+    TOTAL_SIMULATIONS = 2
+    magnitudes = [20]
 
     for i, magnitude in enumerate(magnitudes):
         # if i != 43:
@@ -310,7 +310,7 @@ if __name__ == "__main__":
         
         random_vec = [[-1, 1], [1, -1], [-1, 0], [1, 0], [1.5, 1.5]]
         init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
-        
+        print(init_value_large)
         centralized_system = CentralizedModel(
             num_agents=num_agents, 
             sim_id=unique_sim_id,  # <--- 传入这个唯一 ID

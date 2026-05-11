@@ -38,6 +38,7 @@ config = {
                 'K_m': [1.2, 1.3, 1.2, 1.3, 1.2, 1.3],
                 'share': {
                     "init_value_x": np.array([0, 0.5, 1, 1.5, 2, 2.5]),
+                    "init_value_y": np.array([2, 2.5, 2, 3.5, 3, 4.5]),
                     "init_value_dotx": np.array([-2, -1, -2, 1, 2, 1]),
                     "eta_max": [2.7, 2.8, 1.9],
                     "p": 0.65,
@@ -46,19 +47,19 @@ config = {
                     "lipsthitz": 1,
                     # "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
                     "l": np.array([0]),
-                    "u": np.array([10]),
-                    "c": np.array([20]),
+                    "u": np.array([8]),
+                    "c": np.array([40]),
                     'a': 0.1,
                     'po': 25,
                 },
 
                 'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':3},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':4},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':5},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':6},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':7},
-                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':8}
+                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':10},
+                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':15},
+                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':20},
+                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':25},
+                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':30},
+                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':35}
                 },
             }
         }
@@ -98,19 +99,19 @@ config = {
                     "lipsthitz": 1,
                     # "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
                     "l": np.array([0]),
-                    "u": np.array([4]),
+                    "u": np.array([8]),
                     "c": np.array([0]),
                     'a': 0.1,
                     'po': 25,
                 },
 
                 'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':3},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':4},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':5},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':6},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':7},
-                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':8}
+                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':10},
+                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':15},
+                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':20},
+                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':25},
+                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':30},
+                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':35}
                 },
             }
         }
@@ -144,32 +145,32 @@ config = {
                     "init_value_x": np.array([0, 0.5, 1, 1.5, 2, 2.5]),
                     "init_value_dotx": np.array([-2, -1, -2, 1, 2, 1]),
                     "eta_max": [2.7, 2.8, 1.9],
-                    "p": 0.65,
-                    "q": 1.35,
+                    "p": 1,
+                    "q": 1,
                     "gama": 25,
                     "lipsthitz": 1,
                     # "scale_dict": {'alpha': 4, 'beta': 4, 'eta': 2, 'h1': 1, 'h2':1},
                     "l": np.array([0]),
-                    "u": np.array([5]),
+                    "u": np.array([8]),
                     "c": np.array([0]),
                     'a': 0.1,
-                    'po': 25,
+                    'po': 1.25,
                 },
 
                 'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':3},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':4},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':5},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':6},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':7},
-                '5': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'xi':8}
+                '0': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':10},
+                '1': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':15},
+                '2': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':20},
+                '3': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':25},
+                '4': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':30},
+                '5': { 'alpha': [0, 10, 10], 'beta':[0, 10, 10], 'eta': [0, 0, 1], 'h1': 2, 'h2': 2, 'xi':35}
                 },
             }
         }
     },
 }
 
-config_index = "a_1"
+config_index = "r_0"
 num_agents = 6
 
 class CentralizedModel:
@@ -261,6 +262,7 @@ class CentralizedModel:
                 "x": [[] for _ in range(self.num_agents)],
                 "z": [[] for _ in range(self.num_agents)],
                 "v": [[] for _ in range(self.num_agents)],
+                "y": [[] for _ in range(self.num_agents)],
             }
         }
 
@@ -274,6 +276,8 @@ class CentralizedModel:
                 centralized_data["trajectories"]["x"][i].append(entry['x'])
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
+                centralized_data["trajectories"]["y"][i].append(entry['y'])
+
 
         save_path = self.get_save_path()
         file_path = os.path.join(save_path, "all_agents_trajectories.json")

@@ -51,15 +51,16 @@ config = {
                 },
 
                 'private': {
-                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2},
-                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2},
-                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2},
-                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2},
-                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2},
+                '0': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'b1': 2, 'b2': 2},
+                '1': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'b1': 1, 'b2': 3},
+                '2': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'b1': 3, 'b2': 4},
+                '3': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'b1': 3, 'b2': 1},
+                '4': { 'alpha': [10, 10, 10], 'beta':[10, 10, 10], 'eta': [1, 1, 1], 'h1': 2, 'h2': 2, 'b1': 3, 'b2': 2},
                 },
             }
         }
     },
+    
     "f2":
     {
         "simulation_time": 5, # 总仿真时长 (秒)
@@ -110,7 +111,7 @@ config = {
     },
 }
 
-config_index = "f2"
+config_index = "f1"
 num_agents = 5
 
 class CentralizedModel:
@@ -202,6 +203,9 @@ class CentralizedModel:
                 "x": [[] for _ in range(self.num_agents)],
                 "z": [[] for _ in range(self.num_agents)],
                 "v": [[] for _ in range(self.num_agents)],
+                "u": [[] for _ in range(self.num_agents)],
+                "b": [[] for _ in range(self.num_agents)],
+                "y": [[] for _ in range(self.num_agents)],
             }
         }
 
@@ -215,6 +219,9 @@ class CentralizedModel:
                 centralized_data["trajectories"]["x"][i].append(entry['x'])
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
+                centralized_data["trajectories"]["u"][i].append(entry['ui'])
+                centralized_data["trajectories"]["b"][i].append(entry['b'])
+                centralized_data["trajectories"]["y"][i].append(entry['y'])
 
         save_path = self.get_save_path()
         file_path = os.path.join(save_path, "all_agents_trajectories.json")
@@ -336,31 +343,31 @@ def run_single_simulation():
     centralized_system.run()
 
 if __name__ == "__main__":
-    # run_single_simulation()
+    run_single_simulation()
 
     # 【新增】生成一个进程唯一的 ID 前缀
     # 比如: "P1234_"，这样终端A发的ID是 "P1234_0", 终端B发的ID是 "P5678_0"
-    import os
-    process_prefix = f"Proc{os.getpid()}_" 
-    print(f"Running with Process Prefix: {process_prefix}")
+    # import os
+    # process_prefix = f"Proc{os.getpid()}_" 
+    # print(f"Running with Process Prefix: {process_prefix}")
 
-    TOTAL_SIMULATIONS = 10
-    magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
+    # TOTAL_SIMULATIONS = 2
+    # magnitudes = [5+i*15 for i in range(TOTAL_SIMULATIONS)]
 
-    for i, magnitude in enumerate(magnitudes):
-        # if i != 43:
-        #     continue
-        # 【修改】组合出全局唯一的 sim_id
-        # 前端收到的是字符串，这样就不会冲突了
-        unique_sim_id = f"{process_prefix}{i}"
+    # for i, magnitude in enumerate(magnitudes):
+    #     # if i != 43:
+    #     #     continue
+    #     # 【修改】组合出全局唯一的 sim_id
+    #     # 前端收到的是字符串，这样就不会冲突了
+    #     unique_sim_id = f"{process_prefix}{i}"
         
-        random_vec = [[-1, 1], [1, -1], [-1, 0], [1, 0], [1.5, 1.5]]
-        init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
+    #     random_vec = [[-1, 1], [1, -1], [-1, 0], [1, 0], [1.5, 1.5]]
+    #     init_value_large = (random_vec / np.linalg.norm(random_vec)) * magnitude
         
-        centralized_system = CentralizedModel(
-            num_agents=num_agents, 
-            sim_id=unique_sim_id,  # <--- 传入这个唯一 ID
-            init_value_override=init_value_large,
-            sio_client=None
-        )
-        centralized_system.run()
+    #     centralized_system = CentralizedModel(
+    #         num_agents=num_agents, 
+    #         sim_id=unique_sim_id,  # <--- 传入这个唯一 ID
+    #         init_value_override=init_value_large,
+    #         sio_client=None
+    #     )
+    #     centralized_system.run()

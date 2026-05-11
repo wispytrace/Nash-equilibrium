@@ -15,7 +15,9 @@ class Model:
         # 针对单自由度系统，初始化状态维度通常为 (1,)
         print(self.agent_id, self.model_config['init_value_x'][self.agent_id], self.model_config['init_value_dotx'][self.agent_id])
         self.memory['x'] = self.model_config['init_value_x'][self.agent_id]
-        # self.memory['y'] = self.model_config['init_value_y'][self.agent_id]
+        if 'init_value_y' in self.model_config.keys():
+
+            self.memory['y'] = self.model_config['init_value_y'][self.agent_id]
         self.memory['dot_x'] = self.model_config['init_value_dotx'][self.agent_id]
         
         self.reset_memory_updation()
@@ -157,16 +159,14 @@ class Model:
                 
         # values = np.array(values)
         values = values - 1.4*self.memory['v']
-
         # self.memory['before_values'] = np.copy(values)
 
         # self.memory['before_values_sum'] = value_sum
 
         if self.model_config['c'] == 0:
-            projected_values = np.array(values.shape)
-            for i in range(projected_values.shape[0]):
-                projected_values[i] = max(min(values[i], self.model_config['u']), self.model_config['l'])
-            print("project", projected_values)
+            projected_values = np.zeros_like(values)
+            projected_values = np.clip(values, self.model_config['l'], self.model_config['u'])
+            print(projected_values)
         else:
             projected_values, _ =  self.project_to_box_and_hyperplane(values.flatten(), self.model_config['c'], self.model_config['l'], self.model_config['u'])
         
@@ -274,7 +274,7 @@ class Model:
         cost = (action - xi)**2 + price*action
 
 
-        return cost/4
+        return cost
 
     def partial_value_estimation_update_function(self):
         p = self.model_config['p']
@@ -309,7 +309,7 @@ class Model:
             self.memory[k] = self.memory[k].astype(float)
             self.memory[k] += self.memory_updation[k] * self.time_delta
         
-        print(sum(self.memory['z']), self.memory['y'], self.memory['v'])
+        print(sum(self.memory['z']), self.memory['y'], self.memory['partial_cost'])
         
         # print(f"Agent {self.agent_id} - Updated State: x={self.memory['x']}, dot_x={self.memory['dot_x']}, y={self.memory['y']}, z={self.memory['z']}, v={self.memory['v']}")
         

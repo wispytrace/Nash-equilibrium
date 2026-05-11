@@ -44,7 +44,8 @@ class Model:
                 sign_value[i] = self.approximate_sign(value[i])
         
         return sign_value
-    
+
+
 
     def power(self, value, a):
         # 兼容标量和数组的幂次运算结构
@@ -178,8 +179,10 @@ class Model:
 
         cost = (action - xi)**2 + price*action
 
-
-        return cost/4
+        current_x = action # 假设单维度
+    
+            
+        return cost/4 
 
     def update(self):
         """
@@ -199,7 +202,12 @@ class Model:
             self.memory[k] = self.memory[k].astype(float)
             self.memory[k] += self.memory_updation[k] * self.time_delta
                 
-        # print(f"Agent {self.agent_id} - Updated State: x={self.memory['x']}, dot_x={self.memory['dot_x']}, y={self.memory['y']}, z={self.memory['z']}, v={self.memory['v']}")
+        # lower_bound = 0.0
+        # upper_bound = 8.0
         
+        # # 将 x 强制限制在 [0, 8] 之间
+        # import numpy as np # 确保文件头部导入了 numpy
+        # self.memory['x'] = np.clip(self.memory['x'], lower_bound, upper_bound)
+
         self.reset_memory_updation()
 

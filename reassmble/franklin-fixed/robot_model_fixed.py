@@ -12,7 +12,7 @@ class Model:
         self.time_delta = self.model_config['time_delta']
         self.agent_id = self.model_config['agent_id']
         self.memory['x'] = self.model_config['init_value_x'][self.agent_id]
-        self.memory['y'] = self.model_config['init_value_x'][self.agent_id]
+        self.memory['y'] = self.model_config['init_value_y'][self.agent_id]
         self.memory['dot_x'] = self.model_config['init_value_dotx'][self.agent_id]
         self.time = 0
         self.load_scaled_config()

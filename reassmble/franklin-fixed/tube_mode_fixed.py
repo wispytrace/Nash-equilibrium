@@ -309,7 +309,7 @@ class Model:
             self.memory[k] = self.memory[k].astype(float)
             self.memory[k] += self.memory_updation[k] * self.time_delta
         
-        print(sum(self.memory['z']), self.memory['y'], self.memory['partial_cost'])
+        print(sum(self.memory['z']), self.memory['y'])
         
         # print(f"Agent {self.agent_id} - Updated State: x={self.memory['x']}, dot_x={self.memory['dot_x']}, y={self.memory['y']}, z={self.memory['z']}, v={self.memory['v']}")
         

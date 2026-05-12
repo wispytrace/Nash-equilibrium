@@ -73,7 +73,7 @@ class Model:
     def auxiliary_update_function(self):
         e = self.model_config['h1']
         k = self.model_config['h2']
-        bi = self.model_config['c']/6 # 对应公式里的 b_i
+        bi = self.model_config['c']/5 # 对应公式里的 b_i
         
         # 公式 (7b) dot_yi
         dot_y = e * k * (self.sum_z_diff - bi + self.memory['x']) \
@@ -177,12 +177,9 @@ class Model:
         
         price =  status_sum*a + po
 
-        cost = (action - xi)**2 + price*action
-
-        current_x = action # 假设单维度
-    
+        cost = (action - xi)**2 + price*action    
             
-        return cost/4 
+        return cost 
 
     def update(self):
         """
@@ -197,7 +194,7 @@ class Model:
         self.memory_updation['z'] = self.estimation_update_function()
         self.memory_updation['y_aux'], self.memory_updation['z_aux'] = self.auxiliary_update_function()
 
-        print(f"Agent {self.agent_id} - Pre-Update State: x={self.memory['x']}, dot_x={self.memory['dot_x']}, z={self.memory['z']}")
+        print(f"Agent {self.agent_id} - Pre-Update State: x={self.memory['x']}, dot_x={self.memory['dot_x']}, z={sum(self.memory['z'])}")
         for k in self.memory_updation.keys():
             self.memory[k] = self.memory[k].astype(float)
             self.memory[k] += self.memory_updation[k] * self.time_delta

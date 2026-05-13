@@ -97,15 +97,20 @@ class Model:
         5个智能体的非合作博弈代价函数
         该函数联合伪梯度满足强单调性 (mu 约等于 2.64) 和 Lipschitz连续 (L 约等于 3.5)
         """
-        # 固定的博弈交互矩阵 A (非对称)
+        # 提取参数
         pg = self.model_config['pg']
+        N = self.model_config['N']
         zi = self.memory['z'][self.agent_id]
-
-        cost = 0.5 * np.linalg.norm(zi - pg)
-
-        pre_agent = (self.agent_id - 1) % self.model_config['N'] if self.agent_id > 1 else self.model_config['N'] - 1
-        next_agent = (self.agent_id + 1) % self.model_config['N'] if self.agent_id < self.model_config['N'] - 1 else 0
-        cost += 0.5 * np.linalg.norm(zi - self.memory['z'][pre_agent]) + 0.5*np.linalg.norm(zi - self.memory['z'][next_agent])
+        
+        # 修复逻辑BUG：Python的 % 可以直接处理负数，无需复杂的if-else
+        pre_agent = (self.agent_id - 1) % N
+        next_agent = (self.agent_id + 1) % N
+        
+        # 修复数学BUG：必须使用平方L2范数 (** 2)，否则不可导且不满足强单调性
+        cost = 0.5 * (np.linalg.norm(zi - pg) ** 2)
+        cost += 0.5 * (np.linalg.norm(zi - self.memory['z'][pre_agent]) ** 2) 
+        cost += 0.5 * (np.linalg.norm(zi - self.memory['z'][next_agent]) ** 2)
+        
         return cost
 
 
@@ -306,20 +311,28 @@ class Model:
             self.memory_updation['x_el'] = self.euler_status_update_function()
             self.memory['x'] = self.memory['x_el'][0]
 
-    def init_x(self):
+    def init_x(self, scale_factor=1.0):
+        """
+        初始化智能体状态
+        :param scale_factor: 初始值放缩倍数，默认为1.0（不改变原值）
+        """
         hight_agents = [0, 1]
         linear_agents = [2, 3]
         euler_agents = [4, 5]
 
+        # 提前计算好翻倍/缩放后的初始值，使代码更简洁
+        # 注意：如果 init_value 是 Python 原生列表(list)，直接相乘会变成列表拼接。
+        # 建议确保 init_value 是 numpy 数组或者标量数字。
+        scaled_init_value = self.model_config['init_value'] * scale_factor
+
         if self.agent_id in hight_agents:
-            self.memory['x_hl'] = self.model_config['init_value']
+            self.memory['x_hl'] = scaled_init_value
         
         elif self.agent_id in linear_agents:
-            self.memory['x_li'] = self.model_config['init_value']
+            self.memory['x_li'] = scaled_init_value
         
         elif self.agent_id in euler_agents:
-            self.memory['x_el'] = self.model_config['init_value']
-
+            self.memory['x_el'] = scaled_init_value
 
     def update(self):
         
@@ -333,7 +346,6 @@ class Model:
                 self.memory[k] += self.memory_updation[k] * self.time_delta
         
         self.time += self.time_delta
-        
         
         self.reset_memroy_updation()
     

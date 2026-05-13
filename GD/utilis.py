@@ -74,6 +74,7 @@ def plot_multi_dimension_status_converge_dynamic_graph(
     os.makedirs(figure_dir, exist_ok=True)
 
     status_vector = np.array(status_vector)
+    print(status_vector.shape)
     N, T, D = status_vector.shape
 
     colors = list(mcolors.TABLEAU_COLORS.values())
@@ -108,6 +109,56 @@ def plot_multi_dimension_status_converge_dynamic_graph(
         plt.close()
         print(f"Saved figure: {path}")
 
+
+
+def plot_multi_dimension_control_converge_dynamic_graph(
+    time,
+    status_vector,
+    figure_dir,
+    opt_value=None,
+    y_title="u",
+    label_opt="u",
+    label = "u",
+    file_name_prefix="dynamic_convergence",
+    start_agent_id=0,
+):
+    os.makedirs(figure_dir, exist_ok=True)
+
+    status_vector = np.array(status_vector)
+    print(status_vector.shape)
+    N, T, D = status_vector.shape
+
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    
+    for i in range(N):
+        for d in range(D):
+            y = status_vector[i, :, d]
+            color = colors[d % len(colors)]
+            label_string = r'$%s_{%d%d}$' % (label, i+1, d+1)
+            opt_label_string = r'$%s_{%d%d}^{\star}$' % (label_opt, i+1, d+1)
+            plt.plot(time, y, color=color, label=label_string)
+            if opt_value is not None:
+                plt.plot(time, opt_value[i,:, d], color=color, linestyle='dashed', label=opt_label_string)
+                    
+        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+        y_title_string = r'$%s_{%d}$' % (y_title, i+start_agent_id+1)
+        plt.ylabel(y_title_string, fontsize=15, fontproperties=prop)
+
+        plt.legend(fontsize=12, loc='upper right', ncol=2)
+        plt.xlim(left=0, right=time[-1])
+        plt.tight_layout()
+
+        # y_min = np.min(status_vector[:, :, d])
+        # y_max = np.max(status_vector[:, :, d])
+        # 增加 30% 的顶部空间
+        # padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
+        # plt.ylim(y_min - padding * 0.1, y_max + padding)    
+
+        fname = f"{file_name_prefix}_player_{i+1}.png"
+        path = os.path.join(figure_dir, fname)
+        plt.savefig(path)
+        plt.close()
+        print(f"Saved figure: {path}")
 
 def plot_error_value_graph(
     time,
@@ -431,6 +482,73 @@ def plot_2d_trajectory_graph(status_vector, figure_dir):
     # 显示图表
     plt.tight_layout()
     plt.savefig(figure_dir + "/2d_trajectories.png")
+
+def plot_2d_trajectory_graph_mark(status_vector, xir, figure_dir):
+    plt.clf()
+    colors = list(mcolors.TABLEAU_COLORS.keys())
+    status_vector = np.array(status_vector)
+    xir = np.array(xir)  # 确保目标点参数也是 numpy 数组以便切片
+    shape = status_vector.shape
+    
+    for i in range(shape[0]):
+        x = status_vector[i,:,0]
+        y = status_vector[i,:,1]
+        
+        # 1. 绘制智能体轨迹
+        plt.plot(x, y, 
+            color=colors[i],
+            linestyle='-',
+            linewidth=1,
+            alpha=0.7,
+            label=f'Player {i+1}')
+        
+        # 2. 标记起始点和终点
+        plt.scatter(x[0], y[0], color=colors[i], marker='o', s=50, edgecolor='black')
+        plt.scatter(x[-1], y[-1], color=colors[i], marker='s', s=50, edgecolor='black')
+        
+        # 3. 标记目标点 xir
+        # 使用五角星 '*' 代表目标，并使用动态格式化生成 LaTeX 格式的图例标签
+        print(xir.shape)
+        plt.scatter(xir[i, 0], xir[i, 1], 
+            color=colors[i], 
+            marker='*', 
+            s=100,               # 把目标点画大一点以示区分
+            edgecolor='black', 
+            label=f'Target $x_{{{i+1}}}^r$')
+            
+    plt.xlabel("$x_{i1}$(m)", fontsize=15)
+    plt.ylabel("$x_{i2}$(m)", fontsize=15)
+
+    plt.grid(True, linestyle='--', alpha=0.6)
+    
+    # 调整图例
+    plt.legend(
+        loc='upper right',
+        bbox_to_anchor=(0.98, 0.98),  # 留出2%的边距
+        ncol=3,                       # 建议改为2列，左边玩家轨迹，右边目标点
+        frameon=True,
+        framealpha=0.9,
+        edgecolor='gray',
+        facecolor='white',
+        fontsize=10,                  # 字体稍微调小一点防止出界
+        borderpad=0.8,
+        borderaxespad=0.5
+    )
+    
+    # 自动调整坐标轴范围 (重要修改：将目标点 xir 也纳入极值计算，防止目标点在画面外)
+    margin = 0.1  # 10%的边界留白
+    all_x = np.concatenate([status_vector[:, :, 0].flatten(), xir[:, 0]])
+    all_y = np.concatenate([status_vector[:, :, 1].flatten(), xir[:, 1]])
+    
+    x_min, x_max = np.min(all_x), np.max(all_x)
+    y_min, y_max = np.min(all_y), np.max(all_y)
+    
+    plt.xlim(x_min - (x_max - x_min)*margin, x_max + (x_max - x_min)*5*margin)
+    plt.ylim(y_min - (y_max - y_min)*margin, y_max + (y_max - y_min)*5*margin)
+
+    # 显示图表
+    plt.tight_layout()
+    plt.savefig(figure_dir + "/2d_trajectories_mark.png")
 
 def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x'):
     """

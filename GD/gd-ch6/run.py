@@ -118,7 +118,7 @@ class CentralizedModel:
             self.record()
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"status: {self.agntes[5].memory['omega']}" )
+                print(f"status: {self.agntes[5].memory['x']}" )
 
             self.counts += 1
         self.done()
@@ -199,7 +199,7 @@ def run_single_simulation(config_index, num_agents, init_value):
 if __name__ == "__main__":
     config_list = ["r_0"]
     num_agents = 6
-    # init_value = {"x": np.array([5, -5, -3, -3, 1], dtype=float)}
+    init_value = {"x_li": np.array([[],[]], dtype=float)}
     run_single_simulation(config_list[0], num_agents, None)
 
 # 设定 8 种不同的初始幅度大小（从小到大，测试算法对极大初始偏差的收敛鲁棒性）

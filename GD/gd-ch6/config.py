@@ -21,7 +21,8 @@ config = {
             "model_config": 
             {
                 "N": 6,
-                "memory" : {"omega": np.zeros(2), "z": np.zeros((6,2)), "x": np.zeros(2), "x_hl": np.zeros((2, 2)), "x_li": np.zeros((3,2)), "x_el": np.zeros((2, 2))},
+                "memory" : {"omega": np.zeros(2), "z": np.zeros((6,2)), "x": np.zeros(2), "x_hl": np.zeros((2, 2)), "x_li": np.zeros((2,3)), "x_el": np.zeros((2, 2)), "ei_sum": np.zeros((2)),
+                            'ui_hl': np.zeros((2)), 'ui_li': np.zeros((2,3)), 'ui_el': np.zeros((2))},
                 'share': {
                     "p": 0.8,
                     "q": 1.2,
@@ -36,7 +37,8 @@ config = {
                         'ki': [2, 3, 5],
                         'k_i_tilde': [3, 4, 5],
                         'order': 2,
-                        'pg': np.array([2,2])
+                        'pg': np.array([2,2]),
+                        "init_value": np.array([[4, 4], [-2, 2]], dtype=float)
                         },
 
                     '1': {
@@ -47,19 +49,22 @@ config = {
                         'k_i_tilde': [5, 6, 5],
                         'order': 2,
                         'pg': np.array([4,0]),
+                        "init_value": np.array([[6, -1], [2, -2]], dtype=float)
                     },
                     '2': { 
                             'parameters': np.array([1, 5, 0.2]),
                             'gama': [0.7, 1.3],
                             'ki': [2, 3],
-                            'pg': np.array([2,-2])
+                            'pg': np.array([2,-2]),
+                            "init_value": np.array([[4, 0,1], [-4, 2, 0]], dtype=float)
                         },
 
                     '3': {
                             'parameters': np.array([1.2, 5, 0.2]),
                             'gama': [0.85, 1.3],
                             'ki': [4, 3],
-                            'pg': np.array([-2,-2])
+                            'pg': np.array([-2,-2]),
+                            "init_value": np.array([[-4, 1,0], [-4, 1, 1]], dtype=float)
                             },
                     '4': {
                         "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
@@ -67,7 +72,10 @@ config = {
                                                         [0.31, 0.33, 0.32, 0.34, 0.47],
                                                         [1.78, 1.76, 1.74, 1.72, 1],
                                                         [0.73, 0.76, 0.79, 0.72, 1]]).T,
-                        'pg': np.array([-4,0])
+                        'pg': np.array([-4,0]),
+                        "h1": 2,
+                        "h2": 2,
+                        "init_value": np.array([[-6, 1], [1, -1]], dtype=float)
                     },
                     '5': {
                         "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
@@ -75,7 +83,10 @@ config = {
                                                         [0.31, 0.33, 0.32, 0.34, 0.47],
                                                         [1.78, 1.76, 1.74, 1.72, 1],
                                                         [0.73, 0.76, 0.79, 0.72, 1]]).T,
-                        'pg': np.array([-2,2])
+                        'pg': np.array([-2,2]),
+                        "h1": 2,
+                        "h2": 2,
+                        "init_value": np.array([[-4, 4], [2, 1]], dtype=float)
                         }
                     }                
                 }

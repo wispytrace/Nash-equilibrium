@@ -163,6 +163,13 @@ class Model:
         # print("K1, K2:", K1, K2)
         return np.matrix(K1), np.matrix(K2)
 
+    # def getNormalMatrix(self):
+    #     Qs = np.array([self.B, self.A@self.B, self.A@self.A@self.B])
+    #     t1 = np.array([0,0,1])@np.linalg.inv(Qs)
+    #     T = np.array([t1, t1@self.A, t1@self.A@self.A]).T
+    #     return T
+        
+
     def status_update_function(self):
         ki = self.model_config['ki']
         xi = self.memory['x']

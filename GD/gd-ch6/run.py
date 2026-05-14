@@ -128,61 +128,61 @@ class CentralizedModel:
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def run_batch_simulations(config_list, num_agents, init_values_list):
-    """
-    批量运行相同配置下的不同初始条件（极简多线程版）
-    """
-    # 1. 在函数内部直接定义一个闭包任务，不用把代码移到外面
-    def single_task(config_idx, s_id, i_val):
-        print(f"--- Running config {config_idx}, simulation {s_id} ---")
-        centralized_system = CentralizedModel(
-            num_agents=num_agents, 
-            config_index=config_idx, 
-            init_value=i_val,
-            simu_id=s_id
-        )
-        centralized_system.run()
-        return f"Finished config {config_idx}, simu {s_id}"
-
-    # 2. 开启线程池（max_workers 可以根据你的服务器 CPU 核心数调整，比如 8 或 16）
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        futures = []
-        for config_index in config_list:
-            print(f"========== Queuing runs for configuration: {config_index} ==========")
-            for simu_id, init_val in enumerate(init_values_list):
-                # 提交任务到线程池
-                future = executor.submit(single_task, config_index, simu_id, init_val)
-                futures.append(future)
-        
-        # 3. 动态等待所有任务完成并打印结果 (可选，用于监控进度)
-        for future in as_completed(futures):
-            print(future.result())
-            
-    print("========== Finished ALL batch runs ==========\n")
-
-
 # def run_batch_simulations(config_list, num_agents, init_values_list):
 #     """
-#     批量运行相同配置下的不同初始条件
+#     批量运行相同配置下的不同初始条件（极简多线程版）
 #     """
-#     for config_index in config_list:
-#         print(f"========== Starting batch runs for configuration: {config_index} ==========")
+#     # 1. 在函数内部直接定义一个闭包任务，不用把代码移到外面
+#     def single_task(config_idx, s_id, i_val):
+#         print(f"--- Running config {config_idx}, simulation {s_id} ---")
+#         centralized_system = CentralizedModel(
+#             num_agents=num_agents, 
+#             config_index=config_idx, 
+#             init_value=i_val,
+#             simu_id=s_id
+#         )
+#         centralized_system.run()
+#         return f"Finished config {config_idx}, simu {s_id}"
+
+#     # 2. 开启线程池（max_workers 可以根据你的服务器 CPU 核心数调整，比如 8 或 16）
+#     with ThreadPoolExecutor(max_workers=8) as executor:
+#         futures = []
+#         for config_index in config_list:
+#             print(f"========== Queuing runs for configuration: {config_index} ==========")
+#             for simu_id, init_val in enumerate(init_values_list):
+#                 # 提交任务到线程池
+#                 future = executor.submit(single_task, config_index, simu_id, init_val)
+#                 futures.append(future)
         
-#         for simu_id, init_val in enumerate(init_values_list):
-#             print(f"\n--- Running simulation {simu_id} ---")
+#         # 3. 动态等待所有任务完成并打印结果 (可选，用于监控进度)
+#         for future in as_completed(futures):
+#             print(future.result())
             
-#             # 实例化系统，传入对应的 simu_id
-#             centralized_system = CentralizedModel(
-#                 num_agents=num_agents, 
-#                 config_index=config_index, 
-#                 init_value=init_val,
-#                 simu_id=simu_id  # 传入 ID 用于创建对应的文件夹
-#             )
+#     print("========== Finished ALL batch runs ==========\n")
+
+
+def run_batch_simulations(config_list, num_agents, init_values_list):
+    """
+    批量运行相同配置下的不同初始条件
+    """
+    for config_index in config_list:
+        print(f"========== Starting batch runs for configuration: {config_index} ==========")
+        
+        for simu_id, init_val in enumerate(init_values_list):
+            print(f"\n--- Running simulation {simu_id} ---")
             
-#             # 运行算法
-#             centralized_system.run()
+            # 实例化系统，传入对应的 simu_id
+            centralized_system = CentralizedModel(
+                num_agents=num_agents, 
+                config_index=config_index, 
+                init_value=init_val,
+                simu_id=simu_id  # 传入 ID 用于创建对应的文件夹
+            )
             
-#         print(f"========== Finished batch runs for configuration: {config_index} ==========\n")
+            # 运行算法
+            centralized_system.run()
+            
+        print(f"========== Finished batch runs for configuration: {config_index} ==========\n")
 
 
 def run_single_simulation(config_index, num_agents, init_value):
@@ -199,17 +199,17 @@ def run_single_simulation(config_index, num_agents, init_value):
     centralized_system.run()
 
 if __name__ == "__main__":
-    config_list = ["r_0"]
+    config_list = ["r_0", "r_1"]
     num_agents = 6
     # init_value = {"x_li": np.array([[],[]], dtype=float)}
-    run_single_simulation(config_list[0], num_agents, None)
+    # run_single_simulation(config_list[0], num_agents, None)
 
-    # init_values_list = []
+    init_values_list = []
     
-    # # 自动生成 8 组不同幅度的初始条件
-    # for i in range(6):
-    #     # 将基础方向乘以当前的幅度放大倍数        
-    #     init_values_list.append(None)
+    # 自动生成 8 组不同幅度的初始条件
+    for i in range(7):
+        # 将基础方向乘以当前的幅度放大倍数        
+        init_values_list.append(None)
         
-    # # 调用批量运行函数
-    # run_batch_simulations(config_list, num_agents, init_values_list)
+    # 调用批量运行函数
+    run_batch_simulations(config_list, num_agents, init_values_list)

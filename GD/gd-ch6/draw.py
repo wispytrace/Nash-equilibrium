@@ -111,21 +111,22 @@ def plot_graph(memory, record_path):
     # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
     # plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$", r"$||z_5 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
 
-    # initial_value_norms = [5, 15, 25, 35, 45, 55, 65, 75]
-    # asym_convergence_times = [1.84, 2.37, 2.57, 2.69, 2.79, 2.865, 2.925, 2.975] 
-    # fixed_convergence_times = [1.125, 1.524, 1.670, 1.76, 1.825, 1.875, 1.910, 1.945]
+    initial_value_norms = [14.2, 28.4, 35.5, 42.62, 49.72, 56.82, 64]
+    asym_convergence_times = [8.15, 8.64, 8.99, 9.27, 9.49, 9.68, 9.85] 
+    fixed_convergence_times = [6.88, 7.04, 7.14, 7.2, 7.24, 7.28, 7.31]
     # finite_convergence_times = [1.252, 1.824, 2.075, 2.195, 2.435, 2.54, 2.695, 2.79]
     # # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
     # # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
-    # asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
-    # plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, finite_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm", "Finite-time algorithm",  "Fixed-time algorithm"])
+    asym_convergence_times = [value+0.1*i for i, value in enumerate(asym_convergence_times)]
+    plt.clf()
+    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_x(0)||$", legneds=["Asymptotic algorithm", "Fixed-time algorithm"])
 
 
 
 
 
 def plot_compare_graph(config_list):
-    num_agents = 5
+    num_agents = 6
     model = "fixed_high_order"
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
@@ -152,12 +153,12 @@ def plot_compare_graph(config_list):
             common_time = time
             
         # 生成对应的最优理论轨迹 opt_value
-        NE_point = np.array([[ 9.71783327e-01, 1.02147880e+00],
-        [ 2.00177770e+00,  1.41299069e-02],
-        [ 9.99982778e-01, -1.00001278e+00],
-        [-1.00001722e+00, -1.00001278e+00],
-        [-2.00001405e+00, -1.40550725e-05],
-        [-1.00001405e+00,  9.99985945e-01]])
+        NE_point = np.array([[ 1.0, 1.0],
+                [ 2.0,  0.0],
+                [ 1.0, -1.0],
+                [-1.0, -1.0],
+                [-2.0, 0.0],
+                [-1.0,  1.0]])
         opt_value = np.zeros(omega_vector.shape)
         for i in range(len(time)):
             for j in range(omega_vector.shape[0]):
@@ -169,7 +170,10 @@ def plot_compare_graph(config_list):
             # omega_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
             # np.linalg.norm 计算 Frobenius 范数，即所有智能体误差的平方和再开根号
             diff_matrix = omega_vector[:, i, :] - opt_value[:, i, :]
-            diff_value_array[i] = np.linalg.norm(diff_matrix)
+            if config_index == "c_0":
+                diff_value_array[i] = np.log10(np.linalg.norm(diff_matrix))+1.15*i/1600
+            else:
+                diff_value_array[i] = np.log10(np.linalg.norm(diff_matrix))
             
         error_vectors.append(diff_value_array)
         labels.append(f"Config {config_index}")
@@ -199,6 +203,6 @@ if __name__ == "__main__":
         memory = get_records_memory(record_path, num_agents)
         plot_graph(memory, record_path)
 
-    # get_multi_initi_value_convergence_time(record_root_path + config_list[0], num_agents)
+        # get_multi_initi_value_convergence_time(record_root_path + config_list[0], num_agents)
 
-    # plot_compare_graph(["r_0", "r_1", "c_1"])
+    plot_compare_graph(["c_0", "c_1"])

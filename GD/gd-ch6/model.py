@@ -59,7 +59,7 @@ class Model:
     
 
     def approximate_sign(self, value):
-        extra = 1e-10
+        extra = 1e-4
         value = value/(np.fabs(value)+extra)
         return value
 

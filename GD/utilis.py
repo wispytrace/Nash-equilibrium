@@ -770,7 +770,7 @@ def plot_initial_convergence_line__graph(initial_values, convergence_times, xlab
     plt.xlabel(xlable, fontsize=15)
     plt.ylabel("Convergence Time(sec)", fontsize=15)
     plt.legend(fontsize=12, loc='upper right')
-    plt.xlim(left=0, right=max(initial_values)*1.1)
+    plt.xlim(left=10, right=max(initial_values)*1.1)
     plt.ylim(bottom=0, top=y_max*1.4)
     plt.tight_layout()
     path = "initial_convergence_time.png"

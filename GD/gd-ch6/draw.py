@@ -38,7 +38,12 @@ def get_multi_initi_value_convergence_time(base_path, num_agents, opt_value=None
             time = np.array(memory['time'][-1][:len(status_vector[0])])
             if opt_value is None:
                 opt_value = np.zeros(status_vector.shape)
-                NE_point = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
+                NE_point = np.array([[ 1.0, 1.0],
+                [ 2.0,  0.0],
+                [ 1.0, -1.0],
+                [-1.0, -1.0],
+                [-2.0, 0.0],
+                [-1.0,  1.0]])
                 for i in range(len(time)):
                     for j in range(status_vector.shape[0]):
                         opt_value[j, i, :] = NE_point[j]
@@ -64,9 +69,14 @@ def plot_graph(memory, record_path):
     partial_cost = align_list(memory['partial_cost'])
     # update_value = align_list(memory['update_value'])
     time = np.array(memory['time'][-1][:len(omega_vector[0])])
-
+    print(x_vector[:,-1,:])
     opt_value = np.zeros(omega_vector.shape)
-    NE_point = np.array([[-0.4329887784954573, -0.8676917960068591], [-0.4326561113415024, -0.8676893586184624], [-0.4325579365885621, -0.8683015551590183], [-0.43267989181430777, -0.8683343909485698], [-0.4336820990891488, -0.868376829569358], [0.0, 0.0]])
+    NE_point = np.array([[ 1.0, 1.0],
+                [ 2.0,  0.0],
+                [ 1.0, -1.0],
+                [-1.0, -1.0],
+                [-2.0, 0.0],
+                [-1.0,  1.0]])
     for i in range(len(time)):
         for j in range(omega_vector.shape[0]):
             opt_value[j, i, :] = NE_point[j]
@@ -92,8 +102,8 @@ def plot_graph(memory, record_path):
     # plot_3d_trajectory_global_graph(omega_vector, figure_dir, global_target=pg_opt_value)
     # plot_status_converge_graph(time, omega_vector, opt_value, figure_dir, file_name_prefix='status_convergence', ylabel=r"$x_i$")
     # plot_status_graph(time, partial_cost, figure_dir, file_name_prefix='partial_cost', ylabel=r"$\nabla_if_i(x)$", x_labels=[r"$\nabla_1f_1(x)$", r"$\nabla_2f_2(x)$", r"$\nabla_3f_3(x)$", r"$\nabla_4f_4(x)$", r"$\nabla_5f_5(x)$"], equilibrium_value=0)
-    plot_multi_dimension_status_converge_dynamic_graph(time, omega_vector, figure_dir, file_name_prefix='virtual_signal')
-    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, file_name_prefix='actual_signal')
+    plot_multi_dimension_status_converge_dynamic_graph(time, omega_vector, figure_dir, file_name_prefix='virtual_signal', opt_value=opt_value)
+    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, file_name_prefix='actual_signal', opt_value=opt_value)
     plot_multi_dimension_control_converge_dynamic_graph(time, ui_hl[0:2],figure_dir, file_name_prefix='hl_control')
     plot_multi_dimension_control_converge_dynamic_graph(time, ui_li[2:4].reshape(ui_li[2:4].shape[0], ui_li[2:4].shape[1], -1),figure_dir, file_name_prefix='li_control', start_agent_id=2)
     plot_multi_dimension_control_converge_dynamic_graph(time, ui_el[4:6],figure_dir, file_name_prefix='el_control', start_agent_id=4)
@@ -142,11 +152,16 @@ def plot_compare_graph(config_list):
             common_time = time
             
         # 生成对应的最优理论轨迹 opt_value
-        NE = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
+        NE_point = np.array([[ 9.71783327e-01, 1.02147880e+00],
+        [ 2.00177770e+00,  1.41299069e-02],
+        [ 9.99982778e-01, -1.00001278e+00],
+        [-1.00001722e+00, -1.00001278e+00],
+        [-2.00001405e+00, -1.40550725e-05],
+        [-1.00001405e+00,  9.99985945e-01]])
         opt_value = np.zeros(omega_vector.shape)
         for i in range(len(time)):
             for j in range(omega_vector.shape[0]):
-                opt_value[j, i, :] = NE[j]
+                opt_value[j, i, :] = NE_point[j]
                 
         # 计算该 config 下，每个时间步的全局误差 ||x - x*||
         diff_value_array = np.zeros(len(time))
@@ -154,7 +169,7 @@ def plot_compare_graph(config_list):
             # omega_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
             # np.linalg.norm 计算 Frobenius 范数，即所有智能体误差的平方和再开根号
             diff_matrix = omega_vector[:, i, :] - opt_value[:, i, :]
-            diff_value_array[i] = np.log10(np.linalg.norm(diff_matrix))
+            diff_value_array[i] = np.linalg.norm(diff_matrix)
             
         error_vectors.append(diff_value_array)
         labels.append(f"Config {config_index}")
@@ -164,7 +179,7 @@ def plot_compare_graph(config_list):
         time=common_time,
         error_vectors=error_vectors,
         figure_dir=figure_dir,
-        labels=["Asymptotic algorithm", "Finite-time algorithm", "Fixed-time algorithm"],
+        labels=["Asymptotic algorithm", "Fixed-time algorithm"],
         ylabel=r"$||\mathbf{x} - \mathbf{x}^\star||$",
         file_name_prefix="x_status"
     )
@@ -186,4 +201,4 @@ if __name__ == "__main__":
 
     # get_multi_initi_value_convergence_time(record_root_path + config_list[0], num_agents)
 
-    # plot_compare_graph(["c_2", "c_0", "c_1"])
+    # plot_compare_graph(["r_0", "r_1", "c_1"])

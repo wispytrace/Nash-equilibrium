@@ -4,7 +4,7 @@ import copy
 config = {
     "r_0":
     {
-        "epochs" : 60000,
+        "epochs" : 80000,
         "adjacency_matrix" : [[0, 1, 0, 0, 0, 1 ],
                               [1, 0, 1, 0, 0, 0],
                               [0, 1, 0, 1, 0, 0],
@@ -38,7 +38,8 @@ config = {
                         'k_i_tilde': [3, 4, 5],
                         'order': 2,
                         'pg': np.array([2,2]),
-                        "init_value": np.array([[-4, 4], [-2, 2]], dtype=float)
+                        "init_value": np.array([[-4, 4], [-2, 2]], dtype=float),
+                        "init_omega": np.array([-2, 2], dtype=float)
                         },
 
                     '1': {
@@ -49,14 +50,16 @@ config = {
                         'k_i_tilde': [5, 6, 5],
                         'order': 2,
                         'pg': np.array([4,0]),
-                        "init_value": np.array([[4, 4], [2, -2]], dtype=float)
+                        "init_value": np.array([[4, 4], [2, -2]], dtype=float),
+                        "init_omega": np.array([1, 3], dtype=float)
                     },
                     '2': { 
                             'parameters': np.array([1, 5, 0.2]),
                             'gama': [0.7, 1.3],
                             'ki': [2, 3],
                             'pg': np.array([2,-2]),
-                            "init_value": np.array([[6, 0,1], [1, 2, 0]], dtype=float)
+                            "init_value": np.array([[6, 0,1], [1, 2, 0]], dtype=float),
+                            "init_omega": np.array([-1, 1], dtype=float)
                         },
 
                     '3': {
@@ -64,7 +67,8 @@ config = {
                             'gama': [0.85, 1.3],
                             'ki': [4, 3],
                             'pg': np.array([-2,-2]),
-                            "init_value": np.array([[4, 1,0], [-4, 1, 1]], dtype=float)
+                            "init_value": np.array([[4, 1,0], [-4, 1, 1]], dtype=float),
+                            "init_omega": np.array([4, 4], dtype=float)
                             },
                     '4': {
                         "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
@@ -75,7 +79,8 @@ config = {
                         'pg': np.array([-4,0]),
                         "h1": 2,
                         "h2": 2,
-                        "init_value": np.array([[-4, -4], [-1, -1]], dtype=float)
+                        "init_value": np.array([[-4, -4], [-1, -1]], dtype=float),
+                        "init_omega": np.array([-3, -3], dtype=float)
                     },
                     '5': {
                         "parameter_matrix": np.array([[1.19, 1.16, 1.13, 1.11, 1],
@@ -86,7 +91,8 @@ config = {
                         'pg': np.array([-2,2]),
                         "h1": 2,
                         "h2": 2,
-                        "init_value": np.array([[-6, -1], [2, 1]], dtype=float)
+                        "init_value": np.array([[-6, -1], [2, 1]], dtype=float),
+                        "init_omega": np.array([0.5, 0.5], dtype=float)
                         }
                     }                
                 }
@@ -260,15 +266,17 @@ def parameter_calculate(index):
     """
     Calculate the parameters for the given index.
     """
-    N = 5
-    m = 5
-    sclae = 0.5
+    N = 6
+    m = 6
+    sclae = 0.2
     A =  np.array([
-        [ 3.06,  0.53, -0.27, -0.07,  0.33],
-        [-0.47,  2.94,  0.55, -0.13, -0.05],
-        [ 0.13, -0.05,  3.00,  0.52, -0.36],
-        [-0.07,  0.07, -0.68,  3.02,  0.40],
-        [-0.47, -0.05,  0.04, -0.60,  2.91]
+        [ 2,  0.5, 0, 0,  0, 0.5],
+        [0.5,  2, 0.5, 0, 0, 0],
+        [0, 0.5, 2, 0.5, 0, 0],
+        [0, 0, 0.5, 2, 0.5, 0],
+        [0, 0, 0, 0.5, 2, 0.5],
+        [0.5, 0, 0, 0, 0.5, 2]
+
     ])
 
     A = A*sclae
@@ -283,11 +291,12 @@ def parameter_calculate(index):
             l_hat = np.linalg.norm(A[i,:])
     # h_m = 3.9317
     print(f"m_hat: {m_hat:.6f}, l_hat: {l_hat:.6f}, h_m: {h_m:.6f}")
-    adjacency_matrix = np.array( [[0, 1, 0, 0, 1 ],
-                              [1, 0, 1, 0, 0],
-                              [0, 1, 0, 1, 0],
-                              [0, 0, 1, 0, 1],
-                              [1, 0, 0, 1, 0]])
+    adjacency_matrix = np.array( [[0, 1, 0, 0, 0, 1 ],
+                              [1, 0, 1, 0, 0, 0],
+                              [0, 1, 0, 1, 0, 0],
+                              [0, 0, 1, 0, 1, 0],
+                              [0, 0, 0, 1, 0, 1],
+                              [1, 0, 0, 0, 1, 0]])
     D = np.diag(np.sum(adjacency_matrix, axis=1))
     L = D - adjacency_matrix
     digA = np.diag(adjacency_matrix.flatten())
@@ -306,8 +315,8 @@ def parameter_calculate(index):
     beta2 = 0.5
     alpha1 = 150
     alpha2 = 250
-    alpha3 = 520
-    alpha4 = 800
+    alpha3 = 200
+    alpha4 = 300
 
     p = 0.8
     q = 1.2

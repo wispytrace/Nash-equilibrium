@@ -333,6 +333,9 @@ class Model:
         
         elif self.agent_id in euler_agents:
             self.memory['x_el'] = scaled_init_value
+        
+        if 'init_omega' in self.model_config:
+            self.memory['omega'] = self.model_config['init_omega']
 
     def update(self):
         

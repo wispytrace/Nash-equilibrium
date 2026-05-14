@@ -199,17 +199,17 @@ def run_single_simulation(config_index, num_agents, init_value):
     centralized_system.run()
 
 if __name__ == "__main__":
-    config_list = ["r_0", "r_1"]
+    config_list = ["r_0"]
     num_agents = 6
     # init_value = {"x_li": np.array([[],[]], dtype=float)}
-    # run_single_simulation(config_list[0], num_agents, None)
+    run_single_simulation(config_list[0], num_agents, None)
 
-    init_values_list = []
+    # init_values_list = []
     
-    # 自动生成 8 组不同幅度的初始条件
-    for i in range(8):
-        # 将基础方向乘以当前的幅度放大倍数        
-        init_values_list.append(None)
+    # # 自动生成 8 组不同幅度的初始条件
+    # for i in range(6):
+    #     # 将基础方向乘以当前的幅度放大倍数        
+    #     init_values_list.append(None)
         
-    # 调用批量运行函数
-    run_batch_simulations(config_list, num_agents, init_values_list)
+    # # 调用批量运行函数
+    # run_batch_simulations(config_list, num_agents, init_values_list)

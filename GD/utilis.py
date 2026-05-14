@@ -134,8 +134,8 @@ def plot_multi_dimension_control_converge_dynamic_graph(
         for d in range(D):
             y = status_vector[i, :, d]
             color = colors[d % len(colors)]
-            label_string = r'$%s_{%d%d}$' % (label, i+1, d+1)
-            opt_label_string = r'$%s_{%d%d}^{\star}$' % (label_opt, i+1, d+1)
+            label_string = r'$%s_{%d%d}$' % (label, i+start_agent_id+1, d+1)
+            opt_label_string = r'$%s_{%d%d}^{\star}$' % (label_opt, i+start_agent_id+1, d+1)
             plt.plot(time, y, color=color, label=label_string)
             if opt_value is not None:
                 plt.plot(time, opt_value[i,:, d], color=color, linestyle='dashed', label=opt_label_string)

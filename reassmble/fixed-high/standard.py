@@ -364,8 +364,9 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
 def get_convergencce_time(status_vectors, opt_value, time_vector, error=1e-4, result_dir="/app/records/compared/convergence_time"):
     status_vectors = np.array(status_vectors)
     N,T,D = status_vectors.shape
+    print(status_vectors.shape, opt_value.shape)
     for i in range(T):
-        status_error = status_vectors[:,i,:]-opt_value
+        status_error = status_vectors[:,i,:]-opt_value[:,i,:]
         status_error = np.linalg.norm(status_error)
         if i==T-1:
             print("last_error:", status_error)
@@ -521,7 +522,6 @@ def plot_estimate_norm_converge_graph(
     print(f"Saved figure: {path}")
 
 
-    figure_dir,
 def plot_initial_convergence_line__graph(initial_values, convergence_times, xlable, legneds, figure_dir):
     plt.clf()
     colors = list(mcolors.TABLEAU_COLORS.values())

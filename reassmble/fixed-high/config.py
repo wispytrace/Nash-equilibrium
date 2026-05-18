@@ -351,6 +351,173 @@ config = {
             }
         }
     },
+"r_1":
+    {
+        "epochs" : 200000,
+        "adjacency_matrix" : [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                              [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]], 
+        "agent_config":
+        {  
+            "time_delta": 1e-4,
+            "model": "fixed_high_order",
+            "record_interval": 100,
+            "record_flag": 1,
+
+            "model_config": 
+            {
+                "scale_dict": {'ki': 1, 'k_i_tilde': 1, 'eta': 1, 'zeta': 1},
+                "N": 12,
+                "memory" : {"x": np.zeros((3, 3)), "y": np.zeros(3), "z": np.zeros((12, 3))},
+                "cost_scale": 0.1,
+                "is_finite": False,
+                "initial_scale": 1,
+                
+                'share': {
+                    "pos": np.array([[-1, 0, 0], [0, -1, 0], [1, 0, 0], [0, 1, 0], [2, 0, 3], [-2, 0, 3],
+                                     [-3, 0, 0], [0, -3, 0], [3, 0, 0], [0, 3, 0], [0, 2, 3], [0, -2, 3]]),
+                    "p": 0.5,
+                    "q": 1.2,
+                    "pos_c": np.array([0, 0.5, 2]),
+                    "p1": 0.5,
+                    "q1": 1.5
+                },
+
+                'private': {
+                '0': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 5,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 3, 5],
+                        'order': 1,
+                        'x0': np.array([-2, 2, 0])
+                        },
+                '1': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 8,
+                        'gama': [0.7, 1.3],
+                        'ki': [4, 3, 5],
+                        'k_i_tilde': [5, 4, 5],
+                        'order': 1,
+                        'x0': np.array([-2, -2, 0])
+                        },
+                '2': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 4, 5],
+                        'order': 2,
+                        'x0': np.array([2, -2, 0])
+                        },
+                '3': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 10,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [3, 4, 5],
+                        'k_i_tilde': [5, 6, 5],
+                        'order': 2,
+                        'x0': np.array([2, 2, 0])
+                        },
+                '4': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 4,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 4, 6],
+                        'k_i_tilde': [3, 5, 7],
+                        'order': 3,
+                        'x0': np.array([3, -1, 0])
+                        },
+                '5': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta': [3.5, 0.5],
+                        'zeta': 8,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [4, 6, 7],
+                        'order': 3,
+                        'x0': np.array([-3, 1, 0])
+                        },
+                # --------- 新增的 6-11 节点 ---------
+                '6': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 5,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 3, 5],
+                        'order': 1,
+                        'x0': np.array([-4, 4, 0])  # 与 0 节点不同
+                        },
+                '7': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 8,
+                        'gama': [0.7, 1.3],
+                        'ki': [4, 3, 5],
+                        'k_i_tilde': [5, 4, 5],
+                        'order': 1,
+                        'x0': np.array([-4, -4, 0]) # 与 1 节点不同
+                        },
+                '8': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 4, 5],
+                        'order': 2,
+                        'x0': np.array([4, -4, 0])  # 与 2 节点不同
+                        },
+                '9': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 10,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [3, 4, 5],
+                        'k_i_tilde': [5, 6, 5],
+                        'order': 2,
+                        'x0': np.array([4, 4, 0])   # 与 3 节点不同
+                        },
+                '10': {'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 4,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 4, 6],
+                        'k_i_tilde': [3, 5, 7],
+                        'order': 3,
+                        'x0': np.array([5, -2, 0])  # 与 4 节点不同
+                        },
+                '11': {'alpha':  [220, 250, 1100, 1100],
+                        'beta': [3.5, 0.5],
+                        'zeta': 8,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [4, 6, 7],
+                        'order': 3,
+                        'x0': np.array([-5, 2, 0])  # 与 5 节点不同
+                        },
+                },
+            }
+        }
+    },
 }
 
 
@@ -375,79 +542,79 @@ def batch_modify_config(base_config, path_list, value_list):
 # 用法示例
 
 config['finite_1'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
     [True, 10, 1e-4]
 )
 
 config['finite_2'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
     [True, 20, 3e-4]
 )
 
 config['finite_3'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
     [True, 30, 3e-4]
 )
 
 config['finite_4'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [True, 40, 3e-4, 400000]
 )
 
 config['finite_5'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [True, 50, 4e-4, 400000]
 )
 
 config['finite_6'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [True, 60, 5e-4, 400000]
 )
 
 config['fixed_1'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
     [False, 10]
 )
 
 config['fixed_2'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
     [False, 20]
 )
 
 config['fixed_3'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
     [False, 30]
 )
 
 config['fixed_4'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [False, 40, 1e-4, 200000]
 )
 
 config['fixed_5'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [False, 50, 1e-4, 300000]
 )
 
 config['fixed_6'] = batch_modify_config(
-    config["r_0"], 
+    config["r_1"], 
     ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
     [False, 60, 1e-4, 300000]
 )
@@ -494,38 +661,126 @@ def phi_m(x, y):
     return min(1, x**(1-y))
     
 
+# def parameter_calculate(index):
+#     """
+#     Calculate the parameters for the given index.
+#     """
+#     N = 12
+#     m = 36
+#     scale = 0.10
+#     A = np.array([[7/6, 1/6, 1/6, 1/6,  1/6, 1/6], 
+#                   [1/6, 7/6, 1/6, 1/6, 1/6, 1/6], 
+#                   [1/6, 1/6, 7/6, 1/6, 1/6, 1/6],
+#                   [1/6, 1/6, 1/6, 7/6, 1/6, 1/6], 
+#                   [1/6, 1/6, 1/6, 1/6, 7/6, 1/6],
+#                   [1/6, 1/6, 1/6, 1/6, 1/6, 7/6]])
+
+#     A = A * scale
+#     min_eig, max_eig = compute_eigenvalues(A)
+#     print(f"最小特征值: {min_eig:.6f}")
+#     print(f"最大特征值: {max_eig:.6f}")
+#     m_hat = min_eig
+#     l_hat = np.sqrt((5/36+49/36)*scale**2)
+#     h_m = max_eig
+#     print(f"m_hat: {m_hat:.6f}, l_hat: {l_hat:.6f}, h_m: {h_m:.6f}")
+#     adjacency_matrix = np.array([[0, 1, 0, 0, 0, 1],
+#                   [1, 0, 1, 0, 0, 0],
+#                   [0, 1, 0, 1, 0, 0],
+#                   [0, 0, 1, 0, 1, 0],
+#                   [0, 0, 0, 1, 0, 1],
+#                   [1, 0, 0, 0, 1, 0]])
+#     D = np.diag(np.sum(adjacency_matrix, axis=1))
+#     L = D - adjacency_matrix
+#     digA = np.diag(adjacency_matrix.flatten())
+#     I = np.eye(N)
+#     M = np.kron(L, I) + digA
+#     min_eig_M, max_eig_M = compute_eigenvalues(M)
+#     print(f"矩阵 M 的最小特征值: {min_eig_M:.6f}")
+#     print(f"矩阵 M 的最大特征值: {max_eig_M:.6f}")
+    
+#     rho1 = 0.006
+#     rho2 = 0.004
+#     rho3 = 0.008
+#     rho4 = 0.01
+
+#     varepsilon = m_hat / 2
+#     beta1 = 3.5
+#     beta2 = 0.5
+#     alpha1 = 200
+#     alpha2 = 250
+#     alpha3 = 320
+#     alpha4 = 1200
+
+#     p = 3/5
+#     q = 9/7
+
+#     # rho1 = 0.006
+#     # rho2 = 0.005
+#     # rho3 = 0.01
+#     # rho4 = 0.02
+
+#     c1 = beta1* 2 **(1-p) * (l_hat**p) * (min_eig_M**(-p)) * (N**(1-p/2)) * (m**(1/2-p/2)) 
+#     print(f"c1: {c1:.6f}")
+#     c2 = np.sqrt(N)*beta2 * (min_eig_M**(-q)) * (2**(q-2)+2) * (q*l_hat**q + rho1**(1-q)*l_hat* (m**(1-q/2)))
+#     print(f"c2: {c2:.6f}")
+#     c3 = np.sqrt(N)*(2**(q-2)+2)*rho1*l_hat*(q-1)* m**(q/2-1/2)* (m**(1-q/2))
+#     print(f"c3: {c3:.6f}")
+
+#     sigma1 = m_hat - h_m*(c1*rho3 + c2*rho4 + c3)/(2*np.sqrt(N)) - rho2*(c3+np.sqrt(N))/2
+#     print(f"sigma1: {sigma1:.6f}")
+#     sigma2 = alpha1 - c1 - (c3+np.sqrt(N))/(4*rho2)
+#     print(f"sigma2: {sigma2:.6f}")
+#     sigma3 = alpha2 * (m*N)**(1/2 - q/2) - c2 - (c3+np.sqrt(N))/(4*rho3)
+#     print(f"sigma3: {sigma3:.6f}")
+#     sigma4 = alpha3 - c1*h_m/(2*rho3*np.sqrt(N)) - (c3+np.sqrt(N))/(4*rho2)
+#     print(f"sigma4: {sigma4:.6f}")
+#     sigma5 = alpha4 * (m*N)**(1-q) - c2*h_m/(2*rho4*np.sqrt(N)) - (c3+np.sqrt(N))/(4*rho2)
+#     print(f"sigma5: {sigma5:.6f}")
+def compute_eigenvalues(matrix):
+    """
+    计算矩阵的特征值并返回实部的最小值和最大值
+    （补充原代码缺失的辅助函数）
+    """
+    eigs = np.linalg.eigvals(matrix)
+    # 取实部以避免复数比较引发警告或错误
+    real_eigs = np.real(eigs)
+    return np.min(real_eigs), np.max(real_eigs)
+
 def parameter_calculate(index):
     """
-    Calculate the parameters for the given index.
+    Calculate the parameters for the given index (Modified for 12 nodes).
     """
-    N = 6
-    m = 18
-    scale = 0.10
-    A = np.array([[7/6, 1/6, 1/6, 1/6,  1/6, 1/6], 
-                  [1/6, 7/6, 1/6, 1/6, 1/6, 1/6], 
-                  [1/6, 1/6, 7/6, 1/6, 1/6, 1/6],
-                  [1/6, 1/6, 1/6, 7/6, 1/6, 1/6], 
-                  [1/6, 1/6, 1/6, 1/6, 7/6, 1/6],
-                  [1/6, 1/6, 1/6, 1/6, 1/6, 7/6]])
-
+    N = 12
+    m = N * N  # 144 (原代码中 6x6 矩阵时 m=36)
+    scale = 0.05
+    
+    # 1. 扩展系统矩阵 A 为 12x12 (对角线 7/6，其余 1/6)
+    A = np.ones((N, N)) * (1/6)
+    np.fill_diagonal(A, 7/6)
     A = A * scale
+    
     min_eig, max_eig = compute_eigenvalues(A)
     print(f"最小特征值: {min_eig:.6f}")
     print(f"最大特征值: {max_eig:.6f}")
+    
     m_hat = min_eig
-    l_hat = np.sqrt((5/36+49/36)*scale**2)
+    # 2. 修改 l_hat: 12个节点时每行包含 1个(7/6) 和 11个(1/6)
+    l_hat = np.sqrt((11/36 + 49/36) * scale**2)
     h_m = max_eig
     print(f"m_hat: {m_hat:.6f}, l_hat: {l_hat:.6f}, h_m: {h_m:.6f}")
-    adjacency_matrix = np.array([[0, 1, 0, 0, 0, 1],
-                  [1, 0, 1, 0, 0, 0],
-                  [0, 1, 0, 1, 0, 0],
-                  [0, 0, 1, 0, 1, 0],
-                  [0, 0, 0, 1, 0, 1],
-                  [1, 0, 0, 0, 1, 0]])
+    
+    # 3. 扩展邻接矩阵为 12x12 的无向环形图 (Ring/Cycle Graph)
+    adjacency_matrix = np.zeros((N, N))
+    for i in range(N):
+        adjacency_matrix[i, (i - 1) % N] = 1
+        adjacency_matrix[i, (i + 1) % N] = 1
+        
     D = np.diag(np.sum(adjacency_matrix, axis=1))
     L = D - adjacency_matrix
     digA = np.diag(adjacency_matrix.flatten())
     I = np.eye(N)
+    
+    # 现在 L 是 12x12，I 是 12x12，kron后为 144x144。digA 也是 144x144，维度完美匹配。
     M = np.kron(L, I) + digA
     min_eig_M, max_eig_M = compute_eigenvalues(M)
     print(f"矩阵 M 的最小特征值: {min_eig_M:.6f}")
@@ -539,26 +794,23 @@ def parameter_calculate(index):
     varepsilon = m_hat / 2
     beta1 = 3.5
     beta2 = 0.5
-    alpha1 = 200
-    alpha2 = 250
-    alpha3 = 320
-    alpha4 = 1200
+    alpha1 = 300
+    alpha2 = 500
+    alpha3 = 450
+    alpha4 = 1600
 
     p = 3/5
-    q = 9/7
+    q = 1.2
 
-    # rho1 = 0.006
-    # rho2 = 0.005
-    # rho3 = 0.01
-    # rho4 = 0.02
-
-    c1 = beta1* 2 **(1-p) * (l_hat**p) * (min_eig_M**(-p)) * (N**(1-p/2)) * (m**(1/2-p/2)) 
+    # 计算常数 c1, c2, c3
+    c1 = beta1 * 2**(1-p) * (l_hat**p) * (min_eig_M**(-p)) * (N**(1-p/2)) * (m**(1/2-p/2)) 
     print(f"c1: {c1:.6f}")
-    c2 = np.sqrt(N)*beta2 * (min_eig_M**(-q)) * (2**(q-2)+2) * (q*l_hat**q + rho1**(1-q)*l_hat* (m**(1-q/2)))
+    c2 = np.sqrt(N) * beta2 * (min_eig_M**(-q)) * (q*l_hat**q + rho1**(1-q) * l_hat * (m**(1-q/2)))
     print(f"c2: {c2:.6f}")
-    c3 = np.sqrt(N)*(2**(q-2)+2)*rho1*l_hat*(q-1)* m**(q/2-1/2)* (m**(1-q/2))
+    c3 = np.sqrt(N)  * rho1 * l_hat * (q-1) * m**(q/2-1/2) * (m**(1-q/2))
     print(f"c3: {c3:.6f}")
 
+    # 计算收敛/控制参数 sigma
     sigma1 = m_hat - h_m*(c1*rho3 + c2*rho4 + c3)/(2*np.sqrt(N)) - rho2*(c3+np.sqrt(N))/2
     print(f"sigma1: {sigma1:.6f}")
     sigma2 = alpha1 - c1 - (c3+np.sqrt(N))/(4*rho2)
@@ -570,58 +822,6 @@ def parameter_calculate(index):
     sigma5 = alpha4 * (m*N)**(1-q) - c2*h_m/(2*rho4*np.sqrt(N)) - (c3+np.sqrt(N))/(4*rho2)
     print(f"sigma5: {sigma5:.6f}")
 
-    # w1 = (2**(1-p))*(l_hat**(p))*(min_eig_M**(-p))*((m*N)**(1-p))
-    # print(f"w1: {w1:.6f}")
-
-    # w2 = (min_eig_M**(-q))*(2**(q-2)+2)*(q*l_hat**q*phi(m*N, q)+rho1**(1-q)*l_hat*phi(m, q-1))
-    # print(f"w2: {w2:.6f}", (min_eig_M**(-q)), q*l_hat**q*phi(m*N, q), phi(m, q-1))
-
-    # w3 = (2**(q-2)+2)*rho1*l_hat*(q-1)*phi(m,q-1)
-    # print(f"w3: {w3:.6f}")
-
-    # w4 = m**(1-p)
-    # print(f"w4: {w4:.6f}")
-
-    # w5 = w3 + 1
-    # print(f"w5: {w5:.6f}")
-
-    # g1 = h_m* beta1**2 * w1 * m**(1-p)
-    # print(f"g1: {g1:.6f}")
-    # g2 = h_m * beta1 * beta2 * m**(1-p) * w2
-    # print(f"g2: {g2:.6f}")
-    # g3 = h_m * beta1 * beta2 * w1
-    # print(f"g3: {g3:.6f}")
-
-    # g4 = h_m * beta2**2 * w2
-    # print(f"g4: {g4:.6f}")
-
-    # g5 = h_m * beta2**2 * w3
-    # print(f"g5: {g5:.6f}")
-
-    # delta1 = m_hat - varepsilon
-    # print(f"delta1: {delta1:.6f}")
-    
-    # delta2 = (varepsilon * beta1**2 - (g1 * rho4)/2 - (rho2 * p * beta1 * N**(1/2) * w4)/(1+p) - (rho3 * q * beta2 * N**(1/2) * w5)/(1+q))
-    # print(f"delta2: {delta2:.6f}", (rho2 * p * beta1 * N**(1/2) * w4)/(1+p) + (rho3 * q * beta2 * N**(1/2) * w5)/(1+q), (g1 * rho4)/2)
-
-    # delta3 = varepsilon * beta2**2 * m**(1-q) - (g4*rho5)/2 - (rho2 * p * beta1 * N**(1/2) * w4)/(1+p) - (rho3 * q * beta2 * N**(1/2) * w5)/(1+q) - g5
-    # print(f"delta3: {delta3:.6f}", (g4*rho5)/2, (rho2 * p * beta1 * N**(1/2) * w4)/(1+p))
-
-    # delta4 = 2*varepsilon* beta1 * beta2 * phi_m(m, (p+q)/2) - (g2 * rho6 * p)/(p+1) - (g3 * rho7 * q)/(p+q)
-    # print(f"delta4: {delta4:.6f}")
-
-    # delta5 = alpha1 - w1 * beta1 * N**(1/2) - (rho2**(-1/p)*beta1* N**(1/2) * w4)/(1+p) 
-    # print(f"delta5: {delta5:.6f}", (rho2**(-1/p)*beta1* N**(1/2) * w4)/(1+p) )
-
-    # delta6 = alpha2*((m*N)**(1/2-q/2)) - w2 * beta2 * N**(1/2) - (rho3**(-1/q)*beta2* N**(1/2) * w5)/(1+q)
-    # print(f"delta6: {delta6:.6f}")
-
-    # delta7 = alpha3 - (g1 * 1/rho4)/2 - (g2 * q * (rho6**(-1*p/q)) )/(p+q) - (g4 * p * (rho7**(-1*q/p)) )/(p+q)
-    # print(f"delta7: {delta7:.6f}")
-
-    # delta8 = alpha4 * (m *N)**(1-q) - (g3 * 1/rho5)/2 - (g2 * q * rho6**(-1*p/q))/(p+q) - (g4 * p * rho7**(-1*q/p))/(p+q)
-    # print(f"delta8: {delta8:.6f}")
-    
 if __name__ == "__main__":
     # Example usage
     index = "fixed_1"

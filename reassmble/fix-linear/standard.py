@@ -707,30 +707,6 @@ def plot_dos_estimate_norm_converge_graph(
     N, T, D = status_vector.shape
     colors = list(mcolors.TABLEAU_COLORS.values())
     y_max = 0
-    is_first = True
-    # for i in range(N):
-    #     norms = np.zeros(T)
-    #     for t in range(T):
-    #         diff = estimate_vector[i, t, :] - status_vector[:, t, :]
-    #         norm = matrix_flatten_l2norm(diff)
-    #         norms[t] = norm
-    #         norms[t] = np.log10(norm)
-    #         settle_value = -5
-
-    #         if t*0.025 >43:
-    #             norms[t] = norms[t-1]
-
-    #         # if norms[t] < -4 and is_first:
-    #         #     print("time:",t*0.025)
-    #         #     is_first = False
-    #     color = colors[i % len(colors)]
-    #     plt.plot(time, norms, color=color, label=xlabel_list[i])
-    #     if np.max(norms) > y_max:
-    #         y_max = np.max(norms)
-        
-    #     print(norms[-1])
-    #     # legends.append(f"{var_name}_{i+1}")
-
     for i in range(N):
         norms = np.zeros(T)
         
@@ -740,35 +716,6 @@ def plot_dos_estimate_norm_converge_graph(
             norm = matrix_flatten_l2norm(diff)
             # 这里建议加个极小值防止 log(0) 报错，虽然你的数据可能不会
             norms[t] = np.log10(norm + 1e-16) 
-
-        # # --- 第二步：对 43s 后的尾部进行修饰 ---
-        # dt = 0.025
-        # t_start = 40.5
-        # t_target = 42.5
-        
-        # # 计算对应的索引
-        # idx_start = int(t_start / dt)   # 43s 对应的 index
-        # idx_target = int(t_target / dt) # 45s 对应的 index
-
-        # # 确保索引不越界
-        # if idx_start < T and idx_target < T:
-        #     # 获取关键点的值
-        #     val_start = norms[idx_start]   # 起点值 (43s)
-        #     val_end = norms[idx_target]    # 终点目标值 (45s) - 即我们要渐进的值
-
-        #     # 对 43s 之后的所有点应用“指数衰减”平滑
-        #     # 公式原理： y(t) = 目标值 + (起点值 - 目标值) * e^(-k * delta_time)
-        #     # k 控制衰减快慢，k越大，曲线越快接近目标值
-        #     decay_rate = 1.0  # 你可以调整这个值：1.0 较缓，3.0 较陡
-
-        #     for t in range(idx_start, T):
-        #         # 计算从 43s 开始过去的时间
-        #         time_passed = (t - idx_start) * dt
-                
-        #         # 应用平滑公式
-        #         norms[t] = val_end + (val_start - val_end) * np.exp(-decay_rate * time_passed)
-
-        # --- 绘图 ---
         color = colors[i % len(colors)]
         plt.plot(time, norms, color=color, label=xlabel_list[i])
         

@@ -52,6 +52,7 @@ class Model:
             self.memory_updation[k] = np.zeros(v.shape)
 
         self.memory['partial_cost'] = self.partial_cost()
+        self.memory['cost'] = self.cost_function()
     
     def get_estimate_update_value(self, src_memory, dst_memory, power_value, adj_agent_id):
         estimate_update = src_memory['z'] - dst_memory['z']
@@ -66,8 +67,8 @@ class Model:
         if self.topology_list[self.topology_index%len(self.topology_list)][self.agent_id][adj_agent_id] > 1e-2:
             self.memory_updation['z'] -= alpha[0]* self.get_estimate_update_value(self.memory, memory, p, adj_agent_id)
             self.memory_updation['z'] -= alpha[1]* self.get_estimate_update_value(self.memory, memory, q, adj_agent_id)
-            self.memory_updation['z'] -= alpha[2]* self.get_estimate_update_value(self.memory, memory, 2*p-1, adj_agent_id)
-            self.memory_updation['z'] -= alpha[3]* self.get_estimate_update_value(self.memory, memory, 2*q-1, adj_agent_id)
+            # self.memory_updation['z'] -= alpha[2]* self.get_estimate_update_value(self.memory, memory, 2*p-1, adj_agent_id)
+            # self.memory_updation['z'] -= alpha[3]* self.get_estimate_update_value(self.memory, memory, 2*q-1, adj_agent_id)
             # self.memory_updation['z'] -= alpha[3]* self.get_estimate_update_value(self.memory, memory, 0, adj_agent_id)
 
     def power(self, value, a):
@@ -191,22 +192,41 @@ class Model:
 
             
     def cost_function(self):
-        a = self.model_config['a']
-        po = self.model_config['po']
-        xi = self.model_config['xi']
-
-        action = self.memory['z'][self.agent_id]
-
-        status_sum = 0
-        for status in self.memory['z']:
-            status_sum += status
+        # z 保存了所有智能体状态（即发射功率 power profile x）的估计
+        # 将其展平为一维数组，方便进行向量化计算，对应图1中的 x = [x1, ..., xN]
+        z = self.memory['z'].flatten()
+        agent_id = self.agent_id
         
-        price =  status_sum*a + po
-
-        cost = (action - xi)**2 + price*action
-
-
-        return cost/4
+        # --- 1. 获取公式所需的所有参数 ---
+        # 对应能源消耗定价系数 c_i 和 带宽权重因子 w_i
+        ci = self.model_config['ci']
+        wi = self.model_config['wi']
+        
+        # 对应背景噪声功率 \sigma^2 和 信道增益矩阵 G
+        sigma2 = self.model_config['sigma2']
+        G = np.array(self.model_config['G_matrix']) 
+        
+        # --- 2. 提取自身的功率 x_i 和直接信道增益 g_{ii} ---
+        x_i = z[agent_id]
+        g_ii = G[agent_id, agent_id]
+        
+        # --- 3. 计算交叉信道干扰 \sum_{j \neq i} g_{ji} x_j ---
+        # 【性能优化】使用矩阵点积 np.dot 计算该基站收到的总功率，然后减去自身功率。
+        # 这比写 for 循环遍历 j != i 要快几十倍
+        total_received_power = np.dot(G[agent_id, :], z)
+        interference = total_received_power - g_ii * x_i
+        
+        # --- 4. 计算信干噪比 (SINR) ---
+        # 公式 (1.1): \gamma_i(x) = (g_ii * x_i) / (\sum_{j \neq i} g_ji * x_j + \sigma^2)
+        # 添加 np.abs 确保在偏导数微小扰动计算时，如果干扰项极小且出现浮点误差，分母保持正数
+        sinr = (g_ii * x_i) / (np.abs(interference) + sigma2)
+        
+        # --- 5. 计算最终的 Cost ---
+        # 公式 (1.2): f_i(x_i, x_{-i}) = c_i * x_i - w_i * ln(1 + \gamma_i(x))
+        # 使用 np.maximum(sinr, 0.0) 是一种安全机制，防止在系统仿真剧烈波动的瞬态出现负功率，导致 ln(负数) 抛出 NaN 错误
+        cost = ci * x_i - wi * np.log(1 + np.maximum(sinr, 0.0))
+        
+        return cost
 
     def partial_cost(self):
         delta = 1e-4
@@ -222,37 +242,57 @@ class Model:
 
     def init_topology_list(self):
         topology_list = []
-        topology_list.append([[0, 1, 0, 1],
-                              [1, 0, 1, 0],
-                              [0, 1, 0, 1],
-                              [1, 0, 1, 0],])
         
-        topology_list.append([[0, 0, 0, 0],
-                              [0, 0, 1, 0],
-                              [0, 1, 0, 1],
-                              [0, 0, 1, 0],])
+        # Topo 0: 健康状态 (5节点环形拓扑: 0-1-2-3-4-0)
+        topology_list.append([[0, 1, 0, 0, 1],
+                              [1, 0, 1, 0, 0],
+                              [0, 1, 0, 1, 0],
+                              [0, 0, 1, 0, 1],
+                              [1, 0, 0, 1, 0]])
         
-        topology_list.append([[0, 0, 0, 1],
-                              [0, 0, 0, 0],
-                              [0, 0, 0, 1],
-                              [1, 0, 1, 0],])
+        # Topo 1: 节点 0 被孤立 (剩余链路: 1-2, 2-3, 3-4)
+        topology_list.append([[0, 0, 0, 0, 0],
+                              [0, 0, 1, 0, 0],
+                              [0, 1, 0, 1, 0],
+                              [0, 0, 1, 0, 1],
+                              [0, 0, 0, 1, 0]])
         
-        topology_list.append([[0, 1, 0, 1],
-                              [1, 0, 0, 0],
-                              [0, 0, 0, 0],
-                              [1, 0, 0, 0],])
+        # Topo 2: 节点 1 被孤立 (剩余链路: 2-3, 3-4, 4-0)
+        topology_list.append([[0, 0, 0, 0, 1],
+                              [0, 0, 0, 0, 0],
+                              [0, 0, 0, 1, 0],
+                              [0, 0, 1, 0, 1],
+                              [1, 0, 0, 1, 0]])
+        
+        # Topo 3: 节点 2 被孤立 (剩余链路: 3-4, 4-0, 0-1)
+        topology_list.append([[0, 1, 0, 0, 1],
+                              [1, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 1],
+                              [1, 0, 0, 1, 0]])
 
-        topology_list.append([[0, 1, 0, 0],
-                              [1, 0, 1, 0],
-                              [0, 1, 0, 0],
-                              [0, 0, 0, 0],])
+        # Topo 4: 节点 3 被孤立 (剩余链路: 4-0, 0-1, 1-2)
+        topology_list.append([[0, 1, 0, 0, 1],
+                              [1, 0, 1, 0, 0],
+                              [0, 1, 0, 0, 0],
+                              [0, 0, 0, 0, 0],
+                              [1, 0, 0, 0, 0]])
 
-        topology_list.append([[0, 0, 0, 0],
-                              [0, 0, 0, 0],
-                              [0, 0, 0, 0],
-                              [0, 0, 0, 0],])
+        # Topo 5: 节点 4 被孤立 (剩余链路: 0-1, 1-2, 2-3)
+        topology_list.append([[0, 1, 0, 0, 0],
+                              [1, 0, 1, 0, 0],
+                              [0, 1, 0, 1, 0],
+                              [0, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0]])
+
+        # Topo 6: 全网瘫痪 (所有节点通信中断，全 0)
+        topology_list.append([[0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0]])
+                              
         self.topology_list = topology_list
-
 
     def switching(self):
         Dos_interval = self.model_config.get('DoS_interval', {})
@@ -289,19 +329,19 @@ class Model:
 
     
     def update(self):
-        
         self.memory_updation['y'] = self.virtual_signal_update_function()
         self.memory_updation['z'] = self.estimation_update_function()
-        self.memory_updation['x'] = self.status_update_function()
 
         for k, v in self.memory.items():
             if k in self.memory_updation.keys():
-                self.memory[k] = self.memory[k].astype(float) + 1e-20
+                # 【修改这里】使用 np.asarray 安全地处理标量和数组
+                self.memory[k] = np.asarray(self.memory[k], dtype=np.float64) + 1e-20
                 self.memory[k] += self.memory_updation[k] * self.time_delta
         
         self.time += self.time_delta
         self.switching()
         self.reset_memroy_updation()
+        
     
     def get_action_value(self):
         return eval(self.model_config['action'])

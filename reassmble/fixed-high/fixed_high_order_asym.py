@@ -130,6 +130,7 @@ class DumpRecords:
         
         status_vector = self.align_list(memory['x'])
         virtual_vector = self.align_list(memory['y'])
+        partial = self.align_list(memory['partial_cost'])
         valid_status_vector = []
         valid_speed_vector = []
         valid_acc_vector = []
@@ -154,15 +155,12 @@ class DumpRecords:
                 
         # config_index_list = ["0","0_5", "0_3", "0_4"]
         # self.plot_compared_graph(config_index_list,figure_dir)
-        # print(status_vector[:,-1,0:])
-        print(status_vector.shape)
-        opt_value = np.zeros((status_vector.shape[0], 3))
-        for i in range(status_vector.shape[0]):
-            opt_value[i] = status_vector[i,-1,0]
-        print(opt_value)
-        # opt_value = np.array([[-0.9999385195244029, 0.16660663117309651, 0.3333955560508185], [4.8152365222943084e-05, -0.8334287020540452, 0.3334118895597235], [1.0001074180788625, 0.16654159249067055, 0.33345503463020215], [4.815265801524303e-05, 1.166571297885446, 0.33341188945528427], [2.0000614803817807, 0.16660663112190888, 3.333395556015464], [-1.999953791549649, 0.16663322749224166, 3.3333734276470937]])
+        opt_value = np.array([[-0.9999385195244029, 0.16660663117309651, 0.3333955560508185], [4.8152365222943084e-05, -0.8334287020540452, 0.3334118895597235], [1.0001074180788625, 0.16654159249067055, 0.33345503463020215], [4.815265801524303e-05, 1.166571297885446, 0.33341188945528427], [2.0000614803817807, 0.16660663112190888, 3.333395556015464], [-1.999953791549649, 0.16663322749224166, 3.3333734276470937]])
+        zero_opt = np.zeros(opt_value.shape)
+        print(status_vector[:,-1:])
         plot_status_error_graph(time, virtual_vector, figure_dir, ylabel_list=["$\omega_{i1} - y_{i1}^*$", "$\omega_{i2} - y_{i2}^*$", "$\omega_{i3} - y_{i3}^*$"], opt_value=opt_value)
         plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='y', file_name_prefix='actual', opt_value=opt_value)
+        plot_status_error_graph(time, partial, figure_dir, var_name='y', file_name_prefix='p', opt_value=zero_opt)
         plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y')
         plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
         plot_status_graph(time, valid_speed_vector[2:, :], figure_dir, file_name_prefix="speed", ylabel_list=["$x_{i21}$", "$x_{i22}$", "$x_{i23}$"],xlabel_list=["Player 3", "Player 4", "Player 5", "Player 6"])
@@ -192,10 +190,10 @@ class DumpRecords:
 
 if __name__ == "__main__":
     from config import config
-    # config_list = [ "finite_2", "finite_3", "finite_4",  "finite_5", "finite_6",  "fixed_2", "fixed_3", "fixed_4", "fixed_5", "fixed_6"]
-    config_list = [ "r_1"]
+    config_list = [ "finite_2", "finite_3", "finite_4",  "finite_5", "finite_6",  "fixed_2", "fixed_3", "fixed_4", "fixed_5", "fixed_6"]
+    config_list = [ "r_0"]
     # config_index = "r_0"
-    num_agents = 12
+    num_agents = 6
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records"
     for config_index in config_list:

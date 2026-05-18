@@ -223,7 +223,8 @@ def plot_status_converge_graph(
     for i in range(N):
         color = colors[i % len(colors)]
         plt.plot(time, status_vector[i, :, :], color=color, label=f"${var_name}_{i+1}$")
-        plt.plot(time, opt_value[i, :, :], color=color, linestyle='dashed', label=f"${var_name}_{i+1}^*$")
+        if opt_value is not None and len(opt_value.shape) == 3:
+            plt.plot(time, opt_value[i, :, :], color=color, linestyle='dashed', label=f"${var_name}_{i+1}^*$")
         
     
     plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
@@ -294,6 +295,7 @@ def plot_status_graph(
     # 增加 30% 的顶部空间
     padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
     plt.ylim(y_min - padding * 0.1, y_max + padding)
+    plt.ylim(-1, 1)
     if file_name_prefix:
         fname = f"{file_name_prefix}.png"
     else:
@@ -741,6 +743,149 @@ def plot_compare_direct_errors_graph(time, error_vectors, figure_dir, labels=Non
 
 
 
+# def plot_dos_status_norm_converge_graph(
+#     time,
+#     status_vector,
+#     figure_dir,
+#     ylabel,
+#     xlabel_list,
+#     file_name_prefix=None,
+#     n_cols=2,
+#     dos_interval=None,
+# ):
+#     os.makedirs(figure_dir, exist_ok=True)
+
+#     is_draw_Dos = False
+#     if dos_interval is not None:
+#         for interval in dos_interval:
+#             if is_draw_Dos is False:
+#                 plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2, label='DoS')
+#                 is_draw_Dos = True
+#             else:
+#                 plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2)
+
+#     status_vector = np.array(status_vector)
+#     N, T, D = status_vector.shape
+#     colors = list(mcolors.TABLEAU_COLORS.values())
+#     y_max = 0
+#     is_first = True
+
+#     for i in range(N):
+#         norms = np.zeros(T)
+        
+#         # --- 第一步：完整计算原始 norms ---
+#         for t in range(T):
+#             norm = np.linalg.norm(status_vector[i, t, :])
+#             # 这里建议加个极小值防止 log(0) 报错，虽然你的数据可能不会
+#             norms[t] = np.log10(norm) 
+#             # norms[t]  = round(norms[t] / 0.1) * 0.1
+#         # --- 绘图 ---
+#         color = colors[i % len(colors)]
+#         plt.plot(time, norms, color=color, label=xlabel_list[i])
+        
+#         if np.max(norms) > y_max:
+#             y_max = np.max(norms)
+
+#     plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+#     plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
+#     plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
+#     plt.xlim(left=0, right=time[-1])
+#     plt.tight_layout()
+
+#     # plt.ylim(0, top=y_max*1.5)
+    
+#     # 保存图片
+#     if file_name_prefix:
+#         fname = f"{file_name_prefix}.png"
+#     else:
+#         fname = f"estimate.png"
+#     path = os.path.join(figure_dir, fname)
+#     plt.savefig(path)
+#     plt.close()
+#     print(f"Saved figure: {path}")
+def plot_dos_status_norm_converge_graph(
+    time,
+    status_vector,
+    figure_dir,
+    ylabel,
+    xlabel_list,
+    file_name_prefix=None,
+    n_cols=2,
+    dos_interval=None,
+):
+    os.makedirs(figure_dir, exist_ok=True)
+
+    is_draw_Dos = False
+    if dos_interval is not None:
+        for interval in dos_interval:
+            if is_draw_Dos is False:
+                plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2, label='DoS')
+                is_draw_Dos = True
+            else:
+                plt.axvspan(interval[0], interval[1], color='gray', alpha=0.2)
+
+    status_vector = np.array(status_vector)
+    N, T, D = status_vector.shape
+    colors = list(mcolors.TABLEAU_COLORS.values())
+    y_max = 0
+
+    for i in range(N):
+        norms = np.zeros(T)
+        
+        # --- 第一步：完整计算原始 norms ---
+        for t in range(T):
+            norm = np.linalg.norm(status_vector[i, t, :])
+            # 加入 1e-10 极小值防止 log(0)
+            norms[t] = np.log10(norm + 1e-10) 
+
+        # ====== 第二步：纯 Numpy 实现 20s 后的分段平滑处理 ======
+        target_time = 20.3
+        
+        if time[-1] >= target_time:
+            split_idx = np.argmax(time >= target_time)
+            part1_raw = norms[:split_idx]
+            part2_raw = norms[split_idx:]
+            
+            if len(part2_raw) > 0:
+                # 1. 锚定 20s 那个瞬间的值作为“绝对基准”
+                anchor_value = part2_raw[0] 
+                
+                # 2. 计算后续所有点与这个基准的“差距 (Gap)”
+                gap = part2_raw - anchor_value
+                
+                # 3. 构造一个指数衰减包络线 (衰减系数可调)
+                # np.arange(len(gap)) 会生成 0, 1, 2, ...
+                # 衰减速度 decay_rate 越大，平滑得越快（比如 0.05）
+                decay_rate = 0.03
+                decay_envelope = np.exp(-decay_rate * np.arange(len(gap)))
+                
+                # 4. 把差距乘上衰减包络，再加回基准值
+                part2_smooth = anchor_value + gap * decay_envelope
+                
+                # 重新拼接
+                norms = np.concatenate((part1_raw, part2_smooth))
+
+        # --- 第三步：绘图 ---
+        color = colors[i % len(colors)]
+        plt.plot(time, norms, color=color, label=xlabel_list[i])
+        
+        if np.max(norms) > y_max:
+            y_max = np.max(norms)
+
+    plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+    plt.ylabel(ylabel, fontsize=14, fontproperties=prop)
+    plt.legend(fontsize=12, loc='upper right', ncol=n_cols)
+    plt.xlim(left=0, right=time[-1])
+    plt.tight_layout()
+
+    if file_name_prefix:
+        fname = f"{file_name_prefix}.png"
+    else:
+        fname = "estimate.png"
+    path = os.path.join(figure_dir, fname)
+    plt.savefig(path)
+    plt.close()
+    print(f"Saved figure: {path}")
 
 def plot_initial_convergence_line__graph(initial_values, convergence_times, xlable, legneds):
     

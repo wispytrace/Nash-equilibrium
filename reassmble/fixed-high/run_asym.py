@@ -1,21 +1,20 @@
 import numpy as np
 import copy
-from model import Model
-from config import config
+from model_asym import Model
+from config_asym import config
 import os
 import json
 import time
 # 1. 配置参数
-config_index = "c_0"
-num_agents = 5
 
 
 # 2. 集中式算法框架
 class CentralizedModel:
-    def __init__(self, num_agents):
+    def __init__(self, num_agents, config_index):
         self.num_agents = num_agents
-        self.config = config[config_index]
-        self.agent_config = config[config_index]['agent_config']
+        self.config_index = config_index
+        self.config = config[self.config_index]
+        self.agent_config = config[self.config_index]['agent_config']
         self.agntes = self.load_agents()
         self.epochs = self.config['epochs']
         self.adjacency_matrix = np.array(self.config['adjacency_matrix'])
@@ -79,6 +78,7 @@ class CentralizedModel:
                 f.write(json.dumps(self.records[i]))
                 f.flush()
 
+
     def seconds_to_hms_string(self, seconds):
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -101,23 +101,17 @@ class CentralizedModel:
         self.time_estimate = now_time        
 
     def run(self):
-        print("Start training...")
-        print("config index:", config_index)
         for i in range(self.epochs):
+            # for agent in self.agntes:
+            #     if i > self.epochs * 0.2:
+            #         agent.time_delta = agent.model_config['time_delta']*10
+                # agent.memory['time'] = self.counts * self.agent_config['time_delta']
             self.update()
             self.record()
             
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"virtual_state: {self.agntes[0].memory['y']}" , "x:", self.agntes[0].memory['x'], "action:", self.agntes[0].get_action_value())
-            # y = np.zeros(self.num_agents)
-            # for j in range(self.num_agents):
-            #     y[j] = self.agntes[j].memory['y']
-            # # print("Collective virtual_state:", y)
-            # for j in range(self.num_agents):
-            #     print(f"player{j}:", np.linalg.norm(self.agntes[j].memory['z'].flatten() -y), self.agntes[j].memory['z'], y)
-
-
+                print(f"Agent 0 position: {self.agntes[0].memory['x']}, virtual_status: {self.agntes[0].memory['y']}, ei_sum: {self.agntes[0].memory['ei_sum']}" )
 
             self.counts += 1
 
@@ -128,8 +122,13 @@ class CentralizedModel:
         self.done()
 
 
-
+if __name__ == "__main__":
+    config_list = ["r_0"]
+    # config_index = "r_0"
+    num_agents = 6
 
 # 3. 运行集中式算法
-centralized_system = CentralizedModel(num_agents=num_agents)
-centralized_system.run()
+    for config_index in config_list:
+        print(f"Running configuration: {config_index}")
+        centralized_system = CentralizedModel(num_agents=num_agents, config_index=config_index)
+        centralized_system.run()

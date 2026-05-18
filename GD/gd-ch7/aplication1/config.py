@@ -3,248 +3,18 @@ import copy
 
 
 config = {
-    "r_r":
-    {
-        "epochs" : 100000,
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-3,
-            "model": "fixed_linear",
-            "record_interval": 50,
-            "record_flag": 1,
-            
-            "model_config": 
-            {
-                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
-                "scale_dict": {},
-                "N": 4,
-
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
-                "DoS_interval":{
-                    "1":[[0.23, 0.63], [2, 2.5]],
-                    "2":[[5, 5.5], [11, 11.5]],
-                    "3":[[20, 20.7], [30, 30.5], [40, 40.5]],
-                },
-
-                'share': {
-                    "p": 0.75,
-                    "q": 1.25,
-                    'alpha': [200, 500, 0, 0],
-                    'beta':[1, 0.5],
-                    'po': 5,
-                    "a": 0.04
-                },
-
-
-                'private': {
-                '0': { 
-                        'xi': 10,
-                        'parameters': np.array([1, 5, 0.2]),
-                        'gama': [0.7, 1.3],
-                        'ki': [2, 3],
-                        'x0': np.array([12, 10, 6]),
-                        'y0': np.array([6])
-                        },
-                '1': {
-                        'xi': 20,
-                        'parameters': np.array([1.2, 5, 0.2]),
-                        'gama': [0.85, 1.3],
-                        'ki': [4, 3],
-                        'x0': np.array([7, 8, 7]),
-                        'y0': np.array([5])
-                        },
-                '2': { 
-                        'xi': 30,
-                        'parameters':np.array([1.2, 4.8, 0.2]),
-                        'gama': [0.8, 1.3],
-                        'ki': [5, 4],
-                        'x0': np.array([6, 7, 2]),
-                        'y0': np.array([2])
-                        },
-                '3': { 
-                        'xi': 40,
-                        'parameters': np.array([1, 4.8, 0.21]),
-                        'gama': [0.75, 1.25],
-                        'ki': [3, 3],
-                        'x0': np.array([10, 6, 8]),
-                        'y0': np.array([7])
-                        },
-                },
-            }
-        }
-    },
-    "r_1":
-    {
-        "epochs" : 100000,
-        "simulation_time": 50, # 总仿真时长 (秒)
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-4,
-            "model": "fixed_linear",
-            "record_interval": 10,
-            "record_flag": 1,
-            
-            "model_config": 
-            {
-                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
-                "scale_dict": {},
-                "N": 4,
-
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
-                "DoS_interval":{
-                    "1":[[0.2, 0.3], [2, 2.3], [25.5, 25.6]],
-                    "2":[[0.3, 0.4], [10, 10.2], [25.8, 26.0]],
-                    "3":[[0.4, 0.5], [2.3, 2.5], [26.2, 26.3]],
-                    "4":[[0.5, 0.6], [10, 10.3], [26.5, 26.6]],
-                    "5":[[0.6, 0.7], [15, 15.5], [40, 40.5]]
-                },
-
-                'share': {
-                    "p": 0.75,
-                    "q": 1.25,
-                    'alpha': [100, 100, 0, 0],
-                    'beta':[1, 0.5],
-                    # 'tau': [1, 0.5],
-                    'po': 5,
-                    "a": 0.04
-                },
-
-                'private': {
-                '0': { 
-                        'xi': 10,
-                        'parameters': np.array([1, 5, 0.2]),
-                        'gama': [0.7, 1.3],
-                        'ki': [2, 3],
-                        'x0': np.array([20, 10, 6]),
-                        'y0': np.array([10])
-                        },
-                '1': {
-                        'xi': 20,
-                        'parameters': np.array([1.2, 5, 0.2]),
-                        'gama': [0.85, 1.3],
-                        'ki': [4, 3],
-                        'x0': np.array([10, 8, 7]),
-                        'y0': np.array([12])
-                        },
-                '2': { 
-                        'xi': 30,
-                        'parameters':np.array([1.2, 4.8, 0.2]),
-                        'gama': [0.8, 1.3],
-                        'ki': [5, 4],
-                        'x0': np.array([12, 7, 2]),
-                        'y0': np.array([6])
-                        },
-                '3': { 
-                        'xi': 40,
-                        'parameters': np.array([1, 4.8, 0.21]),
-                        'gama': [0.75, 1.25],
-                        'ki': [3, 3],
-                        'x0': np.array([3, 6, 8]),
-                        'y0': np.array([8])
-                        },
-                },
-            }
-        }
-    },
-    "r_5":
-    {
-        "epochs" : 100000,
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-4,
-            "model": "fixed_linear",
-            "record_interval": 50,
-            "record_flag": 1,
-            
-            "model_config": 
-            {
-                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
-                "scale_dict": {},
-                "N": 4,
-
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
-                "DoS_interval":{
-                    "1":[[1, 1.5], [15.5, 16], [24.5, 25]],
-                    "2":[[5.5, 5.7], [11, 11.3], [30, 30.5]],
-                    "3":[[10, 10.5], [20, 20.5], [35, 35.5]],
-                },
-
-                'share': {
-                    "p": 0.75,
-                    "q": 1.25,
-                    'alpha': [200, 500, 0, 0],
-                    'beta':[1, 0.5],
-                    'po': 5,
-                    "a": 0.04
-                },
-
-                'private': {
-                '0': { 
-                        'xi': 10,
-                        'parameters': np.array([1, 5, 0.2]),
-                        'gama': [0.7, 1.3],
-                        'ki': [2, 3],
-                        'x0': np.array([12, 10, 6]),
-                        'y0': np.array([6])
-                        },
-                '1': {
-                        'xi': 20,
-                        'parameters': np.array([1.2, 5, 0.2]),
-                        'gama': [0.85, 1.3],
-                        'ki': [4, 3],
-                        'x0': np.array([7, 8, 7]),
-                        'y0': np.array([5])
-                        },
-                '2': { 
-                        'xi': 30,
-                        'parameters':np.array([1.2, 4.8, 0.2]),
-                        'gama': [0.8, 1.3],
-                        'ki': [5, 4],
-                        'x0': np.array([6, 7, 2]),
-                        'y0': np.array([2])
-                        },
-                '3': { 
-                        'xi': 40,
-                        'parameters': np.array([1, 4.8, 0.21]),
-                        'gama': [0.75, 1.25],
-                        'ki': [3, 3],
-                        'x0': np.array([10, 6, 8]),
-                        'y0': np.array([7])
-                        },
-                },
-            }
-        }
-    },
-
-    "c_1":
+"c_0":
     {
         "epochs" : 250000,
-        "simulation_time": 12, # 总仿真时长 (秒)
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
+        "simulation_time": 25, # 总仿真时长调整为 25 秒以匹配后续 DoS 设定
+        "adjacency_matrix" : [[1, 1, 1, 1, 1],
+                              [1, 1, 1, 1, 1],
+                              [1, 1, 1, 1, 1],
+                              [1, 1, 1, 1, 1],
+                              [1, 1, 1, 1, 1]], 
         "agent_config":
         {  
-            "time_delta": 2e-4,
+            "time_delta": 1e-4,
             "model": "fixed_linear",
             "record_interval": 10,
             "record_flag": 1,
@@ -253,36 +23,42 @@ config = {
             {
                 "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
                 "scale_dict": {},
-                "N": 4,
+                "N": 5, # 智能体数量改为5
 
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
+                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((5, 1))}, # z 扩展为 5x1
+                
+                # DoS 强度计算：每个节点攻击总时长设定为 2.5 秒 (2.5 / 25 = 0.1 即 10% 的强度)
                 "DoS_interval":{
-                    "1":[[0.2, 0.4], [8, 8.2], [16.1, 16.3]],
-
-                    "2":[[0.4, 0.6], [9.2, 9.5], [17.1, 17.3]],
-
-                    "3":[[1, 1.3], [14.0, 14.2], [18.1, 18.3]],
-
-                    "4":[[1.3, 1.5], [14.2, 14.4], [19.1, 19.3]],
-
-                    "5":[[2, 2.3], [14.4, 14.5], [20.1, 20.3]]
+                    "0":[[1.0, 1.15], [8.0, 8.15], [16.0, 16.15]], # 0.15 * 3 = 0.45s
+                    "1":[[2.0, 2.15], [9.0, 9.15], [17.0, 17.15]], # 0.15 * 3 = 0.45s
+                    "2":[[3.0, 3.15], [10.0, 10.15], [18.0, 18.15]], # 0.15 * 3 = 0.45s
+                    "3":[[4.0, 4.15], [11.0, 11.15], [19.0, 19.15]], # 0.15 * 3 = 0.45s
+                    "4":[[5.0, 5.15], [12.0, 12.15], [20.0, 20.15]]  # 0.15 * 3 = 0.45s
                 },
 
                 'share': {
                     "p": 0.7,
                     "q": 1.3,
                     'alpha': [300, 400, 0, 0],
-                    'beta':[3, 0.8],
-                    # 'tau': [1, 0.5],
-                    'po': 5,
-                    "a": 0.04
+                    'beta':[20, 20],
+                    
+                    # --- 图1公式新增共享参数 ---
+                    "sigma2": 0.01,  # 背景噪声功率 \sigma^2
+                    "G_matrix": [    # 5x5 信道增益矩阵 (对角线为直接增益 g_ii, 其他为交叉干扰增益 g_ji)
+                        [1.0, 0.1, 0.1, 0.1, 0.1],
+                        [0.1, 1.0, 0.1, 0.1, 0.1],
+                        [0.1, 0.1, 1.0, 0.1, 0.1],
+                        [0.1, 0.1, 0.1, 1.0, 0.1],
+                        [0.1, 0.1, 0.1, 0.1, 1.0]
+                    ]
                 },
 
                 'private': {
                 '0': { 
-                        'xi': 10,
+                        # --- 图1公式新增私有参数 ---
+                        'ci': 0.1,   # 能源消耗定价系数 c_i
+                        'wi': 1.0,   # 带宽权重因子 w_i
+                        # ---------------------------
                         'parameters': np.array([1, 5, 0.2]),
                         'gama': [0.7, 1.3],
                         'ki': [2, 3],
@@ -290,7 +66,8 @@ config = {
                         'y0': np.array([10])
                         },
                 '1': {
-                        'xi': 20,
+                        'ci': 0.15,
+                        'wi': 1.2,
                         'parameters': np.array([1.2, 5, 0.2]),
                         'gama': [0.85, 1.3],
                         'ki': [4, 3],
@@ -298,7 +75,8 @@ config = {
                         'y0': np.array([12])
                         },
                 '2': { 
-                        'xi': 30,
+                        'ci': 0.12,
+                        'wi': 0.8,
                         'parameters':np.array([1.2, 4.8, 0.2]),
                         'gama': [0.8, 1.3],
                         'ki': [5, 4],
@@ -306,187 +84,27 @@ config = {
                         'y0': np.array([6])
                         },
                 '3': { 
-                        'xi': 40,
+                        'ci': 0.18,
+                        'wi': 1.5,
                         'parameters': np.array([1, 4.8, 0.21]),
                         'gama': [0.75, 1.25],
                         'ki': [3, 3],
                         'x0': np.array([3, 6, 8]),
                         'y0': np.array([8])
                         },
-                },
-            }
-        }
-    },
-
-
-   "c_3":
-    {
-        "epochs" : 250000,
-        "simulation_time": 15, # 总仿真时长 (秒)
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
-        "agent_config":
-        {  
-            "time_delta": 5e-4,
-            "model": "fixed_linear",
-            "record_interval": 10,
-            "record_flag": 1,
-            
-            "model_config": 
-            {
-                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
-                "scale_dict": {},
-                "N": 4,
-
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
-                "DoS_interval":{
-                    "1":[[0.2, 0.4],  [16.1, 16.3]],
-
-                    "2":[[0.4, 0.6],  [17.1, 17.3]],
-
-                    "3":[[1, 1.3], [14.0, 14.2], [18.1, 18.3]],
-
-                    "4":[[1.3, 1.5], [14.2, 14.4], [19.1, 19.3]],
-
-                    "5":[[2, 2.3], [14.4, 14.5], [20.1, 20.3]]
-                },
-
-                'share': {
-                    "p": 0.7,
-                    "q": 1.03,
-                    'alpha': [400, 300, 0, 0],
-                    'beta':[3, 0.15],
-                    # 'tau': [1, 0.5],
-                    'po': 5,
-                    "a": 0.04
-                },
-
-                'private': {
-                '0': { 
-                        'xi': 10,
-                        'parameters': np.array([1, 5, 0.2]),
-                        'gama': [0.7, 1.3],
-                        'ki': [2, 3],
-                        'x0': np.array([20, 10, 6]),
-                        'y0': np.array([10])
-                        },
-                '1': {
-                        'xi': 20,
-                        'parameters': np.array([1.2, 5, 0.2]),
-                        'gama': [0.85, 1.3],
-                        'ki': [4, 3],
-                        'x0': np.array([10, 8, 7]),
-                        'y0': np.array([12])
-                        },
-                '2': { 
-                        'xi': 30,
-                        'parameters':np.array([1.2, 4.8, 0.2]),
-                        'gama': [0.8, 1.3],
-                        'ki': [5, 4],
-                        'x0': np.array([12, 7, 2]),
-                        'y0': np.array([6])
-                        },
-                '3': { 
-                        'xi': 40,
-                        'parameters': np.array([1, 4.8, 0.21]),
-                        'gama': [0.75, 1.25],
-                        'ki': [3, 3],
-                        'x0': np.array([3, 6, 8]),
-                        'y0': np.array([8])
+                '4': {  # --- 新增的第5个智能体 ---
+                        'ci': 0.11,
+                        'wi': 1.1,
+                        'parameters': np.array([1.1, 4.9, 0.2]),
+                        'gama': [0.8, 1.2],
+                        'ki': [3, 4],
+                        'x0': np.array([15, 5, 4]),
+                        'y0': np.array([9])
                         },
                 },
             }
         }
-    },
-
-
-    "c_4":
-    {
-        "epochs" : 250000,
-        "simulation_time": 30, # 总仿真时长 (秒)
-        "adjacency_matrix" : [[1, 1, 1, 1 ],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1 ],
-                                [1, 1, 1, 1 ]], 
-        "agent_config":
-        {  
-            "time_delta": 10e-4,
-            "model": "fixed_linear",
-            "record_interval": 10,
-            "record_flag": 1,
-            
-            "model_config": 
-            {
-                "action": "np.array(self.C@np.matrix(self.memory['x']).T).flatten()",
-                "scale_dict": {},
-                "N": 4,
-
-                "memory" : {"x": np.zeros(3), "y": np.zeros(1), "z": np.zeros((4, 1))},
-                # "cost_scale": 0.1,
-                # "epsilon": 0.1,
-                "DoS_interval":{
-                    "1":[[0.2, 0.4], [8, 8.2], [16.1, 16.3]],
-
-                    "2":[[0.4, 0.6], [9.2, 9.5], [17.1, 17.3]],
-
-                    "3":[[1, 1.3], [14.0, 14.2], [18.1, 18.3]],
-
-                    "4":[[1.3, 1.5], [14.2, 14.4], [19.1, 19.3]],
-
-                    "5":[[2, 2.3], [14.4, 14.5], [20.1, 20.3]]
-                },
-
-                'share': {
-                    "p": 1,
-                    "q": 1,
-                    'alpha': [400, 0, 0, 0],
-                    'beta':[3, 0],
-                    # 'tau': [1, 0.5],
-                    'po': 5,
-                    "a": 0.04
-                },
-
-                'private': {
-                '0': { 
-                        'xi': 10,
-                        'parameters': np.array([1, 5, 0.2]),
-                        'gama': [0.7, 1.3],
-                        'ki': [2, 3],
-                        'x0': np.array([20, 10, 6]),
-                        'y0': np.array([10])
-                        },
-                '1': {
-                        'xi': 20,
-                        'parameters': np.array([1.2, 5, 0.2]),
-                        'gama': [0.85, 1.3],
-                        'ki': [4, 3],
-                        'x0': np.array([10, 8, 7]),
-                        'y0': np.array([12])
-                        },
-                '2': { 
-                        'xi': 30,
-                        'parameters':np.array([1.2, 4.8, 0.2]),
-                        'gama': [0.8, 1.3],
-                        'ki': [5, 4],
-                        'x0': np.array([12, 7, 2]),
-                        'y0': np.array([6])
-                        },
-                '3': { 
-                        'xi': 40,
-                        'parameters': np.array([1, 4.8, 0.21]),
-                        'gama': [0.75, 1.25],
-                        'ki': [3, 3],
-                        'x0': np.array([3, 6, 8]),
-                        'y0': np.array([8])
-                        },
-                },
-            }
-        }
-    },
+    }
 
 }
 
@@ -518,34 +136,34 @@ def get_scaled_dos(dos_intrvals, scale=0.5):
             scaled_dos[k].append([interval[0], interval[0]+ (interval[1]-interval[0])*scale])
     return scaled_dos
 
-config["r_2"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.DoS_interval"],
-    [
-    get_scaled_dos({
-                    "1":[[0.2, 0.3], [2, 2.3], [25.5, 25.6]],
-                    "2":[[0.3, 0.4], [10, 10.2], [25.8, 26.0]],
-                    "3":[[0.4, 0.5], [2.3, 2.5], [26.2, 26.3]],
-                    "4":[[0.5, 0.6], [10, 10.3], [26.5, 26.6]],
-                    "5":[[0.6, 0.7], [15, 15.5], [40, 40.5]]
-                })
-    ]
-)
+# config["r_2"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.DoS_interval"],
+#     [
+#     get_scaled_dos({
+#                     "1":[[0.2, 0.3], [2, 2.3], [25.5, 25.6]],
+#                     "2":[[0.3, 0.4], [10, 10.2], [25.8, 26.0]],
+#                     "3":[[0.4, 0.5], [2.3, 2.5], [26.2, 26.3]],
+#                     "4":[[0.5, 0.6], [10, 10.3], [26.5, 26.6]],
+#                     "5":[[0.6, 0.7], [15, 15.5], [40, 40.5]]
+#                 })
+#     ]
+# )
 
 # config["r_3"] = batch_modify_config(config["r_1"],
 #     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta"],
 #     [[100, 0,0,0], [1, 0]]
 # )
 
-config["r_3"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.q"],
-    [[100, 100, 0,0], [1, 0.5], 1]
-)
+# config["r_3"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.q"],
+#     [[100, 100, 0,0], [1, 0.5], 1]
+# )
 
 
-config["r_4"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
-    [[100, 0,0,0], [1, 0], 1, 1]
-)
+# config["r_4"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.share.alpha", "agent_config.model_config.share.beta", "agent_config.model_config.share.p", "agent_config.model_config.share.q"],
+#     [[100, 0,0,0], [1, 0], 1, 1]
+# )
 
 
 # config["c_3"] = batch_modify_config(config["c_1"],
@@ -559,18 +177,18 @@ config["r_4"] = batch_modify_config(config["r_1"],
 #     [[300, 0,0,0], [3, 0], 1, 1]
 # )
 
-config["r_5"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.DoS_interval"],
-    [
-    {
-                    "1":[],
-                    "2":[],
-                    "3":[],
-                    "4":[],
-                    "5":[]
-        }
-    ]
-)
+# config["r_5"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.DoS_interval"],
+#     [
+#     {
+#                     "1":[],
+#                     "2":[],
+#                     "3":[],
+#                     "4":[],
+#                     "5":[]
+#         }
+#     ]
+# )
 
 dos1 = [[0.2+i, i+1] for i in range(10)]
 dos2 = [[10.2+i, 11+i] for i in range(10)]
@@ -578,31 +196,31 @@ dos3 = [[20.2+i, 21+i] for i in range(10)]
 dos4 = [[30.2+i, 31+i] for i in range(10)]
 dos5 = [[40.2+i, 41+i] for i in range(10)]
 
-config["r_6"] = batch_modify_config(config["r_1"],
-    ["agent_config.model_config.share.tau", "agent_config.model_config.DoS_interval"],
-    [[0.005,0.005],
-    {
-        "1":dos1,
-        "2":dos2,
-        "3":dos3,
-        "4":dos4,
-        "5":dos5
-    }
-    ]
-)
+# config["r_6"] = batch_modify_config(config["r_1"],
+#     ["agent_config.model_config.share.tau", "agent_config.model_config.DoS_interval"],
+#     [[0.005,0.005],
+#     {
+#         "1":dos1,
+#         "2":dos2,
+#         "3":dos3,
+#         "4":dos4,
+#         "5":dos5
+#     }
+#     ]
+# )
 
-config["c_6"] = batch_modify_config(config["c_1"],
-    ["agent_config.model_config.share.tau", "agent_config.model_config.DoS_interval"],
-    [[0.005,0.005],
-    {
-        "1":dos1,
-        "2":dos2,
-        "3":dos3,
-        "4":dos4,
-        "5":dos5
-    }
-    ]
-)
+# config["c_6"] = batch_modify_config(config["c_1"],
+#     ["agent_config.model_config.share.tau", "agent_config.model_config.DoS_interval"],
+#     [[0.005,0.005],
+#     {
+#         "1":dos1,
+#         "2":dos2,
+#         "3":dos3,
+#         "4":dos4,
+#         "5":dos5
+#     }
+#     ]
+# )
 
 def compute_eigenvalues(matrix):
     """

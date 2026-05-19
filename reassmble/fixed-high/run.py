@@ -124,7 +124,7 @@ class CentralizedModel:
 
 if __name__ == "__main__":
     config_list = ["r_1"]
-    config_list = ["fixed_6", "finite_6"]
+    # config_list = ["fixed_6", "finite_6"]
     # config_index = "r_0"
     num_agents = 12
 

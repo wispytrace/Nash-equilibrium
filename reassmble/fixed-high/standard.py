@@ -13,10 +13,10 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401, needed for 3d plots
 
 mpl.rcParams['figure.dpi'] = 600 
 # mpl.rcParams['lines.linewidth'] = 1
-font_path = '/app/GD/resource/font/Times New Roman.ttf'
+# font_path = '/app/GD/resource/font/Times New Roman.ttf'
 plt.rcParams['mathtext.fontset'] = 'stix'
 
-font_path = '/app/GD/resource/font/Times New Roman.ttf'
+font_path = '/mnt/binghao/NESeeking/Nash-equilibrium/GD/resource/font/Times New Roman.ttf'
 # mpl.rcParams['font.family'] = 'sans-serif'  # 或 'serif'，都可以，但建议是 'serif'
 # mpl.rcParams['font.sans-serif'] = ['Times New Roman']  # 放字体名，不是文件名
 
@@ -122,7 +122,7 @@ def plot_status_error_graph(
             lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
             plt.ylabel(lable_bottom, fontsize=15,  fontproperties=prop)
             
-        plt.legend(fontsize=12, loc='upper right')
+        plt.legend(fontsize=12, loc='upper right', ncol=2)
         plt.ylim(top=np.fabs(max_y_value)*1.5)
         if xlim is not None:
             plt.xlim(xlim)
@@ -178,7 +178,7 @@ def plot_status_graph(
             lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
             plt.ylabel(lable_bottom, fontsize=15, fontproperties=prop)
             
-        plt.legend(fontsize=12)
+        plt.legend(fontsize=12, loc='upper right', ncol=2)
         plt.ylim(top=np.fabs(max_y_value)*1.5)
         if xlim is not None:
             plt.xlim(xlim)
@@ -260,6 +260,7 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
         '#4DBEEE',  # 淡蓝
         '#A2142F',  # 红褐色
     ]
+    matlab_colors = list(mcolors.TABLEAU_COLORS.values())
 
     status_vector = np.array(status_vector)
     N = status_vector.shape[0]
@@ -278,6 +279,7 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
         y = status_vector[i, :, 1]
         z = status_vector[i, :, 2]
         color = matlab_colors[i % len(matlab_colors)]
+        # color = matlab_colors[i % len(matlab_colors)]
         
         # MATLAB风格的线条更粗
         ax.plot(x, y, z,
@@ -291,7 +293,7 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
         ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
     
     if p_center is not None:
-        ax.scatter(p_center[0], p_center[1], p_center[2], color=matlab_colors[-1], s=80, marker="*", label="Global target")
+        ax.scatter(p_center[0], p_center[1], p_center[2], color="#E92448", s=120, marker="*", label="Global target")
 
     # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
     ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=14, labelpad=10)
@@ -391,7 +393,7 @@ def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_n
         for i in range(status_vector.shape[1]):
             # print(status_vector[:,i], "kk", final_value)
             diff_value = status_vector[:,i] - opt_value
-            diff_value = np.linalg.norm(diff_value)
+            diff_value = np.linalg.norm(diff_value.flatten())
             diff_value_array[i] = diff_value
 
         plt.plot(time, diff_value_array, color=colors[agent_id], label=labels[agent_id], linewidth=1)
@@ -404,7 +406,7 @@ def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_n
         plt.ylabel(f"||{var_name} - {var_name}*||", fontsize=15, fontproperties=prop)
         
     plt.legend(fontsize=12, loc='upper right')
-    plt.xlim(left=0, right=8)
+    plt.xlim(left=0, right=50)
     plt.ylim(bottom=0)
     plt.tight_layout()
 

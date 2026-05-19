@@ -744,6 +744,7 @@ def compute_eigenvalues(matrix):
     eigs = np.linalg.eigvals(matrix)
     # 取实部以避免复数比较引发警告或错误
     real_eigs = np.real(eigs)
+    print(real_eigs)
     return np.min(real_eigs), np.max(real_eigs)
 
 def parameter_calculate(index):
@@ -757,7 +758,8 @@ def parameter_calculate(index):
     # 1. 扩展系统矩阵 A 为 12x12 (对角线 7/6，其余 1/6)
     A = np.ones((N, N)) * (1/6)
     np.fill_diagonal(A, 7/6)
-    A = A * scale
+    A = A * scale 
+    print(1/scale*7/6)
     
     min_eig, max_eig = compute_eigenvalues(A)
     print(f"最小特征值: {min_eig:.6f}")
@@ -781,6 +783,7 @@ def parameter_calculate(index):
     I = np.eye(N)
     
     # 现在 L 是 12x12，I 是 12x12，kron后为 144x144。digA 也是 144x144，维度完美匹配。
+    compute_eigenvalues(L)  # 输出 L 的特征值以验证
     M = np.kron(L, I) + digA
     min_eig_M, max_eig_M = compute_eigenvalues(M)
     print(f"矩阵 M 的最小特征值: {min_eig_M:.6f}")

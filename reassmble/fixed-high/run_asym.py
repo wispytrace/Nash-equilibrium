@@ -123,9 +123,9 @@ class CentralizedModel:
 
 
 if __name__ == "__main__":
-    config_list = ["r_0"]
+    config_list = ["a_1"]
     # config_index = "r_0"
-    num_agents = 6
+    num_agents = 12
 
 # 3. 运行集中式算法
     for config_index in config_list:

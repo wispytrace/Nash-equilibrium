@@ -178,7 +178,7 @@ class Model:
                 # 【修改】其他人的项用观测估计位置
                 status_sum += self.memory['z'][i]
                 
-        cost += 1/2*(np.linalg.norm(status_sum/6-self.model_config['pos_c'])**2)
+        cost += 1/2*(np.linalg.norm(status_sum/self.model_config['N']-self.model_config['pos_c'])**2)
         if 'cost_scale' in self.model_config.keys():
             cost = cost * self.model_config['cost_scale']
         return cost

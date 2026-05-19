@@ -140,6 +140,7 @@ class DumpRecords:
         
         status_vector = self.align_list(memory['x'])
         virtual_vector = self.align_list(memory['y'])
+        ui = self.align_list(memory['ui'])
         valid_status_vector = []
         valid_speed_vector = []
         valid_acc_vector = []
@@ -175,8 +176,11 @@ class DumpRecords:
         plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='y', file_name_prefix='actual', opt_value=opt_value)
         plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y')
         plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
-        plot_status_graph(time, valid_speed_vector[2:, :], figure_dir, file_name_prefix="speed", ylabel_list=["$x_{i21}$", "$x_{i22}$", "$x_{i23}$"],xlabel_list=["Player 3", "Player 4", "Player 5", "Player 6"])
-        plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
+        x_label_list = [ f"Player {i+1}" for i in range(valid_speed_vector.shape[0])]
+        plot_status_graph(time, ui, figure_dir, file_name_prefix="control", ylabel_list=["$u_{i1}$", "$u_{i2}$", "$u_{i3}$"], xlabel_list=x_label_list)
+
+        # plot_status_graph(time, valid_speed_vector[2:, :], figure_dir, file_name_prefix="speed", ylabel_list=["$x_{i21}$", "$x_{i22}$", "$x_{i23}$"],xlabel_list=["Player 3", "Player 4", "Player 5", "Player 6"])
+        # plot_status_graph(time, valid_acc_vector[4:, :], figure_dir, file_name_prefix="acc", ylabel_list=["$x_{i31}$", "$x_{i32}$", "$x_{i33}$"],xlabel_list=["Player 5", "Player 6"])
 
         # self.plot_compared_graph(["3", "3_14", "3_15", "3_11", "3_12", "3_13"])
         # self.plot_status_graph(time, virtual_vector, virtual_vector,figure_dir, "virtual_status", 'y')
@@ -198,16 +202,34 @@ class DumpRecords:
 
 
         # self.plot_assemble_estimation_graph(time, [estimate_vector], [virtual_vector], figure_dir, "virtual_status_estimate")
+
+def plot_compare_response(record_path_list, figure_dir):
+    status_vectors = []
+    dumpRecords = DumpRecords(config['fixed_1'], 'fixed_1', "./")
+    opt_value = None
+    for record_path in record_path_list:
+        records = dumpRecords.read_records(record_path)
+        memory = dumpRecords.extract_records(records)
+        status_vector = dumpRecords.align_list(memory['x'])
+        print("1")
+        print(status_vector[:,-1,:])
+        if opt_value is None:
+            opt_value = np.zeros((status_vector.shape[0], status_vector.shape[2]))
+            opt_value= status_vector[:, -1, :]
+        time = np.array(memory['time'][-1][:len(status_vector[0])])
+        status_vectors.append(status_vector)
     
+    status_vectors = np.array(status_vectors)
+        
+    plot_compare_errors_graph(time, status_vectors, figure_dir, var_name='x', file_name_prefix=f"compare_response", opt_value=opt_value, labels=["Fixed-time algorithm", "Asymptotic algorithm"])
 
 if __name__ == "__main__":
     from config import config
-    config_list = ["finite_1", "finite_2", "finite_3", "finite_4",  "finite_5", "finite_6", "fixed_1", "fixed_2", "fixed_3", "fixed_4", "fixed_5", "fixed_6"]
+
+    # current_dir = os.path.dirname(os.path.realpath(__file__))
+    # record_root_path = f"{current_dir}/records"
     # config_list = [ "r_1"]
-    # config_index = "r_0"
     # num_agents = 12
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    record_root_path = f"{current_dir}/records"
     # for config_index in config_list:
     #     print(f"Running configuration: {config_index}")
     #     current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -215,5 +237,9 @@ if __name__ == "__main__":
     #     dumpRecords = DumpRecords(config[config_index], config_index, record_root_path=record_root_path)
     #     dumpRecords.plot_graph()
 
-    dumpRecords = DumpRecords(config['fixed_1'], 'fixed_1', record_root_path)
-    dumpRecords.plot_compared_graph(config_list)
+    # config_list = ["finite_1", "finite_2", "finite_3", "finite_4",  "finite_5", "finite_6", "fixed_1", "fixed_2", "fixed_3", "fixed_4", "fixed_5", "fixed_6"]
+    # dumpRecords = DumpRecords(config['fixed_1'], 'fixed_1', record_root_path)
+    # dumpRecords.plot_compared_graph(config_list)
+
+
+    plot_compare_response(["/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/fixed-high/records/fixed_high_order/r_1", "/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/fixed-high/records/fixed_high_order/a_1"], "/mnt/binghao/NESeeking/Nash-equilibrium/reassmble/fixed-high/records")

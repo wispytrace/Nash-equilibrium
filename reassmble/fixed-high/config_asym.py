@@ -97,6 +97,173 @@ config = {
             }
         }
     },
+"a_1":
+    {
+        "epochs" : 200000,
+        "adjacency_matrix" : [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                              [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]], 
+        "agent_config":
+        {  
+            "time_delta": 1e-4,
+            "model": "fixed_high_order",
+            "record_interval": 100,
+            "record_flag": 1,
+
+            "model_config": 
+            {
+                "scale_dict": {'ki': 1, 'k_i_tilde': 1, 'eta': 1, 'zeta': 1},
+                "N": 12,
+                "memory" : {"x": np.zeros((3, 3)), "y": np.zeros(3), "z": np.zeros((12, 3))},
+                "cost_scale": 0.1,
+                "is_finite": False,
+                "initial_scale": 1,
+                
+                'share': {
+                    "pos": np.array([[-1, 0, 0], [0, -1, 0], [1, 0, 0], [0, 1, 0], [2, 0, 3], [-2, 0, 3],
+                                     [-3, 0, 0], [0, -3, 0], [3, 0, 0], [0, 3, 0], [0, 2, 3], [0, -2, 3]]),
+                    "p": 0.5,
+                    "q": 1.2,
+                    "pos_c": np.array([0, 0.5, 2]),
+                    "p1": 0.5,
+                    "q1": 1.5
+                },
+
+                'private': {
+                '0': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 5,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 3, 5],
+                        'order': 1,
+                        'x0': np.array([-2, 2, 0])
+                        },
+                '1': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 8,
+                        'gama': [0.7, 1.3],
+                        'ki': [4, 3, 5],
+                        'k_i_tilde': [5, 4, 5],
+                        'order': 1,
+                        'x0': np.array([-2, -2, 0])
+                        },
+                '2': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 4, 5],
+                        'order': 2,
+                        'x0': np.array([2, -2, 0])
+                        },
+                '3': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 10,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [3, 4, 5],
+                        'k_i_tilde': [5, 6, 5],
+                        'order': 2,
+                        'x0': np.array([2, 2, 0])
+                        },
+                '4': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 4,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 4, 6],
+                        'k_i_tilde': [3, 5, 7],
+                        'order': 3,
+                        'x0': np.array([3, -1, 0])
+                        },
+                '5': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta': [3.5, 0.5],
+                        'zeta': 8,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [4, 6, 7],
+                        'order': 3,
+                        'x0': np.array([-3, 1, 0])
+                        },
+                # --------- 新增的 6-11 节点 ---------
+                '6': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 5,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 3, 5],
+                        'order': 1,
+                        'x0': np.array([-4, 4, 0])  # 与 0 节点不同
+                        },
+                '7': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 8,
+                        'gama': [0.7, 1.3],
+                        'ki': [4, 3, 5],
+                        'k_i_tilde': [5, 4, 5],
+                        'order': 1,
+                        'x0': np.array([-4, -4, 0]) # 与 1 节点不同
+                        },
+                '8': { 'alpha': [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 7,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [3, 4, 5],
+                        'order': 2,
+                        'x0': np.array([4, -4, 0])  # 与 2 节点不同
+                        },
+                '9': { 'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 10,
+                        'eta': 6,
+                        'gama': [0.7, 1.3],
+                        'ki': [3, 4, 5],
+                        'k_i_tilde': [5, 6, 5],
+                        'order': 2,
+                        'x0': np.array([4, 4, 0])   # 与 3 节点不同
+                        },
+                '10': {'alpha':  [220, 250, 1100, 1100],
+                        'beta':[3.5, 0.5],
+                        'zeta': 4,
+                        'eta': 5,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 4, 6],
+                        'k_i_tilde': [3, 5, 7],
+                        'order': 3,
+                        'x0': np.array([5, -2, 0])  # 与 4 节点不同
+                        },
+                '11': {'alpha':  [220, 250, 1100, 1100],
+                        'beta': [3.5, 0.5],
+                        'zeta': 8,
+                        'eta': 9,
+                        'gama': [0.7, 1.3],
+                        'ki': [2, 3, 5],
+                        'k_i_tilde': [4, 6, 7],
+                        'order': 3,
+                        'x0': np.array([-5, 2, 0])  # 与 5 节点不同
+                        },
+                },
+            }
+        }
+    },
 }
 
 
@@ -119,87 +286,6 @@ def batch_modify_config(base_config, path_list, value_list):
     return new_config
 
 # 用法示例
-
-config['finite_1'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
-    [True, 10, 1e-4]
-)
-
-config['finite_2'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
-    [True, 20, 3e-4]
-)
-
-config['finite_3'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta"], 
-    [True, 30, 3e-4]
-)
-
-config['finite_4'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [True, 40, 3e-4, 400000]
-)
-
-config['finite_5'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [True, 50, 4e-4, 400000]
-)
-
-config['finite_6'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [True, 60, 5e-4, 400000]
-)
-
-config['fixed_1'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
-    [False, 10]
-)
-
-config['fixed_2'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
-    [False, 20]
-)
-
-config['fixed_3'] = batch_modify_config(
-    config["r_0"], 
-
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale"], 
-    [False, 30]
-)
-
-config['fixed_4'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [False, 40, 1e-4, 200000]
-)
-
-config['fixed_5'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [False, 50, 1e-4, 300000]
-)
-
-config['fixed_6'] = batch_modify_config(
-    config["r_0"], 
-    ["agent_config.model_config.is_finite", "agent_config.model_config.initial_scale", "agent_config.time_delta", "epochs"], 
-    [False, 60, 1e-4, 300000]
-)
-
-
-print(config['fixed_1'])
 
 
 

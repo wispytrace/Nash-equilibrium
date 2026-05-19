@@ -90,7 +90,7 @@ class Model:
     
     def approximate_sign(self, value):
         # 原生支持矢量化
-        extra = 1e-10
+        extra = 5e-3
         return value / (np.abs(value) + extra)
     
     def virtual_signal_update_function(self):
@@ -169,7 +169,7 @@ class Model:
         sum_z = np.sum(self.memory['z'], axis=0)
         status_sum = np.broadcast_to(sum_z, self.memory['x'].shape)
         
-        cost += 0.5 * np.sum((status_sum / 6.0 - self.model_config['pos_c']) ** 2)
+        cost += 0.5 * np.sum((status_sum / self.model_config['N'] - self.model_config['pos_c']) ** 2)
         
         if 'cost_scale' in self.model_config:
             cost *= self.model_config['cost_scale']

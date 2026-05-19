@@ -167,9 +167,9 @@ class Model:
         
         # 【优化】使用 numpy 内置的矩阵纵列求和 (axis=0) 代替原始的缓慢求和循环，并通过 broadcast_to 保留原本维度的计算特征
         sum_z = np.sum(self.memory['z'], axis=0)
-        status_sum = np.broadcast_to(sum_z, self.memory['x'].shape)
+        # status_sum = np.broadcast_to(sum_z, self.memory['x'].shape)
         
-        cost += 0.5 * np.sum((status_sum / self.model_config['N'] - self.model_config['pos_c']) ** 2)
+        cost += 0.5 * np.sum((sum_z / self.model_config['N'] - self.model_config['pos_c']) ** 2)
         
         if 'cost_scale' in self.model_config:
             cost *= self.model_config['cost_scale']

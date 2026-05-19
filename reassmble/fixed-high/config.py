@@ -353,7 +353,7 @@ config = {
     },
 "r_1":
     {
-        "epochs" : 200000,
+        "epochs" : 300000,
         "adjacency_matrix" : [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                               [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                               [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -756,10 +756,9 @@ def parameter_calculate(index):
     scale = 0.05
     
     # 1. 扩展系统矩阵 A 为 12x12 (对角线 7/6，其余 1/6)
-    A = np.ones((N, N)) * (1/6)
-    np.fill_diagonal(A, 7/6)
+    A = np.ones((N, N)) * (1/12)
+    np.fill_diagonal(A, 13/12)
     A = A * scale 
-    print(1/scale*7/6)
     
     min_eig, max_eig = compute_eigenvalues(A)
     print(f"最小特征值: {min_eig:.6f}")

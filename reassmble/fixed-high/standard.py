@@ -16,7 +16,7 @@ mpl.rcParams['figure.dpi'] = 600
 # font_path = '/app/GD/resource/font/Times New Roman.ttf'
 plt.rcParams['mathtext.fontset'] = 'stix'
 
-font_path = '/mnt/binghao/NESeeking/Nash-equilibrium/GD/resource/font/Times New Roman.ttf'
+font_path = '/app/GD/resource/font/Times New Roman.ttf'
 # mpl.rcParams['font.family'] = 'sans-serif'  # 或 'serif'，都可以，但建议是 'serif'
 # mpl.rcParams['font.sans-serif'] = ['Times New Roman']  # 放字体名，不是文件名
 
@@ -96,7 +96,20 @@ def plot_status_error_graph(
     status_vector = np.array(status_vector)
     N, T, D = status_vector.shape
 
-    colors = list(mcolors.TABLEAU_COLORS.values())
+    colors = [
+    '#0072BD',  # 纯红 (Red) - 保留一个最鲜艳的红
+    '#008000',  # 经典绿 (Green) - 饱和度高且稳重
+    '#0000FF',  # 纯蓝 (Blue) - 鲜艳醒目
+    '#FF8C00',  # 深橙 (DarkOrange) - 与红和黄有明显区别
+    '#800080',  # 纯紫 (Purple) - 独特且非淡色
+    '#00FFFF',  # 青色/青绿色 (Cyan) - 非常鲜艳
+    '#FF00FF',  # 洋红/品红 (Magenta) - 比深粉色更偏紫且鲜艳
+    '#FFFF00',  # 纯黄 (Yellow) - 经典高亮，非金色
+    '#00FF00',  # 莱姆绿/亮绿 (Lime) - 与经典绿有明显区别
+    '#8B4513',  # 棕褐色 (SaddleBrown) - 独特且稳重，区分蓝色和紫色
+    '#008080',  # 青黛色/鸭羽绿 (Teal) - 在青色和绿色之间取得平衡，更暗一些
+    '#000080'   # 海军蓝 (Navy) - 与纯蓝、纯紫有明显区别
+    ]
     max_y_value = -100
     for d in range(D):
         for i in range(N):
@@ -244,78 +257,206 @@ def plot_2d_trajectory_graph(status_vector, figure_dir):
     plt.tight_layout()
     plt.savefig(figure_dir + "/2d_trajectories.png")
 
-def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x'):
+# def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x'):
+#     """
+#     status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
+#     figure_dir: 保存图片的目录，MATLAB风格绘图
+#     """
+#     os.makedirs(figure_dir, exist_ok=True)
+#     # MATLAB默认颜色序列
+#     matlab_colors = [
+#         '#0072BD',  # 蓝色
+#         '#D95319',  # 橙色
+#         '#EDB120',  # 黄色
+#         '#7E2F8E',  # 紫色
+#         '#77AC30',  # 绿色
+#         '#4DBEEE',  # 淡蓝
+#         '#A2142F',  # 红褐色
+#     ]
+#     matlab_colors = [
+#     '#0072BD',  # 纯红 (Red) - 保留一个最鲜艳的红
+#     '#008000',  # 经典绿 (Green) - 饱和度高且稳重
+#     '#0000FF',  # 纯蓝 (Blue) - 鲜艳醒目
+#     '#FF8C00',  # 深橙 (DarkOrange) - 与红和黄有明显区别
+#     '#800080',  # 纯紫 (Purple) - 独特且非淡色
+#     '#00FFFF',  # 青色/青绿色 (Cyan) - 非常鲜艳
+#     '#FF00FF',  # 洋红/品红 (Magenta) - 比深粉色更偏紫且鲜艳
+#     '#FFFF00',  # 纯黄 (Yellow) - 经典高亮，非金色
+#     '#00FF00',  # 莱姆绿/亮绿 (Lime) - 与经典绿有明显区别
+#     '#8B4513',  # 棕褐色 (SaddleBrown) - 独特且稳重，区分蓝色和紫色
+#     '#008080',  # 青黛色/鸭羽绿 (Teal) - 在青色和绿色之间取得平衡，更暗一些
+#     '#000080'   # 海军蓝 (Navy) - 与纯蓝、纯紫有明显区别
+#     ]
+#     status_vector = np.array(status_vector)
+#     N = status_vector.shape[0]
+
+#     # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
+#     plt.figure(figsize=(10, 8))
+#     ax = plt.subplot(111, projection='3d')
+
+#     # 设置背景色为白色，MATLAB风格
+#     ax.set_facecolor('white')
+#     ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
+
+#     # 绘制轨迹，使用MATLAB样式
+#     for i in range(N):
+#         x = status_vector[i, :, 0]
+#         y = status_vector[i, :, 1]
+#         z = status_vector[i, :, 2]
+#         color = matlab_colors[i % len(matlab_colors)]
+#         # color = matlab_colors[i % len(matlab_colors)]
+        
+#         # MATLAB风格的线条更粗
+#         ax.plot(x, y, z,
+#                 color=color,
+#                 linestyle='-',
+#                 linewidth=2.0,
+#                 label=f'Player {i+1}')
+                
+#         # 起点和终点标记，更像MATLAB的默认标记大小
+#         ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
+#         ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
+    
+#     if p_center is not None:
+#         ax.scatter(p_center[0], p_center[1], p_center[2], color='#FF0000', s=120, marker="*", label="Global target")
+
+#     # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
+#     ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=14, labelpad=10)
+#     ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=14, labelpad=10)
+#     ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=14, labelpad=15)  # z轴增加更多间距
+
+#     # 轴刻度字体大小，MATLAB风格
+#     ax.tick_params(axis='both', which='major', labelsize=12)
+#     ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
+
+#     # 设置轴边框颜色，MATLAB风格
+#     ax.xaxis.pane.set_edgecolor('#D9D9D9')
+#     ax.yaxis.pane.set_edgecolor('#D9D9D9')
+#     ax.zaxis.pane.set_edgecolor('#D9D9D9')
+
+#     # 设置坐标面板填充颜色为白色或透明
+#     ax.xaxis.pane.fill = False
+#     ax.yaxis.pane.fill = False
+#     ax.zaxis.pane.fill = False
+
+
+#     # 坐标范围等比例+留白，MATLAB通常保持更均匀的空间分布
+#     def set_equal_3d(ax, X, Y, Z, margin=0.1):
+#         x_middle = 0.5*(np.max(X)+np.min(X))
+#         y_middle = 0.5*(np.max(Y)+np.min(Y))
+#         z_middle = 0.5*(np.max(Z)+np.min(Z))
+#         max_range = 0.5*max(np.ptp(X), np.ptp(Y), np.ptp(Z)) * (1+margin)
+#         ax.set_xlim(x_middle - max_range, x_middle + max_range)
+#         ax.set_ylim(y_middle - max_range, y_middle + max_range)
+#         ax.set_zlim(0, z_middle + max_range)
+
+#     set_equal_3d(
+#         ax,
+#         status_vector[:, :, 0].flatten(),
+#         status_vector[:, :, 1].flatten(),
+#         status_vector[:, :, 2].flatten(),
+#         margin=0.15
+#     )
+
+#     # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
+#     ax.view_init(elev=30, azim=45)
+
+#     # MATLAB风格图例
+#     legend = ax.legend(
+#         loc='best',
+#         fontsize=12,
+#         frameon=True,
+#         framealpha=1.0,
+#         edgecolor='k',
+#         facecolor='white',
+#         ncol=1
+#     )
+
+#     # 添加MATLAB风格的边框
+#     ax.spines['top'].set_visible(True)
+#     ax.spines['right'].set_visible(True)
+
+#     # 调整布局以确保标签可见
+#     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+    
+#     # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
+#     plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
+#                 dpi=600, 
+#                 bbox_inches='tight',
+#                 pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+#     plt.close()
+#     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
+
+def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=None, var_name='x', topology_edges=None):
     """
     status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
     figure_dir: 保存图片的目录，MATLAB风格绘图
+    topology_edges: list of tuples, 形如 [(0, 1), (1, 2), ...]，指定哪些智能体的终点需要连线
     """
     os.makedirs(figure_dir, exist_ok=True)
-    # MATLAB默认颜色序列
+    
     matlab_colors = [
-        '#0072BD',  # 蓝色
-        '#D95319',  # 橙色
-        '#EDB120',  # 黄色
-        '#7E2F8E',  # 紫色
-        '#77AC30',  # 绿色
-        '#4DBEEE',  # 淡蓝
-        '#A2142F',  # 红褐色
+        '#0072BD', '#008000', '#0000FF', '#FF8C00', '#800080', '#00FFFF', 
+        '#FF00FF', '#FFFF00', '#00FF00', '#8B4513', '#008080', '#000080' 
     ]
-    matlab_colors = list(mcolors.TABLEAU_COLORS.values())
-
+    
     status_vector = np.array(status_vector)
     N = status_vector.shape[0]
 
-    # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
     plt.figure(figsize=(10, 8))
     ax = plt.subplot(111, projection='3d')
 
-    # 设置背景色为白色，MATLAB风格
     ax.set_facecolor('white')
     ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
 
-    # 绘制轨迹，使用MATLAB样式
+    # 1. 绘制轨迹和端点
     for i in range(N):
         x = status_vector[i, :, 0]
         y = status_vector[i, :, 1]
         z = status_vector[i, :, 2]
         color = matlab_colors[i % len(matlab_colors)]
-        # color = matlab_colors[i % len(matlab_colors)]
         
-        # MATLAB风格的线条更粗
-        ax.plot(x, y, z,
-                color=color,
-                linestyle='-',
-                linewidth=2.0,
-                label=f'Player {i+1}')
-                
-        # 起点和终点标记，更像MATLAB的默认标记大小
+        ax.plot(x, y, z, color=color, linestyle='-', linewidth=2.0, label=f'Player {i+1}')
         ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
         ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
     
+    # 2. 绘制全局目标点
     if p_center is not None:
-        ax.scatter(p_center[0], p_center[1], p_center[2], color="#E92448", s=120, marker="*", label="Global target")
+        ax.scatter(p_center[0], p_center[1], p_center[2], color='#FF0000', s=120, marker="*", label="Global target")
 
-    # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
+    # 【修改2】绘制终止节点之间的自定义虚线连接
+    if topology_edges is not None:
+        for edge in topology_edges:
+            idx1, idx2 = edge
+            # 获取两个智能体的最终坐标 (最后一步索引为 -1)
+            p1 = status_vector[idx1, -1, :]
+            p2 = status_vector[idx2, -1, :]
+            
+            # 将两点的 x, y, z 坐标分别组合
+            ax.plot([p1[0], p2[0]], 
+                    [p1[1], p2[1]], 
+                    [p1[2], p2[2]], 
+                    color='gray',       # 使用灰色避免喧宾夺主
+                    linestyle='--',     # 虚线样式
+                    linewidth=1.5,      # 适当的线宽
+                    alpha=0.8,          # 增加一点透明度
+                    zorder=4)           # 保证线在散点下方
+
+    # 3. 坐标轴设置
     ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=14, labelpad=10)
     ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=14, labelpad=10)
-    ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=14, labelpad=15)  # z轴增加更多间距
+    ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=14, labelpad=15) 
 
-    # 轴刻度字体大小，MATLAB风格
     ax.tick_params(axis='both', which='major', labelsize=12)
-    ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
+    ax.tick_params(axis='z', which='major', labelsize=12, pad=8) 
 
-    # 设置轴边框颜色，MATLAB风格
     ax.xaxis.pane.set_edgecolor('#D9D9D9')
     ax.yaxis.pane.set_edgecolor('#D9D9D9')
     ax.zaxis.pane.set_edgecolor('#D9D9D9')
-
-    # 设置坐标面板填充颜色为白色或透明
     ax.xaxis.pane.fill = False
     ax.yaxis.pane.fill = False
     ax.zaxis.pane.fill = False
 
-
-    # 坐标范围等比例+留白，MATLAB通常保持更均匀的空间分布
     def set_equal_3d(ax, X, Y, Z, margin=0.1):
         x_middle = 0.5*(np.max(X)+np.min(X))
         y_middle = 0.5*(np.max(Y)+np.min(Y))
@@ -333,35 +474,17 @@ def plot_3d_trajectory_graph(status_vector, figure_dir, file_tag="", p_center=No
         margin=0.15
     )
 
-    # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
     ax.view_init(elev=30, azim=45)
 
-    # MATLAB风格图例
-    legend = ax.legend(
-        loc='best',
-        fontsize=12,
-        frameon=True,
-        framealpha=1.0,
-        edgecolor='k',
-        facecolor='white',
-        ncol=1
-    )
+    legend = ax.legend(loc='best', fontsize=12, frameon=True, framealpha=1.0, edgecolor='k', facecolor='white', ncol=1)
 
-    # 添加MATLAB风格的边框
     ax.spines['top'].set_visible(True)
     ax.spines['right'].set_visible(True)
 
-    # 调整布局以确保标签可见
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-    
-    # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
-    plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
-                dpi=600, 
-                bbox_inches='tight',
-                pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+    plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), dpi=600, bbox_inches='tight', pad_inches=0.2) 
     plt.close()
     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
-
 
 def get_convergencce_time(status_vectors, opt_value, time_vector, error=1e-4, result_dir="/app/records/compared/convergence_time"):
     status_vectors = np.array(status_vectors)
@@ -392,7 +515,7 @@ def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_n
         diff_value_array = np.zeros(len(time))
         for i in range(status_vector.shape[1]):
             # print(status_vector[:,i], "kk", final_value)
-            diff_value = status_vector[:,i] - opt_value
+            diff_value = status_vector[:,i,0] - opt_value
             diff_value = np.linalg.norm(diff_value.flatten())
             diff_value_array[i] = diff_value
 
@@ -406,7 +529,7 @@ def plot_compare_errors_graph(time, status_vectors, figure_dir, opt_value, var_n
         plt.ylabel(f"||{var_name} - {var_name}*||", fontsize=15, fontproperties=prop)
         
     plt.legend(fontsize=12, loc='upper right')
-    plt.xlim(left=0, right=50)
+    plt.xlim(left=0, right=30)
     plt.ylim(bottom=0)
     plt.tight_layout()
 

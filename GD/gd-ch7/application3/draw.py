@@ -57,7 +57,7 @@ def plot_graph(memory, record_path):
     y_vector = align_list(memory['y'])
     z_vector = align_list(memory['z'])
     x_vector = align_list(memory['x'])
-    ui = align_list(memory['update_value'])
+    # ui = align_list(memory['update_value'])
     time = np.array(memory['time'][-1][:len(y_vector[0])])
 
     opt_value = np.zeros(status_vector.shape)
@@ -95,30 +95,26 @@ def plot_graph(memory, record_path):
     
     pg_opt_value = np.zeros((y_vector.shape[1], y_vector.shape[2]))
     for i in range(len(time)):
-        pg_opt_value[i, :] = np.array([
-            3 * np.cos(0.5 * time[i]), 
-            3 * np.sin(0.5 * time[i]), 
-            0.5 * time[i]
-        ])
+        pg_opt_value[i, :] = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0.5*time[i]])
     z_opt_value = np.zeros(z_vector.shape)
     for i in range(len(time)):
         for j in range(z_vector.shape[0]):
             z_opt_value[j, i, :] = status_vector[:, i, :]
 
-    plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
+    plot_multiple_time_slices(x_vector, figure_dir, global_target=pg_opt_value)
     plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
     plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
-    plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
-    plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
-    plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
+    # plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
+    # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
+    # plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
 
-    initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
-    asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
-    fixed_convergence_times = [3.12, 3.57, 3.68, 3.73, 3.77, 3.81, 3.83, 3.85]
-    # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
-    # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
-    asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
-    plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_\omega(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
+    # initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
+    # asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
+    # fixed_convergence_times = [3.12, 3.57, 3.68, 3.73, 3.77, 3.81, 3.83, 3.85]
+    # # finite_convergence_times = [6.0700, 7.115, 7.820, 8.37, 8.83, 9.225, 9.640, 9.98, 10.26, 10.51]
+    # # finite_convergence_times = [value for i, value in enumerate(finite_convergence_times)]
+    # asym_convergence_times = [value+0.04*i for i, value in enumerate(asym_convergence_times)]
+    # plot_initial_convergence_line__graph(initial_value_norms, [asym_convergence_times, fixed_convergence_times], "$||e_\omega(0)||$", legneds=["Asymptotic algorithm",  "Fixed-time algorithm"])
 
 
 def plot_compare_graph(config_list):
@@ -185,7 +181,7 @@ if __name__ == "__main__":
     config_list = [ "r_0"]
     # config_index = "r_0"
     model = "air_ground_protection"
-    num_agents = 4
+    num_agents = 8
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     

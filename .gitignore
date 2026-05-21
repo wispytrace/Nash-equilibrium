@@ -6,6 +6,7 @@ ros2_ws/log/*
 *.json
 *.txt
 */records
+.vscode
 
 reassmble/tcns-fixed/records
 reassmble/nd-fixed/records

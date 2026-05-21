@@ -307,6 +307,51 @@ def plot_status_graph(
 
 
 
+def plot_multiple_time_slices(status_vector, figure_dir, global_target, slice_interval=100, file_tag=""):
+    """
+    status_vector: (N, T, 3)
+    slice_interval: 每隔多少步保存一张图
+    """
+    os.makedirs(figure_dir, exist_ok=True)
+    matlab_colors = ['#0072BD', '#77AC30', '#EDB120', '#7E2F8E', '#D95319', '#77AC30', '#4DBEEE', "#FC0733"]
+    N, T, _ = status_vector.shape
+
+    # 遍历时间轴，按间隔创建切片
+    for t in range(0, T, slice_interval):
+        plt.figure(figsize=(10, 8))
+        ax = plt.subplot(111, projection='3d')
+        ax.set_facecolor('white')
+        
+        # 1. 绘制截止到当前时刻 t 的完整历史轨迹（用浅色淡化）
+        for i in range(N):
+            ax.plot(status_vector[i, :t+1, 0], status_vector[i, :t+1, 1], status_vector[i, :t+1, 2],
+                    color=matlab_colors[i % len(matlab_colors)], alpha=0.3, linewidth=1)
+
+        # 2. 绘制目标的完整历史轨迹（用黑色虚线）
+        ax.plot(global_target[:t+1, 0], global_target[:t+1, 1], global_target[:t+1, 2],
+                color='k', linestyle='--', linewidth=1.5, alpha=0.5)
+
+        # 3. 绘制当前时刻 t 的智能体散点
+        for i in range(N):
+            ax.scatter(status_vector[i, t, 0], status_vector[i, t, 1], status_vector[i, t, 2],
+                       color=matlab_colors[i % len(matlab_colors)], s=100, edgecolor='k', zorder=10)
+
+        # 4. 绘制当前时刻 t 的目标位置
+        ax.scatter(global_target[t, 0], global_target[t, 1], global_target[t, 2],
+                   color='r', marker='*', s=200, edgecolor='k', zorder=10)
+
+        # 5. 设置视角与轴，确保多张图的视角一致，方便对比
+        ax.set_title(f"Time Step: {t}", fontsize=16)
+        ax.set_xlim(np.min(global_target[:,0])-5, np.max(global_target[:,0])+5)
+        ax.set_ylim(np.min(global_target[:,1])-5, np.max(global_target[:,1])+5)
+        ax.set_zlim(np.min(global_target[:,2])-5, np.max(global_target[:,2])+5)
+        ax.view_init(elev=30, azim=45)
+        
+        # 保存图片，文件名带时间戳
+        plt.savefig(os.path.join(figure_dir, f"{file_tag}_slice_{t:04d}.png"), dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"Saved slice at time {t}")
+
 
 def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, file_tag="", p_center=None, var_name='x'):
     """

@@ -67,42 +67,55 @@ class Model:
         est_update = -1*(alpha[0]*self.power(z_upd, p) + alpha[1]*self.power(z_upd, q)) - gama*self.sign(z_upd)
         return np.clip(est_update, -10e3, 10e3)
 
-    def partial_cost(self):
-        """
-        核心亮点：极具视觉冲击力的 3D 防御队形代价梯度
-        """
+    def cost_function(self):
+        N = self.memory['z'].shape[0]  # 总数 8
         i = self.agent_id
-        t = self.time
+        zi = self.memory['z'][i]       # 当前智能体位置 [x, y, z]
         
-        # 1. 目标 (Target) 轨迹: 地面上的 ∞ 字形 (Lissajous curve)
-        # X振幅=10, Y振幅=10, 频率比 1:2
-        p_target = np.array([
-            10.0 * np.sin(0.3 * t), 
-            10.0 * np.sin(0.6 * t), 
-            0.0
+        # --- 1. 设定保护目标中心 (Target trajectory) ---
+        # 假设目标沿着螺旋线运动
+        target_pos = np.array([5*np.cos(0.5*self.time), 5*np.sin(0.5*self.time), 0])
+        
+        # --- 2. 设定智能体在目标周围的理想相位位置 (Formation Control) ---
+        # ID 0-3: UGV, ID 4-7: UAV
+        is_uav = i >= 4
+        radius = 2.0 if not is_uav else 4.0      # UAV 半径更大
+        height = 0.0 if not is_uav else 5.0      # UAV 高度更高
+        
+        # 计算围绕目标的相位: 4个智能体平均分布在 0, pi/2, pi, 3pi/2
+        phase = (i % 4) * (2 * np.pi / 4) + (0.5 * self.time) # 加上时间项让队形转动
+        
+        # 理想位置 pi
+        pi = target_pos + np.array([
+            radius * np.cos(phase), 
+            radius * np.sin(phase), 
+            height
         ])
         
-        # 2. 异构队形设计
-        if i < 4:
-            # UAV (i=0,1,2,3): 逆时针旋转，高空浮动，半径大
-            radius = 6.0
-            omega = 0.8  # 旋转角速度
-            theta = i * (np.pi / 2) + omega * t
-            z_height = 5.0 + 1.5 * np.sin(1.0 * t) # 上下浮动
-        else:
-            # UGV (i=4,5,6,7): 顺时针旋转，贴地，半径小 (紧密保护)
-            radius = 4.0
-            omega = -0.5 # 反向旋转
-            theta = (i - 4) * (np.pi / 2) + omega * t
-            z_height = 0.0 # 严格贴地
+        # --- 3. 代价计算 ---
+        # 个体追踪代价：试图保持在目标周围的预定相位位置
+        individual_cost = np.power(np.linalg.norm(zi[:3] - pi), 2)
+        
+        # 群体协同代价：确保整体质心紧跟目标中心 (Coupling)
+        # 这样整个队形不会因为个体波动而偏离目标太远
+        status_sum = np.mean(self.memory['z'][:, :3], axis=0)
+        coupling_cost = np.power(np.linalg.norm(status_sum - target_pos), 2)
+        
+
+        return 0.5*individual_cost + 0.5*coupling_cost 
+
+    def partial_cost(self):
+        delta = 1e-5
+        partial_cost_value = np.zeros_like(self.memory['z'][self.agent_id])
+        
+        for i in range(len(self.memory['z'][self.agent_id])):
+            cost = self.cost_function()
+            self.memory['z'][self.agent_id][i] += delta
+            cost_hat = self.cost_function()
+            self.memory['z'][self.agent_id][i] -= delta
+            partial_cost_value[i] = (cost_hat - cost) / delta
             
-        p_ideal = p_target + np.array([radius * np.cos(theta), radius * np.sin(theta), z_height])
-        
-        # 3. 计算个体梯度 (解析解)
-        zi = self.memory['z'][i]
-        grad = 2.0 * (zi - p_ideal)
-        
-        return grad
+        return partial_cost_value
 
     def status_updation(self):
         """
@@ -157,6 +170,7 @@ class Model:
 
             # 步骤 D: 将真实的加速度映射回 ENU 坐标系，供仿真引擎更新 3D 位置
             ddot_x = np.array([ddot_x_ned, -ddot_y_ned, -ddot_z_ned])
+            self.memory_updation['update_value'] = np.array([T, phi_d, theta_d]) # 记录飞控输出供分析
             
         else:
             # ===================================================================
@@ -165,6 +179,7 @@ class Model:
             ddot_x = u_des 
             ddot_x[2] = 0.0 # 强制 Z 轴加速度为 0
             vi[2] = 0.0     # 强制 Z 轴速度为 0
+            self.memory_updation['update_value'] = np.array(u_des) # UGV 无飞控输出
             
         return vi, ddot_x
 

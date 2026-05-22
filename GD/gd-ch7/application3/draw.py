@@ -53,22 +53,14 @@ def plot_graph(memory, record_path):
     figure_dir = record_path + "/figure"
     result_dir = record_path + "/result"
     
-    status_vector = align_list(memory['vr'])
-    y_vector = align_list(memory['y'])
-    z_vector = align_list(memory['z'])
-    x_vector = align_list(memory['x'])
-    # ui = align_list(memory['update_value'])
+    status_vector = align_list(memory['vr']) # vr为NE seeking的参考信号
+    y_vector = align_list(memory['y'])  # 所有智能体的私有目标的速度的平均值的估计
+    z_vector = align_list(memory['z']) # 状态估计，（agents, time, status_vector.shape）
+    x_vector = align_list(memory['x']) # 位置
+    v_vector = align_list(memory['v']) # 速度
+    ui = align_list(memory['update_value']) # 控制输入
     time = np.array(memory['time'][-1][:len(y_vector[0])])
 
-    opt_value = np.zeros(status_vector.shape)
-    for i in range(len(time)):
-        for j in range(status_vector.shape[0]):
-            opt_value[j, i, :] = np.array([
-                3 * np.cos(0.5 * time[i]) + 2 * np.cos(2 * time[i] + j * np.pi / 2)-0.4, 
-                3 * np.sin(0.5 * time[i]) + 2 * np.sin(2 * time[i] + j * np.pi / 2)-0.4, 
-                0.5 * time[i]
-            ])
-    
     y_opt_value = np.zeros(y_vector.shape)
     for i in range(len(time)):
         for j in range(y_vector.shape[0]):
@@ -76,34 +68,43 @@ def plot_graph(memory, record_path):
             for k in range(y_vector.shape[0]):
                 y_sum += np.array(y_vector[k, i, :])
             y_opt_value[j, i, :] = y_sum/y_vector.shape[0]
- 
-
-    # y_opt_value = np.zeros_like(y_vector)
-    # N = y_vector.shape[0]
-
-    # # 利用数学性质：相对旋转项求和为0，y 的理论最优解其实就是纯净的全局宏观导数
-    # # 利用 NumPy 的向量化特性，直接对整个 time 数组进行一次性计算
-    # opt_x = -1.5 * np.sin(0.5 * time)
-    # opt_y =  1.5 * np.cos(0.5 * time)
-    # opt_z =  0.5 * np.ones_like(time)  # 生成与 time 长度相同的 0.5 数组
-
-    # 所有智能体 (j) 追踪的理论最优 y 值都是一样的
-    # for j in range(N):
-    #     y_opt_value[j, :, 0] = opt_x
-    #     y_opt_value[j, :, 1] = opt_y
-    #     y_opt_value[j, :, 2] = opt_z
     
     pg_opt_value = np.zeros((y_vector.shape[1], y_vector.shape[2]))
     for i in range(len(time)):
-        pg_opt_value[i, :] = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0.5*time[i]])
+        target_pos = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0])
+        pg_opt_value[i, :] = target_pos
+    
     z_opt_value = np.zeros(z_vector.shape)
     for i in range(len(time)):
         for j in range(z_vector.shape[0]):
             z_opt_value[j, i, :] = status_vector[:, i, :]
+    
+    opt_value = np.zeros(x_vector.shape)
+    for i in range(len(time)):
+        for j in range(x_vector.shape[0]):
+            target_pos = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0])
+            
+            # --- 2. 设定智能体在目标周围的理想相位位置 (Formation Control) ---
+            # ID 0-3: UGV, ID 4-7: UAV
+            is_uav = j >= 4
+            radius = 3.0 if not is_uav else 4.0      # UAV 半径更大
+            height = 0.0 if not is_uav else 5.0      # UAV 高度更高
+            
+            # 计算围绕目标的相位: 4个智能体平均分布在 0, pi/2, pi, 3pi/2
+            phase = (i % 4) * (2 * np.pi / 4) + (0.5 * time[i]) # 加上时间项让队形转动
+            
+            # 理想位置 pi
+            pi = target_pos-[0.5, 0.5, 0] + np.array([
+                radius * np.cos(phase), 
+                radius * np.sin(phase), 
+                height
+            ])
 
-    plot_multiple_time_slices(x_vector, figure_dir, global_target=pg_opt_value)
-    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
-    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
+            opt_value[j, i, :] = pi+1/(8+1)*target_pos  + [0,0,height]
+
+    # plot_multiple_time_slices(x_vector, figure_dir, global_target=pg_opt_value)
+    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=None, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
+    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=None, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
     # plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
     # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
     # plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))

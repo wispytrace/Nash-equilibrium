@@ -13,6 +13,9 @@ import os
 import matplotlib.colors as mcolors
 COLORS = list(mcolors.TABLEAU_COLORS.keys())
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 def plot_simulation_result(centralized_data=None):
     if centralized_data is None:
         return
@@ -20,256 +23,163 @@ def plot_simulation_result(centralized_data=None):
     sim_id = centralized_data.get('sim_id', 0)
     time_steps = np.array(centralized_data["time_steps"])
     
-    # 定义 NE 点 (N个玩家, 2个维度)
-    NE_vector = np.array([6.14369664e-13, 6.59648787e-01, 1.64974270e+00, 2.63984995e+00,
- 3.62994579e+00, 4.62004803e+00, 5.61015032e+00, 6.60024727e+00,
- 7.59034764e+00 ,8.00000000e+00, 8.00000000e+00, 8.00000000e+00,
- 8.00000000e+00])
-    tau_max = 8
-
-    # 数据处理
+    # 尝试解析数据
     try:
-        x_matrix = np.array(centralized_data["trajectories"]["y"])
-        # u_matrix = np.array(centralized_data["trajectories"]["u"])
-        # b_matrix = np.array(centralized_data["trajectories"]["b"])
-        num_agents = x_matrix.shape[0]
+        # 使用 squeeze() 去除最后一维 Dimension (假设 Dimension=1)，使得矩阵变为 (Num_Agents, Time)
+        q_matrix = np.array(centralized_data["trajectories"]["x"]).squeeze()     # qi
+        dotq_matrix = np.array(centralized_data["trajectories"]["dot_x"]).squeeze() # dotqi
+        u_matrix = np.array(centralized_data["trajectories"]["ui"]).squeeze()      # ui
+        virtual = np.array(centralized_data["trajectories"]["y"]).squeeze()  # 虚拟信号 y
+        num_agents = q_matrix.shape[0]
     except Exception as e:
         print(f"数据解析失败: {e}")
         return
 
-    print(x_matrix[:,-1])
+    # ====== 引入给定参数 ======
+    D = 65            # 总需求 Demand
+    q_i_min = 0       # 发电下限
+    q_i_max = 8       # 发电上限
+    a = 0.02          # 价格系数 (对应原模型的 b)
+    p0 = 40           # 基础价格
+    # 假设你理论推导的固定时间收敛上限为 T_max (你可以根据实际情况修改)
+    T_max = 5.0       
 
-    # 维度标签
-    print(x_matrix[:,-1])
-    dim_labels = ["1"]
+    # ====== 全局绘图样式设置 (适合学术论文) ======
+    plt.rcParams.update({
+        'font.size': 12, 
+        'font.family': 'serif', # 论文常用衬线字体
+        'axes.grid': True,
+        'grid.linestyle': ':',
+        'grid.alpha': 0.7
+    })
+
+    # ---------------------------------------------------------
+    # 图 1: 发电机输出功率 (q_i) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
     
-    for dim in range(1): # 遍历两个维度，分别生成图片
-        # 创建新的图片，使用默认长宽比 (6.4, 4.8)
-        plt.figure()
+    for i in range(num_agents):
+        # 1. 绘制实际功率演化曲线，并获取当前曲线的颜色
+        line, = plt.plot(time_steps, q_matrix[i, :], linewidth=1.5, label=f'Agent {i+1}')
         
-        # 1. 绘制每个玩家的轨迹
-        for i in range(num_agents):
-            plt.plot(time_steps, x_matrix[i, :]- NE_vector[i], color=COLORS[i % len(COLORS)],
-                     label=f"$x_{i}-x_{i}^{{\star}}$", linewidth=1.2)
-            
-            # 2. 绘制对应的 NE 点 (虚线)
-            # 仅为第一个玩家的虚线添加图例标签，防止图例冗余
-            ne_label = f"$y_{{{i+1}{dim_labels[dim]}}}^{{\star}}$"
-            # plt.axhline(0, color=COLORS[i % len(COLORS)], linestyle='--', alpha=0.6, label=ne_label)
-
-        # 3. 绘制控制边界 tau_max (红色点划线)
-        plt.axhline(0, color='black', linestyle='-.', linewidth=1)
-        # plt.axhline(y=-tau_max, color=COLORS[8], linestyle='-.', linewidth=1, label=r"$-\tau_{max}$")
-
-        # 样式设置
-        plt.xlabel("Time (s)", fontsize=15)
-        plt.ylabel(f"$x_i-x_i^{{\star}}$", fontsize=15)
-        # plt.grid(True, which='both', linestyle=':', alpha=0.5)
+        # 2. 提取时间切片的最后一个值作为该智能体的理论纳什均衡点 q_i^*
+        q_gne = q_matrix[i, -1]
         
-        # 将图例放在右侧外部
-        plt.legend(loc='upper right',  fontsize=12, ncol=2)
-        
-        # 保存图片
-        file_name = f"tube_transient_response_dim{dim+1}_sim_{sim_id}.png"
-        full_path = os.path.join( file_name)
-        plt.xlim(left=0,right=5)
-        plt.ylim(top=2)
-        plt.savefig(full_path, dpi=300)
-        plt.show()
-        plt.close() # 显式关闭，释放内存
-        
-        print(f"维度 {dim+1} 的图像已保存至: {full_path}")
-
-# def plot_coupled_constraints(centralized_data=None):
-#     if centralized_data is None:
-#         return
-
-#     time_steps = np.array(centralized_data["time_steps"])
+        # 3. 绘制对应智能体的纳什均衡虚线
+        # 使用 line.get_color() 确保虚线颜色与曲线完美对应；ls=':' 表示细点虚线；alpha=0.6 降低透明度避免抢戏
+        # 不设置 label，避免图例成倍增加
+        plt.axhline(y=q_gne, color=line.get_color(), linestyle=':', alpha=0.6, linewidth=1.2)
     
-#     # 1. 获取所有智能体的轨迹数据 (Shape: Num_Agents, Time, Dimension)
-#     x_matrix = np.array(centralized_data["trajectories"]["y"])
+    # 4. 绘制全局容量约束的上下界（保持作为参考背景）
+    plt.axhline(y=q_i_max, color='red', linestyle='--', linewidth=1.5, label=f'Capacity Max ($q^{{max}}={q_i_max}$)')
+    plt.axhline(y=q_i_min, color='black', linestyle='--', linewidth=1.5, label=f'Capacity Min ($q^{{min}}={q_i_min}$)')
     
-#     # 2. 计算耦合项之和: 对所有智能体(axis=0)求和
-#     # sum_x_dim1 shape: (Time,) 代表 sum(x_i1)
-#     # sum_x_dim2 shape: (Time,) 代表 sum(x_i2)
-#     sum_x_dim1 = np.sum(x_matrix[:, :], axis=0)
+    # 为了在图例中向审稿人说明“细点虚线代表纳什均衡”，我们可以手动添加一个辅助图例项
+    plt.plot([], [], color='gray', linestyle=':', alpha=0.6, linewidth=1.2, label='Nash Equilibrium ($q_i^*$)')
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('Power Output $q_i$ (p.u.)')
     
-#     # 3. 从配置中获取耦合约束边界 (g_l, g_u)
-#     # 假设你的配置文件中有这些值
-#     c = 40
+    # 使用 ncol=3 将图例排成三列，紧凑地放在上方或右侧
+    plt.legend(loc='upper right', ncol=3, fontsize=10, frameon=True) 
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_q_outputs.pdf", format='pdf', bbox_inches='tight')
 
-#     plt.plot(time_steps, sum_x_dim1, label=r'$\sum_{i=1}^6 y_{i}$', color='darkgreen', linewidth=2)
-#     # 绘制耦合边界线 (红色粗虚线)
-#     plt.axhline(y=c, color='red', linestyle='--', linewidth=2, label=r'$\sum_{i=1}^6 g_i=40$')
+    # ---------------------------------------------------------
+    # 图 2: 系统供需平衡误差 (Sum(q_i) - D) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
+    # 沿着智能体维度(axis=0)求和
+    total_generation = np.sum(q_matrix, axis=0) 
+    mismatch = total_generation - D
     
-
-#     # plt.title("Total Coupled State Evolution ($y_{i1}$)")
-#     plt.xlabel("Time (s)")
-#     plt.ylabel(r" $\sum_{i=1}^6 y_{i}$")
-#     # plt.grid(True, linestyle=':', alpha=0.6)
-#     plt.legend(loc='upper right')
-#     plt.ylim(top=50)
+    plt.plot(time_steps, mismatch, color='blue', linewidth=2, label='$\sum q_i - D$')
+    plt.axhline(y=0, color='red', linestyle='--', linewidth=1.5)
     
-#     # 自动保存
-#     plt.savefig(os.path.join( "coupled_constraint_dim1.png"), dpi=300, bbox_inches='tight')
-#     print(f"图像已保存至: coupled_constraint_dim1.png")
-#     plt.clf()
+    plt.xlabel('Time (s)')
+    plt.ylabel('Supply-Demand Mismatch')
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_mismatch.pdf", format='pdf')
 
+    # ---------------------------------------------------------
+    # 图 3: 实时电价演化 (Price) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
+    # 计算价格 p = p0 - a * sum(q_i)
+    clearing_price = p0 - a * total_generation
+    
+    plt.plot(time_steps, clearing_price, color='darkgreen', linewidth=2, label='Clearing Price $p(\sigma(\mathbf{q}))$')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Electricity Price')
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_price.pdf", format='pdf')
 
-def plot_compare(centralized_data_list, labels):
-    plt.clf()
-    NE_vector = np.array([2.01980647, 3.00989722 ,4.00000317, 4.99010216, 5.98019429])
+    # ---------------------------------------------------------
+    # 图 4: 发电机转速偏差/导数动态 (dot_q_i) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
+    for i in range(num_agents):
+        plt.plot(time_steps, dotq_matrix[i, :], linewidth=1.5)
+    plt.axhline(y=0, color='black', linestyle='--', linewidth=1.5)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Rate of Power Change $\dot{q}_i$')
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_dot_q.pdf", format='pdf')
 
-    for i, centralized_data in enumerate(centralized_data_list):
-        time_steps = np.array(centralized_data["time_steps"])
-        
-        # 获取轨迹矩阵，形状应为 (n_agents, n_timesteps)，即 (5, len(time_steps))
-        x_matrix = np.array(centralized_data["trajectories"]["x"])
-        
-        x_matrix_cleaned = np.array(centralized_data["trajectories"]["x"]).squeeze() 
-        print(x_matrix_cleaned[:,-1])
+    # ---------------------------------------------------------
+    # 图 5: 物理层控制输入 (u_i) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
+    for i in range(num_agents):
+        plt.plot(time_steps, u_matrix[i, :], linewidth=1.5)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Control Input $u_i / \\tau_i$')
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_control_input.pdf", format='pdf')
 
-        # 2. 检查智能体数量是否匹配
-        n_agents_data = x_matrix_cleaned.shape[0]
-        n_agents_ne = NE_vector.shape[0]
-
-        if n_agents_data != n_agents_ne:
-            print(f"警告：数据中有 {n_agents_data} 个智能体，但 NE 向量只有 {n_agents_ne} 个！")
-            # 截取匹配的部分进行计算（仅用于调试）
-            x_matrix_cleaned = x_matrix_cleaned[:n_agents_ne, :]
-
-        # 3. 重新计算 diff
-        diff = x_matrix_cleaned - NE_vector.reshape(-1, 1)
-        dist_to_NE = np.linalg.norm(diff, axis=0)
-
-        # 绘制曲线
-        plt.plot(time_steps, dist_to_NE, linewidth=1.2, color=COLORS[i % len(COLORS)], label=labels[i])
-
-    plt.axhline(0, color='black', linestyle='--', alpha=0.6)
-    plt.xlim(left=0,right=5)
+    # 将所有生成的图展示出来
     plt.show()
-    plt.legend(loc='upper right',  fontsize=12)
 
-    file_name = f"tube_transient_response_compare.png"
-    full_path = os.path.join( file_name)
-    plt.xlim(left=0,right=7)
-    plt.ylim(bottom=0)
-    plt.xlabel("Time (s)", fontsize=15)
-    plt.ylabel('$\|x - x^*\|$')
-    # plt.ylim(top=10)
-    plt.savefig(full_path, dpi=300)
-    print(f"图像已保存至: {full_path}")
-
-def plot_simulation_result2(centralized_data=None):
-    if centralized_data is None:
-        return
-
-    sim_id = centralized_data.get('sim_id', 0)
-    time_steps = np.array(centralized_data["time_steps"])
+# ---------------------------------------------------------
+    # 图 6: 纳什均衡收敛误差 (Convergence Error) vs 时间
+    # ---------------------------------------------------------
+    plt.figure()
     
-    # 定义 NE 点 (N个玩家, 2个维度)
-    NE_vector = np.array([4.98628387, 5.97637428 ,6.96648187, 7.95657234, 7.99999998])
-    tau_max = 8
-
-    # 数据处理
-    try:
-        x_matrix = np.array(centralized_data["trajectories"]["y"])
-        # u_matrix = np.array(centralized_data["trajectories"]["u"])
-        # b_matrix = np.array(centralized_data["trajectories"]["b"])
-        num_agents = x_matrix.shape[0]
-    except Exception as e:
-        print(f"数据解析失败: {e}")
-        return
-
-    print(x_matrix[:,-1])
-
-    # 维度标签
-    print(x_matrix[:,-1])
-    dim_labels = ["1"]
+    # 1. 提取理论纳什均衡点 (取仿真最后一步的值作为稳态 GNE)
+    # 使用 keepdims 保持二维结构 (Num_Agents, 1)，利用 numpy 广播机制计算差值
     
-    for dim in range(1): # 遍历两个维度，分别生成图片
-        # 创建新的图片，使用默认长宽比 (6.4, 4.8)
-        plt.figure()
-        
-        # 1. 绘制每个玩家的轨迹
-        for i in range(num_agents):
-            plt.plot(time_steps, x_matrix[i, :]- NE_vector[i], color=COLORS[i % len(COLORS)],
-                     label=f"$x_{i+1}-x_{i+1}^{{\star}}$", linewidth=1.2)
-            
-            # 2. 绘制对应的 NE 点 (虚线)
-            # 仅为第一个玩家的虚线添加图例标签，防止图例冗余
-            ne_label = f"$y_{{{i+1}{dim_labels[dim]}}}^{{\star}}$"
-            # plt.axhline(0, color=COLORS[i % len(COLORS)], linestyle='--', alpha=0.6, label=ne_label)
+    # 2. 计算每个智能体的绝对误差 e_i(t) = |q_i(t) - q_i^*|
+    error_matrix = np.abs(q_matrix - virtual)
+    
+    # 也可以计算系统的总体范数误差 (可选)：
+    # system_error = np.linalg.norm(q_matrix - q_star, axis=0)
+    # plt.plot(time_steps, system_error, color='black', linewidth=2, label='System Norm Error')
 
-        # 3. 绘制控制边界 tau_max (红色点划线)
-        plt.axhline(0, color='black', linestyle='-.', linewidth=1)
-        # plt.axhline(y=-tau_max, color=COLORS[8], linestyle='-.', linewidth=1, label=r"$-\tau_{max}$")
+    # 3. 绘制每个智能体的误差曲线
+    for i in range(num_agents):
+        # 为了防止 log 坐标系下报错（log(0) 是无意义的），可以给误差加上一个极小的值 1e-12
+        plt.plot(time_steps, error_matrix[i, :] + 1e-12, linewidth=1.5, label=f'Player {i+1}')
+    
+    # ====== 高级技巧：使用对数坐标系 ======
+    # 固定时间算法的误差在对数系下会呈现“断崖式下跌”，而渐近收敛只是一条平缓斜线
+    # plt.yscale('log')
+    
+    # 设置 y 轴显示范围，过滤掉 1e-12 以下毫无意义的数值噪声，让图面更干净
+    plt.ylim(bottom=1e-6) 
+    
+    # 标注理论的固定时间收敛上界 T_max
+    # plt.axvline(x=T_max, color='purple', linestyle='-.', linewidth=1.5, label='$T_{max}$')
 
-        # 样式设置
-        plt.xlabel("Time (s)", fontsize=15)
-        plt.ylabel(f"$x_i-x_i^{{\star}}$", fontsize=15)
-        # plt.grid(True, which='both', linestyle=':', alpha=0.5)
-        
-        # 将图例放在右侧外部
-        plt.legend(loc='upper right',  fontsize=12, ncol=2)
-        
-        # 保存图片
-        file_name = f"tube_transient_response_dim{dim+1}_sim_{sim_id}_2.png"
-        full_path = os.path.join( file_name)
-        plt.xlim(left=0,right=5)
-        plt.ylim(top=3)
-        plt.savefig(full_path, dpi=300)
-        plt.show()
-        plt.close() # 显式关闭，释放内存
-        
-        print(f"维度 {dim+1} 的图像已保存至: {full_path}")
-
-def plot_compare2(centralized_data_list, labels):
-    plt.clf()
-    NE_vector = np.array([4.98628387, 5.97637428 ,6.96648187, 7.95657234, 7.99999998])
-
-    for i, centralized_data in enumerate(centralized_data_list):
-        time_steps = np.array(centralized_data["time_steps"])
-        
-        # 获取轨迹矩阵，形状应为 (n_agents, n_timesteps)，即 (5, len(time_steps))
-        x_matrix = np.array(centralized_data["trajectories"]["x"])
-        
-        x_matrix_cleaned = np.array(centralized_data["trajectories"]["x"]).squeeze() 
-        print(x_matrix_cleaned[:,-1])
-
-        # 2. 检查智能体数量是否匹配
-        n_agents_data = x_matrix_cleaned.shape[0]
-        n_agents_ne = NE_vector.shape[0]
-
-        if n_agents_data != n_agents_ne:
-            print(f"警告：数据中有 {n_agents_data} 个智能体，但 NE 向量只有 {n_agents_ne} 个！")
-            # 截取匹配的部分进行计算（仅用于调试）
-            x_matrix_cleaned = x_matrix_cleaned[:n_agents_ne, :]
-
-        # 3. 重新计算 diff
-        diff = x_matrix_cleaned - NE_vector.reshape(-1, 1)
-        dist_to_NE = np.linalg.norm(diff, axis=0)
-
-        # 绘制曲线
-        plt.plot(time_steps, dist_to_NE, linewidth=1.2, color=COLORS[i % len(COLORS)], label=labels[i])
-
-    plt.axhline(0, color='black', linestyle='--', alpha=0.6)
-    plt.xlim(left=0,right=5)
-    plt.show()
-    plt.legend(loc='upper right',  fontsize=12)
-
-    file_name = f"tube_transient_response_compare2.png"
-    full_path = os.path.join( file_name)
-    plt.xlim(left=0,right=7)
-    plt.ylim(bottom=0)
-    plt.xlabel("Time (s)", fontsize=15)
-    plt.ylabel('$\|x - x^*\|$')
-    # plt.ylim(top=10)
-    plt.savefig(full_path, dpi=300)
-    print(f"图像已保存至: {full_path}")
+    plt.xlabel('Time (s)')
+    plt.ylabel('Convergence Error $|q_i(t) - q_i^*|$ (Log Scale)')
+    plt.legend(loc='upper right', ncol=3, fontsize=10)
+    plt.tight_layout()
+    plt.savefig(f"sim_{sim_id}_convergence_error.pdf", format='pdf', bbox_inches='tight')
 
 if __name__ == "__main__":
-    with open('/app/GD/gd-ch7/application2/records/euler_constraint/r_0/sim_101/all_agents_trajectories.json') as f:
+    with open('/mnt/binghao/NESeeking/Nash-equilibrium/GD/gd-ch7/application2/records/euler_constraint/r_0/sim_101/all_agents_trajectories.json') as f:
         centralized_data = json.load(f)
         plot_simulation_result(centralized_data)
         # plot_coupled_constraints(centralized_data)

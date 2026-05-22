@@ -16,7 +16,6 @@ class Model:
         print(self.agent_id, self.model_config['init_value_x'][self.agent_id], self.model_config['init_value_dotx'][self.agent_id])
         self.memory['x'] = self.model_config['init_value_x'][self.agent_id]
         if 'init_value_y' in self.model_config.keys():
-
             self.memory['y'] = self.model_config['init_value_y'][self.agent_id]
         self.memory['dot_x'] = self.model_config['init_value_dotx'][self.agent_id]
         
@@ -268,9 +267,9 @@ class Model:
         for status in self.memory['z']:
             status_sum += status
         
-        price =  status_sum*a + po
+        price =  po - status_sum*a 
 
-        cost = (action - xi)**2 + price*action
+        cost = (action - xi)**2 - price*action
 
 
         return cost

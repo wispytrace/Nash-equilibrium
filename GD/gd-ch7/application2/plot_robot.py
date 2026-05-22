@@ -64,15 +64,11 @@ def plot_simulation_result(centralized_data=None):
     sim_id = centralized_data.get('sim_id', 0)
     time_steps = np.array(centralized_data["time_steps"])
     
-    # 定义 NE 点 (N个玩家, 2个维度)
-    NE_vector = np.array([[-0.5, -0.32], [0.5, -0.32], [-0.5, 0.18], [0.5, 0.18], [0, 0.68]])
-    tau_max = 2
-
     # 数据处理
     try:
-        x_matrix = np.array(centralized_data["trajectories"]["y"])
-        u_matrix = np.array(centralized_data["trajectories"]["u"])
-        b_matrix = np.array(centralized_data["trajectories"]["b"])
+        x_matrix = np.array(centralized_data["trajectories"]["x"])    # xi (Num_Agents, Time, Dimension)
+        dotx_matrix = np.array(centralized_data["trajectories"]["dotx"]) # dotxi (Num_Agents, Time, Dimension)
+        u_matrix = np.array(centralized_data["trajectories"]["ui"])  # 控制输入
         num_agents = x_matrix.shape[0]
     except Exception as e:
         print(f"数据解析失败: {e}")

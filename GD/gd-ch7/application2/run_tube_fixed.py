@@ -56,7 +56,7 @@ config = {
                 
                 'share': {
                     # 初始值数组严格扩充至 13 个元素
-                    "init_value_x": np.array([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]),
+                    "init_value_x": np.array([6, 5.5, 5, 4.5, 4, 3.5, 3, 3, 2.5, 2, 1.5, 1, 0.5]),
                     "init_value_y": np.array([2, 2.5, 2, 3.5, 3, 4.5, 4, 5.5, 5, 6.5, 6, 7.5, 7]),
                     "init_value_dotx": np.array([-2, -1, -2, 1, 2, 1, -1, 0, 1, -2, 2, -1, 0]),
                     
@@ -69,7 +69,7 @@ config = {
                     "u": np.array([8]),
                     "c": np.array([65]),
                     'a': 0.02,
-                    'po': 1.25,
+                    'po': 40,
                 },
 
                 # 严格保留 0 到 12，共 13 个节点的私有配置 (删除了冗余的 '13')
@@ -186,6 +186,8 @@ class CentralizedModel:
                 "z": [[] for _ in range(self.num_agents)],
                 "v": [[] for _ in range(self.num_agents)],
                 "y": [[] for _ in range(self.num_agents)],
+                "ui": [[] for _ in range(self.num_agents)],  # 如果需要记录 ui 的轨迹，可以在 agent 的 memory 中添加 'update_value' 并在这里提取
+                "dot_x": [[] for _ in range(self.num_agents)],  # 如果需要记录 dot_x 的轨迹，可以在 agent 的 memory 中添加 'dot_x' 并在这里提取
             }
         }
 
@@ -200,6 +202,8 @@ class CentralizedModel:
                 centralized_data["trajectories"]["z"][i].append(entry['z'])
                 centralized_data["trajectories"]["v"][i].append(entry['v'])
                 centralized_data["trajectories"]["y"][i].append(entry['y'])
+                centralized_data["trajectories"]["ui"][i].append(entry['ui']) 
+                centralized_data["trajectories"]["dot_x"][i].append(entry['dot_x'])
 
 
         save_path = self.get_save_path()

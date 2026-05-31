@@ -62,14 +62,15 @@ def plot_status_converge_graph(
         plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
         # y轴标题
         if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14, fontproperties=prop)
+            plt.ylabel(ylabel_list[d], fontsize=18, fontproperties=prop)
         else:
             lable_bottom = "$x_{i" + str(d+1) + "}(m)$"
-            plt.ylabel(lable_bottom, fontsize=15, fontproperties=prop)
-        plt.legend(fontsize=12, loc='upper right')
+            plt.ylabel(lable_bottom, fontsize=18, fontproperties=prop)
+        plt.legend(fontsize=15, loc='upper right')
         plt.xlim(left=0, right=time[-1])
         plt.tight_layout()
-        
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
         # 保存图片
         if file_name_prefix:
             fname = f"{file_name_prefix}_dim{d+1}.png"
@@ -127,22 +128,23 @@ def plot_status_error_graph(
         plt.hlines(
             0, xmin=time[0], xmax=time[-1],
             colors='black', linestyles='dashed', linewidth=0.8)
-        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+        plt.xlabel('Time(sec)', fontsize=18, fontproperties=prop)
         
         if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14)
+            plt.ylabel(ylabel_list[d], fontsize=18)
         else:
             lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
             plt.ylabel(lable_bottom, fontsize=15,  fontproperties=prop)
             
-        plt.legend(fontsize=12, loc='upper right', ncol=2)
-        plt.ylim(top=np.fabs(max_y_value)*1.5)
+        plt.legend(fontsize=14, loc='upper right', ncol=2)
+        plt.ylim(top=np.fabs(max_y_value)*1.55)
         if xlim is not None:
             plt.xlim(xlim)
         else:
-            plt.xlim(left=0, right=time[-1])
+            plt.xlim(left=0, right=15)
         plt.tight_layout()
-
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
         if file_name_prefix:
             fname = f"{file_name_prefix}_dim{d+1}.png"
         else:
@@ -183,26 +185,27 @@ def plot_status_graph(
         plt.hlines(
             0, xmin=time[0], xmax=time[-1],
             colors='black', linestyles='dashed', linewidth=0.8)
-        plt.xlabel('Time(sec)', fontsize=15, fontproperties=prop)
+        plt.xlabel('Time(sec)', fontsize=18, fontproperties=prop)
         
         if ylabel_list is not None and len(ylabel_list) == D:
-            plt.ylabel(ylabel_list[d], fontsize=14, fontproperties=prop)
+            plt.ylabel(ylabel_list[d], fontsize=18, fontproperties=prop)
         else:
             lable_bottom = f"${var_name}_{{i{d+1}}} - {var_name}_{{i{d+1}}}^*$"
-            plt.ylabel(lable_bottom, fontsize=15, fontproperties=prop)
+            plt.ylabel(lable_bottom, fontsize=18, fontproperties=prop)
             
-        plt.legend(fontsize=12, loc='upper right', ncol=2)
+        plt.legend(fontsize=14, loc='upper right', ncol=2)
         plt.ylim(top=np.fabs(max_y_value)*1.5)
         if xlim is not None:
             plt.xlim(xlim)
         else:
-            plt.xlim(left=0, right=time[-1])
+            plt.xlim(left=0, right=15)
 
         if ylim is not None:
             plt.ylim(ylim)
 
         plt.tight_layout()
-
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
         if file_name_prefix:
             fname = f"{file_name_prefix}_dim{d+1}.png"
         else:

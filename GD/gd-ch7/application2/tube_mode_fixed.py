@@ -304,6 +304,8 @@ class Model:
         self.memory_updation['v'] = self.partial_value_estimation_update_function()
 
         for k in self.memory_updation.keys():
+            # if k == 'x' and self.memory[k] >= self.model_config['u']:
+            #     continue
             self.memory[k] = self.memory[k].astype(float)
             self.memory[k] += self.memory_updation[k] * self.time_delta
         

@@ -93,14 +93,14 @@ def plot_multi_dimension_status_converge_dynamic_graph(
         y_title_string = r'$%s_{i%d}$' % (y_title, d+1)
         plt.ylabel(y_title_string, fontsize=15, fontproperties=prop)
 
-        plt.legend(fontsize=12, loc='upper right', ncol=2)
+        plt.legend(fontsize=12, loc='upper right', ncol=3)
         plt.xlim(left=0, right=time[-1])
         plt.tight_layout()
 
         y_min = np.min(status_vector[:, :, d])
         y_max = np.max(status_vector[:, :, d])
         # 增加 30% 的顶部空间
-        padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
+        padding = (y_max - y_min) * 0.7 if y_max != y_min else 1.0
         plt.ylim(y_min - padding * 0.1, y_max + padding)    
 
         fname = f"{file_name_prefix}_dim{d+1}.png"
@@ -194,6 +194,7 @@ def plot_error_value_graph(
         plt.xlim(xlim)
     else:
         plt.xlim(left=0, right=time[-1])
+    plt.ylim(bottom=0)
     plt.tight_layout()
 
     fname = f"{file_name_prefix}.png"
@@ -295,7 +296,7 @@ def plot_status_graph(
     # 增加 30% 的顶部空间
     padding = (y_max - y_min) * 0.4 if y_max != y_min else 1.0
     plt.ylim(y_min - padding * 0.1, y_max + padding)
-    plt.ylim(-1, 1)
+    # plt.ylim(-1, 1)
     if file_name_prefix:
         fname = f"{file_name_prefix}.png"
     else:
@@ -307,51 +308,144 @@ def plot_status_graph(
 
 
 
-def plot_multiple_time_slices(status_vector, figure_dir, global_target, slice_interval=100, file_tag=""):
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_3d_separate_time_slices(status_vector, time_indices, figure_dir, global_target, 
+                                 time_labels=None, file_tag="", var_name='x', draw_formation_net=True):
     """
-    status_vector: (N, T, 3)
-    slice_interval: 每隔多少步保存一张图
+    为每个指定的时间点单独生成一张3D快照图。
+    连线逻辑: 仅连接 0-3 (Player 1-4) 和 4-7 (Player 5-8)。
     """
     os.makedirs(figure_dir, exist_ok=True)
-    matlab_colors = ['#0072BD', '#77AC30', '#EDB120', '#7E2F8E', '#D95319', '#77AC30', '#4DBEEE', "#FC0733"]
-    N, T, _ = status_vector.shape
+    
+    matlab_colors = [
+        '#0072BD',  # 蓝色
+        '#77AC30',  # 绿色
+        '#EDB120',  # 黄色
+        '#7E2F8E',  # 紫色
+        '#D95319',  # 橙色
+        "#800826",  # 绿色
+        '#4DBEEE',  # 淡蓝
+        "#D8DB0F",  # 淡蓝
+        "#FC0733",  # 红褐色
+    ]
 
-    # 遍历时间轴，按间隔创建切片
-    for t in range(0, T, slice_interval):
-        plt.figure(figsize=(10, 8))
+    status_vector = np.array(status_vector)
+    N = status_vector.shape[0]
+    
+    if time_labels is None:
+        time_labels = [f"$t={t}$" for t in time_indices]
+
+    # ==========================================
+    # 🌟 关键：计算全局的最大最小值，锁定坐标轴
+    # 保证每张图的视角和缩放比例绝对一致，方便对比
+    # ==========================================
+    all_x = np.append(status_vector[:, :, 0].flatten(), global_target[:, 0])
+    all_y = np.append(status_vector[:, :, 1].flatten(), global_target[:, 1])
+    all_z = np.append(status_vector[:, :, 2].flatten(), global_target[:, 2])
+    
+    x_min, x_max = all_x.min() - 1, all_x.max() + 1
+    y_min, y_max = all_y.min() - 1, all_y.max() + 1
+    z_min, z_max = all_z.min() - 0.5, all_z.max() + 1.5
+
+    # 遍历每一个指定的时间切片，每次都生成一张新图
+    for idx, t_idx in enumerate(time_indices):
+        plt.figure(figsize=(16, 12))
         ax = plt.subplot(111, projection='3d')
         ax.set_facecolor('white')
+        ax.grid(True, linestyle='-', alpha=0.5, color='#D9D9D9')
+
+        # 1. 绘制各个智能体在该时刻的点
+        for i in range(N):
+            x = status_vector[i, t_idx, 0]
+            y = status_vector[i, t_idx, 1]
+            z = status_vector[i, t_idx, 2]
+            
+            color = matlab_colors[i % len(matlab_colors)]
+            
+            ax.scatter(x, y, z, 
+                       color=color, 
+                       marker='s' if i < 4 else 'o',  # UAV用方块，UGV用圆点区分一下
+                       s=120,                         # 单张图里点可以大一点
+                       edgecolor='k', 
+                       zorder=5,
+                       label=f'Player {i+1}')
+
+        # 2. 绘制全局目标在该时刻的点
+        px, py, pz = global_target[t_idx, 0], global_target[t_idx, 1], global_target[t_idx, 2]
+        target_color = matlab_colors[-1]
         
-        # 1. 绘制截止到当前时刻 t 的完整历史轨迹（用浅色淡化）
-        for i in range(N):
-            ax.plot(status_vector[i, :t+1, 0], status_vector[i, :t+1, 1], status_vector[i, :t+1, 2],
-                    color=matlab_colors[i % len(matlab_colors)], alpha=0.3, linewidth=1)
+        ax.scatter(px, py, pz, 
+                   color=target_color, 
+                   edgecolors='k', 
+                   marker='*', 
+                   s=300, 
+                   zorder=6,
+                   label="Global target")
+                   
+        # 加上时间标签
+        # ax.text(px, py, pz + 0.8, time_labels[idx], 
+        #         fontsize=18, fontweight='bold', color='black')
 
-        # 2. 绘制目标的完整历史轨迹（用黑色虚线）
-        ax.plot(global_target[:t+1, 0], global_target[:t+1, 1], global_target[:t+1, 2],
-                color='k', linestyle='--', linewidth=1.5, alpha=0.5)
+        # 3. 绘制分层的“阵型连线网”
+        if draw_formation_net:
+            # 第一组：Player 1-4 (对应索引 0, 1, 2, 3)
+            g1 = [0, 1, 2, 3]
+            g1_x = [status_vector[i, t_idx, 0] for i in g1] + [status_vector[g1[0], t_idx, 0]]
+            g1_y = [status_vector[i, t_idx, 1] for i in g1] + [status_vector[g1[0], t_idx, 1]]
+            g1_z = [status_vector[i, t_idx, 2] for i in g1] + [status_vector[g1[0], t_idx, 2]]
+            
+            ax.plot(g1_x, g1_y, g1_z, color='gray', linestyle='--', linewidth=1.5, zorder=4)
 
-        # 3. 绘制当前时刻 t 的智能体散点
-        for i in range(N):
-            ax.scatter(status_vector[i, t, 0], status_vector[i, t, 1], status_vector[i, t, 2],
-                       color=matlab_colors[i % len(matlab_colors)], s=100, edgecolor='k', zorder=10)
+            # 第二组：Player 5-8 (对应索引 4, 5, 6, 7)
+            g2 = [4, 5, 6, 7]
+            g2_x = [status_vector[i, t_idx, 0] for i in g2] + [status_vector[g2[0], t_idx, 0]]
+            g2_y = [status_vector[i, t_idx, 1] for i in g2] + [status_vector[g2[0], t_idx, 1]]
+            g2_z = [status_vector[i, t_idx, 2] for i in g2] + [status_vector[g2[0], t_idx, 2]]
+            
+            ax.plot(g2_x, g2_y, g2_z, color='gray', linestyle='--', linewidth=1.5, zorder=4)
 
-        # 4. 绘制当前时刻 t 的目标位置
-        ax.scatter(global_target[t, 0], global_target[t, 1], global_target[t, 2],
-                   color='r', marker='*', s=200, edgecolor='k', zorder=10)
+        # 4. 锁定坐标轴范围，防止每张图尺寸乱跳
+        ax.set_xlim([x_min, x_max])
+        ax.set_ylim([y_min, y_max])
+        ax.set_zlim([z_min, z_max])
 
-        # 5. 设置视角与轴，确保多张图的视角一致，方便对比
-        ax.set_title(f"Time Step: {t}", fontsize=16)
-        ax.set_xlim(np.min(global_target[:,0])-5, np.max(global_target[:,0])+5)
-        ax.set_ylim(np.min(global_target[:,1])-5, np.max(global_target[:,1])+5)
-        ax.set_zlim(np.min(global_target[:,2])-5, np.max(global_target[:,2])+5)
+        # 5. 设置坐标轴样式
+        ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=16, labelpad=10)
+        ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=16, labelpad=10)
+        ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=16, labelpad=15)
+        
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.tick_params(axis='z', which='major', labelsize=12, pad=8)
+        
+        ax.xaxis.pane.set_edgecolor('#D9D9D9')
+        ax.yaxis.pane.set_edgecolor('#D9D9D9')
+        ax.zaxis.pane.set_edgecolor('#D9D9D9')
+        ax.xaxis.pane.fill = False
+        ax.yaxis.pane.fill = False
+        ax.zaxis.pane.fill = False
+
         ax.view_init(elev=30, azim=45)
         
-        # 保存图片，文件名带时间戳
-        plt.savefig(os.path.join(figure_dir, f"{file_tag}_slice_{t:04d}.png"), dpi=300, bbox_inches='tight')
-        plt.close()
-        print(f"Saved slice at time {t}")
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
 
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        # 把图例放在右下角或其他不妨碍阵型的地方
+        plt.legend(fontsize=15, ncol=2, loc='upper right',)
+        
+        # 6. 为每个时间片段保存独立的文件
+        save_path = os.path.join(figure_dir, f"{file_tag}snapshot_step_{t_idx}.png")
+        plt.savefig(save_path, dpi=600, bbox_inches='tight', pad_inches=0.2)
+        plt.close()
+        
+        print(f"Saved snapshot figure for step {t_idx}: {save_path}")
 
 def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, file_tag="", p_center=None, var_name='x'):
     """
@@ -366,8 +460,9 @@ def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, fi
         '#EDB120',  # 黄色
         '#7E2F8E',  # 紫色
         '#D95319',  # 橙色
-        '#77AC30',  # 绿色
+        "#800826",  # 绿色
         '#4DBEEE',  # 淡蓝
+        "#D8DB0F",  # 淡蓝
         "#FC0733",  # 红褐色
     ]
 
@@ -423,26 +518,63 @@ def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, fi
             s=200,               # 尺寸调大一点
             zorder=5)
 
+    group1_idx = [0, 1, 2, 3]
+    ring1_x = [status_vector[i, -1, 0] for i in group1_idx]
+    ring1_y = [status_vector[i, -1, 1] for i in group1_idx]
+    ring1_z = [status_vector[i, -1, 2] for i in group1_idx]
+    
+    # 闭合第一组的环 (3 -> 0)
+    ring1_x.append(ring1_x[0])
+    ring1_y.append(ring1_y[0])
+    ring1_z.append(ring1_z[0])
+
+    # 2. 提取第二组 (Player 5-8, 对应索引 4-7) 的坐标
+    group2_idx = [4, 5, 6, 7]
+    ring2_x = [status_vector[i, -1, 0] for i in group2_idx]
+    ring2_y = [status_vector[i, -1, 1] for i in group2_idx]
+    ring2_z = [status_vector[i, -1, 2] for i in group2_idx]
+    
+    # 闭合第二组的环 (7 -> 4)
+    ring2_x.append(ring2_x[0])
+    ring2_y.append(ring2_y[0])
+    ring2_z.append(ring2_z[0])
+
+    # 3. 绘制第一层保护网 (UAV)
+    ax.plot(ring1_x, ring1_y, ring1_z, 
+            color='gray',          # 使用灰色，高级且不喧宾夺主
+            linestyle='--',        # 虚线样式
+            linewidth=1.5, 
+            alpha=0.8,             # 增加透明度，体现出“虚拟连线”的质感
+            zorder=4)
+
+    # 4. 绘制第二层保护网 (UGV)
+    ax.plot(ring2_x, ring2_y, ring2_z, 
+            color='gray', 
+            linestyle='--', 
+            linewidth=1.5, 
+            alpha=0.8, 
+            zorder=4)
+
     # print("global target:", global_target[-1])
     # print("individual target:", status_vector[:, -1, :])
 
-    ring_x = [status_vector[i, -1, 0] for i in range(N)]
-    ring_y = [status_vector[i, -1, 1] for i in range(N)]
-    ring_z = [status_vector[i, -1, 2] for i in range(N)]
+    # ring_x = [status_vector[i, -1, 0] for i in range(N)]
+    # ring_y = [status_vector[i, -1, 1] for i in range(N)]
+    # ring_z = [status_vector[i, -1, 2] for i in range(N)]
 
-    # 为了让线条形成一个闭合的环 (Agent 1 -> 2 -> 3 -> 4 -> 1)
-    # 我们把第一个智能体的坐标再次加到列表末尾
-    ring_x.append(ring_x[0])
-    ring_y.append(ring_y[0])
-    ring_z.append(ring_z[0])
+    # # 为了让线条形成一个闭合的环 (Agent 1 -> 2 -> 3 -> 4 -> 1)
+    # # 我们把第一个智能体的坐标再次加到列表末尾
+    # ring_x.append(ring_x[0])
+    # ring_y.append(ring_y[0])
+    # ring_z.append(ring_z[0])
 
-    # 绘制这层“保护网”
-    ax.plot(ring_x, ring_y, ring_z, 
-            color='black',        # 使用灰色，高级且不喧宾夺主
-            linestyle='--',      # 虚线样式
-            linewidth=1.5,       # 线宽稍微细一点，作为辅助线
-            alpha=0.8,           # 增加透明度，体现出“虚拟拓扑连接”的质感
-            zorder=4)            # 图层放在点(5)下面，主线上面
+    # # 绘制这层“保护网”
+    # ax.plot(ring_x, ring_y, ring_z, 
+    #         color='black',        # 使用灰色，高级且不喧宾夺主
+    #         linestyle='--',      # 虚线样式
+    #         linewidth=1.5,       # 线宽稍微细一点，作为辅助线
+    #         alpha=0.8,           # 增加透明度，体现出“虚拟拓扑连接”的质感
+    #         zorder=4)            # 图层放在点(5)下面，主线上面
 
     # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
     ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=16, labelpad=10)
@@ -466,7 +598,8 @@ def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, fi
 
 
     # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
-    ax.view_init(elev=25, azim=65)
+    ax.view_init(elev=30, azim=45)
+    
     # MATLAB风格图例
 
     # 添加MATLAB风格的边框
@@ -475,7 +608,7 @@ def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, fi
 
     # 调整布局以确保标签可见
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-    plt.legend(fontsize=18)
+    plt.legend(fontsize=15, ncol=2, loc='upper right',)
     # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
     plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
                 dpi=600, 
@@ -485,6 +618,177 @@ def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, fi
     plt.close()
     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
 
+
+# def plot_3d_trajectory_global_graph(status_vector, figure_dir, global_target, file_tag="", p_center=None, var_name='x'):
+#     """
+#     status_vector: numpy array (N, T, 3), N条轨迹，每条T步，三维坐标
+#     figure_dir: 保存图片的目录，MATLAB风格绘图
+#     """
+#     os.makedirs(figure_dir, exist_ok=True)
+#     # MATLAB默认颜色序列
+#     matlab_colors = [
+#         '#0072BD',  # 蓝色
+#         '#77AC30',  # 绿色
+#         '#EDB120',  # 黄色
+#         '#7E2F8E',  # 紫色
+#         '#D95319',  # 橙色
+#         "#800826",  # 绿色
+#         '#4DBEEE',  # 淡蓝
+#         "#D8DB0F",  # 淡蓝
+#         "#FC0733",  # 红褐色
+#     ]
+
+#     status_vector = np.array(status_vector)
+#     N = status_vector.shape[0]
+
+#     # 创建图形，使用MATLAB默认大小比例，稍微增大以容纳标签
+#     plt.figure(figsize=(16, 12))
+#     ax = plt.subplot(111, projection='3d')
+
+#     # 设置背景色为白色，MATLAB风格
+#     ax.set_facecolor('white')
+#     ax.grid(True, linestyle='-', alpha=0.7, color='#D9D9D9')
+
+#     # 绘制轨迹，使用MATLAB样式
+#     for i in range(N):
+#         x = status_vector[i, :, 0]
+#         y = status_vector[i, :, 1]
+#         z = status_vector[i, :, 2]
+#         # z = np.zeros((status_vector.shape[1]))
+#         color = matlab_colors[i % len(matlab_colors)]
+        
+#         # MATLAB风格的线条更粗
+#         ax.plot(x, y, z,
+#                 color=color,
+#                 linestyle='-',
+#                 linewidth=2.0,
+#                 label=f'Player {i+1}')
+                
+#         # 起点和终点标记，更像MATLAB的默认标记大小
+#         ax.scatter(x[0], y[0], z[0], color=color, marker='o', s=80, edgecolor='k', zorder=5)
+#         ax.scatter(x[-1], y[-1], z[-1], color=color, marker='s', s=80, edgecolor='k', zorder=5)
+    
+#     px = global_target[:, 0]
+#     py = global_target[:, 1]
+#     pz = global_target[:, 2]
+#     # pz = np.zeros((status_vector.shape[1]))
+#     color = matlab_colors[-1]
+#     ax.plot(px, py, pz, color=color, linestyle='--', linewidth=2.0, label="Global target")
+
+#     ax.scatter(px[0], py[0], pz[0], 
+#             color=color,    # 边缘颜色（或者设为 'k' 黑色边框）
+#             marker='o',          # 五角星形状
+#             s=80,               # 尺寸调大一点
+#             zorder=5)
+
+#     # 2. 绘制【实心五角星】（作为终点）
+#     # 关键设置: color=color 直接填充，edgecolors='k' 加一圈黑边增加立体感
+#     ax.scatter(px[-1], py[-1], pz[-1], 
+#             color=color,         # 内部实心填充
+#             edgecolors='k',      # 黑色描边（与你的圆形/方形风格保持一致）
+#             marker='*',          # 五角星形状
+#             s=200,               # 尺寸调大一点
+#             zorder=5)
+
+#     group1_idx = [0, 1, 2, 3]
+#     ring1_x = [status_vector[i, -1, 0] for i in group1_idx]
+#     ring1_y = [status_vector[i, -1, 1] for i in group1_idx]
+#     ring1_z = [status_vector[i, -1, 2] for i in group1_idx]
+    
+#     # 闭合第一组的环 (3 -> 0)
+#     ring1_x.append(ring1_x[0])
+#     ring1_y.append(ring1_y[0])
+#     ring1_z.append(ring1_z[0])
+
+#     # 2. 提取第二组 (Player 5-8, 对应索引 4-7) 的坐标
+#     group2_idx = [4, 5, 6, 7]
+#     ring2_x = [status_vector[i, -1, 0] for i in group2_idx]
+#     ring2_y = [status_vector[i, -1, 1] for i in group2_idx]
+#     ring2_z = [status_vector[i, -1, 2] for i in group2_idx]
+    
+#     # 闭合第二组的环 (7 -> 4)
+#     ring2_x.append(ring2_x[0])
+#     ring2_y.append(ring2_y[0])
+#     ring2_z.append(ring2_z[0])
+
+#     # 3. 绘制第一层保护网 (UAV)
+#     ax.plot(ring1_x, ring1_y, ring1_z, 
+#             color='gray',          # 使用灰色，高级且不喧宾夺主
+#             linestyle='--',        # 虚线样式
+#             linewidth=1.5, 
+#             alpha=0.8,             # 增加透明度，体现出“虚拟连线”的质感
+#             zorder=4)
+
+#     # 4. 绘制第二层保护网 (UGV)
+#     ax.plot(ring2_x, ring2_y, ring2_z, 
+#             color='gray', 
+#             linestyle='--', 
+#             linewidth=1.5, 
+#             alpha=0.8, 
+#             zorder=4)
+
+#     # print("global target:", global_target[-1])
+#     # print("individual target:", status_vector[:, -1, :])
+
+#     # ring_x = [status_vector[i, -1, 0] for i in range(N)]
+#     # ring_y = [status_vector[i, -1, 1] for i in range(N)]
+#     # ring_z = [status_vector[i, -1, 2] for i in range(N)]
+
+#     # # 为了让线条形成一个闭合的环 (Agent 1 -> 2 -> 3 -> 4 -> 1)
+#     # # 我们把第一个智能体的坐标再次加到列表末尾
+#     # ring_x.append(ring_x[0])
+#     # ring_y.append(ring_y[0])
+#     # ring_z.append(ring_z[0])
+
+#     # # 绘制这层“保护网”
+#     # ax.plot(ring_x, ring_y, ring_z, 
+#     #         color='black',        # 使用灰色，高级且不喧宾夺主
+#     #         linestyle='--',      # 虚线样式
+#     #         linewidth=1.5,       # 线宽稍微细一点，作为辅助线
+#     #         alpha=0.8,           # 增加透明度，体现出“虚拟拓扑连接”的质感
+#     #         zorder=4)            # 图层放在点(5)下面，主线上面
+
+#     # MATLAB风格的轴标签 - 增加labelpad以确保z轴标签可见
+#     ax.set_xlabel(f"${var_name}_{{i1}}$ (m)", fontsize=16, labelpad=10)
+#     ax.set_ylabel(f"${var_name}_{{i2}}$ (m)", fontsize=16, labelpad=10)
+#     ax.set_zlabel(f"${var_name}_{{i3}}$ (m)", fontsize=16, labelpad=15)  # z轴增加更多间距
+
+#     # 轴刻度字体大小，MATLAB风格
+#     ax.tick_params(axis='both', which='major', labelsize=12)
+#     ax.tick_params(axis='z', which='major', labelsize=12, pad=8)  # z轴刻度标签额外间距
+
+#     # 设置轴边框颜色，MATLAB风格
+#     ax.xaxis.pane.set_edgecolor('#D9D9D9')
+#     ax.yaxis.pane.set_edgecolor('#D9D9D9')
+#     ax.zaxis.pane.set_edgecolor('#D9D9D9')
+
+#     # 设置坐标面板填充颜色为白色或透明
+#     ax.xaxis.pane.fill = False
+#     ax.yaxis.pane.fill = False
+#     ax.zaxis.pane.fill = False
+
+
+
+#     # 设置MATLAB默认视角，稍微调整以更好显示z轴标签
+#     ax.view_init(elev=20, azim=60)
+    
+#     # MATLAB风格图例
+
+#     # 添加MATLAB风格的边框
+#     ax.spines['top'].set_visible(True)
+#     ax.spines['right'].set_visible(True)
+
+#     # 调整布局以确保标签可见
+#     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+#     plt.legend(fontsize=15, ncol=2, loc='upper right',)
+#     # 保存高分辨率图像 - 使用pad_inches而不是bbox_inches='tight'
+#     plt.savefig(os.path.join(figure_dir, file_tag+"3d_trajectories.png"), 
+#                 dpi=600, 
+#                 bbox_inches='tight',
+#                 pad_inches=0.2)  # 增加边距以确保标签不被裁剪
+
+#     plt.close()
+#     print(f"Saved MATLAB-style figure: {os.path.join(figure_dir, file_tag+'3d_trajectories.png')}")
 
 def plot_2d_trajectory_graph(status_vector, figure_dir):
     plt.clf()
@@ -743,6 +1047,7 @@ def plot_compare_direct_errors_graph(time, error_vectors, figure_dir, labels=Non
         ylabel: Y轴标签
         file_name_prefix: 保存文件名的前缀
     """
+    plt.clf()
     os.makedirs(figure_dir, exist_ok=True)
     colors = list(mcolors.TABLEAU_COLORS.values())
     print(f"Plotting {len(error_vectors)} error trajectories...")
@@ -754,9 +1059,11 @@ def plot_compare_direct_errors_graph(time, error_vectors, figure_dir, labels=Non
     for i, error_vector in enumerate(error_vectors):
         error_vector = np.array(error_vector)
         # 确保 error_vector 是一维的
-        if error_vector.ndim > 1:
-            error_vector = error_vector.flatten()
-            
+        # if error_vector.ndim > 1:
+        #     error_vector = np.linalg.norm(error_vector, axis=0) # 转化为系统总误差
+        
+        # print(error_vector[0])
+
         plt.plot(time, error_vector, color=colors[i % len(colors)], label=labels[i], linewidth=1.5)
 
     # 设置坐标轴标签 (如果需要自定义字体，可在此处加上 fontproperties=prop)
@@ -771,7 +1078,7 @@ def plot_compare_direct_errors_graph(time, error_vectors, figure_dir, labels=Non
     
     # 动态设置 X 轴边界为时间的起止点
     plt.xlim(left=time[0] if len(time) > 0 else 0, right=time[-1] if len(time) > 0 else 8)
-    # plt.ylim(bottom=0)
+    plt.ylim(bottom=0)
     
     plt.tight_layout()
 

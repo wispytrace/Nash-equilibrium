@@ -106,6 +106,7 @@ def plot_graph(memory, record_path):
             z_opt_value[j, i, :] = status_vector[:, i, :]
 
     plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
+    
     plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=opt_value, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
     plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=opt_value, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
     plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')

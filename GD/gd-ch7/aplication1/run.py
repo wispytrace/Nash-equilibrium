@@ -104,8 +104,8 @@ class CentralizedModel:
         print("Start training...")
         print("config index:", config_index)
         for i in range(self.epochs):
-            self.update()
             self.record()
+            self.update()
             
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()

@@ -174,21 +174,21 @@ class DumpRecords:
         # opt_value = np.array([[-0.9999385195244029, 0.16660663117309651, 0.3333955560508185], [4.8152365222943084e-05, -0.8334287020540452, 0.3334118895597235], [1.0001074180788625, 0.16654159249067055, 0.33345503463020215], [4.815265801524303e-05, 1.166571297885446, 0.33341188945528427], [2.0000614803817807, 0.16660663112190888, 3.333395556015464], [-1.999953791549649, 0.16663322749224166, 3.3333734276470937]])
         plot_status_error_graph(time, virtual_vector, figure_dir, ylabel_list=["$\omega_{i1} - y_{i1}^*$", "$\omega_{i2} - y_{i2}^*$", "$\omega_{i3} - y_{i3}^*$"], opt_value=opt_value)
         plot_status_error_graph(time, valid_status_vector, figure_dir, var_name='y', file_name_prefix='actual', opt_value=opt_value)
-        plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y', topology_edges= [
-    # 第一组：底层小菱形 (z=0 平面，半径 1)
-    # 包含点: 0[-1,0,0], 1[0,-1,0], 2[1,0,0], 3[0,1,0]
-    (0, 1), (1, 2), (2, 3), (3, 0),
+#         plot_3d_trajectory_graph(valid_status_vector, figure_dir, "status", p_center=np.array([0, 0.5, 2]), var_name='y', topology_edges= [
+#     # 第一组：底层小菱形 (z=0 平面，半径 1)
+#     # 包含点: 0[-1,0,0], 1[0,-1,0], 2[1,0,0], 3[0,1,0]
+#     (0, 1), (1, 2), (2, 3), (3, 0),
 
-    # 第二组：底层大菱形 (z=0 平面，半径 3)
-    # 包含点: 6[-3,0,0], 7[0,-3,0], 8[3,0,0], 9[0,3,0]
-    (6, 7), (7, 8), (8, 9), (9, 6),
+#     # 第二组：底层大菱形 (z=0 平面，半径 3)
+#     # 包含点: 6[-3,0,0], 7[0,-3,0], 8[3,0,0], 9[0,3,0]
+#     (6, 7), (7, 8), (8, 9), (9, 6),
 
-    # 第三组：上层中菱形 (z=3 平面，半径 2)
-    # 包含点: 4[2,0,3], 10[0,2,3], 5[-2,0,3], 11[0,-2,3]
-    # 注意：这里顺序是 4->10->5->11，这样连出来的线才不会交叉！
-    (4, 10), (10, 5), (5, 11), (11, 4)
-])
-        plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
+#     # 第三组：上层中菱形 (z=3 平面，半径 2)
+#     # 包含点: 4[2,0,3], 10[0,2,3], 5[-2,0,3], 11[0,-2,3]
+#     # 注意：这里顺序是 4->10->5->11，这样连出来的线才不会交叉！
+#     (4, 10), (10, 5), (5, 11), (11, 4)
+# ])
+#         plot_3d_trajectory_graph(virtual_vector, figure_dir, "virtual_status")
         x_label_list = [ f"Player {i+1}" for i in range(valid_speed_vector.shape[0])]
         plot_status_graph(time, ui, figure_dir, file_name_prefix="control", ylabel_list=["$u_{i1}$", "$u_{i2}$", "$u_{i3}$"], xlabel_list=x_label_list)
 
@@ -247,21 +247,21 @@ def plot_compare_response(record_path_list, figure_dir):
     
     status_vectors = np.array(status_vectors)
         
-    plot_compare_errors_graph(time, status_vectors, figure_dir, var_name='y', file_name_prefix=f"compare_response", opt_value=opt_value, labels=["Asymptotic algorithm", "Fixed-time algorithm"])
+    plot_compare_errors_graph(time, status_vectors, figure_dir, var_name='y', file_name_prefix=f"compare_response", opt_value=opt_value, labels=["Exponential algorithm", "Fixed-time algorithm"])
 
 if __name__ == "__main__":
     from config import config
 
-    # current_dir = os.path.dirname(os.path.realpath(__file__))
-    # record_root_path = f"{current_dir}/records"
-    # config_list = [ "r_1"]
-    # num_agents = 12
-    # for config_index in config_list:
-    #     print(f"Running configuration: {config_index}")
-    #     current_dir = os.path.dirname(os.path.realpath(__file__))
-    #     record_root_path = f"{current_dir}/records"
-    #     dumpRecords = DumpRecords(config[config_index], config_index, record_root_path=record_root_path)
-    #     dumpRecords.plot_graph()
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    record_root_path = f"{current_dir}/records"
+    config_list = [ "r_2"]
+    num_agents = 12
+    for config_index in config_list:
+        print(f"Running configuration: {config_index}")
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        record_root_path = f"{current_dir}/records"
+        dumpRecords = DumpRecords(config[config_index], config_index, record_root_path=record_root_path)
+        dumpRecords.plot_graph()
 
     # config_list = ["finite_1", "finite_2", "finite_3", "finite_4",  "finite_5", "finite_6", "fixed_1", "fixed_2", "fixed_3", "fixed_4", "fixed_5", "fixed_6"]
     # dumpRecords = DumpRecords(config['fixed_1'], 'fixed_1', record_root_path)

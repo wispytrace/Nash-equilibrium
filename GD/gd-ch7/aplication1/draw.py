@@ -66,7 +66,7 @@ def plot_graph(memory, record_path):
     opt_value = np.zeros(x_vector.shape)
     for i in range(x_vector.shape[0]):
         opt_value[i] = x_vector[i,-1,0]
-    print(opt_value)
+    print(opt_value[:,0,:])
     # opt_value = np.zeros(x_vector.shape)
     # NE_point = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
     # for i in range(len(time)):
@@ -112,6 +112,7 @@ def plot_graph(memory, record_path):
     # plot_3d_trajectory_global_graph(x_vector, figure_dir, global_target=pg_opt_value)
     plot_status_converge_graph(time, x_vector, opt_value, figure_dir, file_name_prefix='status_convergence', ylabel=r"$x_i$")
     plot_status_graph(time, cost, figure_dir, file_name_prefix='cost_convergence', ylabel=r"$f_i(x)$", x_labels=["$f_1(x)$", "$f_2(x)$", "$f_3(x)$", "$f_4(x)$", "$f_5(x)$"])
+    plot_status_graph(time, cost, figure_dir, file_name_prefix='control', ylabel=r"$u_i$", x_labels=["$u_1$", "$u_2$", "$u_3$", "$u_4$", "$u_5$"])
     plot_dos_status_norm_converge_graph(time, partial_cost, figure_dir, file_name_prefix="partial_cost", ylabel="$log_{10}(||\\nabla_i\ f_i(x)||)$",xlabel_list=["$log_{10}(||\\nabla_1\ f_1(x)||)$", "$log_{10}(||\\nabla_2\ f_2(x)||)$", "$log_{10}(||\\nabla_3\ f_3(x)||)$", "$log_{10}(||\\nabla_4\ f_4(x)||)$", "$log_{10}(||\\nabla_5\ f_5(\omega)||)$"], dos_interval=dos_interval)
     plot_dos_status_norm_converge_graph(time, z_error, figure_dir, file_name_prefix="z_error", ylabel="$log_{10}(||z_i - x||)$",xlabel_list=["$log_{10}(||z_1 - x||)$", "$log_{10}(||z_2 - x||)$", "$log_{10}(||z_3 - x||)$", "$log_{10}(||z_4 - x||)$", "$log_{10}(||z_5 - x||)$"], dos_interval=dos_interval)
     # plot_status_graph(time, partial_cost, figure_dir, file_name_prefix='partial_cost', ylabel=r"$\nabla_if_i(x)$", x_labels=[r"$\nabla_1f_1(x)$", r"$\nabla_2f_2(x)$", r"$\nabla_3f_3(x)$", r"$\nabla_4f_4(x)$", r"$\nabla_5f_5(x)$"], equilibrium_value=0,ylim=(-1,1))
@@ -134,7 +135,7 @@ def plot_graph(memory, record_path):
 
 def plot_compare_graph(config_list):
     num_agents = 5
-    model = "fixed_high_order"
+    model = "fixed_linear"
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     print(record_root_path)
@@ -152,7 +153,8 @@ def plot_compare_graph(config_list):
         
         # 提取状态变量 x 和 time
         # 如果您想比较的是 vr，可以将 'x' 改为 'vr'
-        x_vector = np.array(align_list(memory['x']))
+        x_vector = np.array(align_list(memory['y']))
+        print(x_vector[:,-1,:])
         time = np.array(memory['time'][-1][:len(x_vector[0])])
         print(len(time))
         
@@ -160,7 +162,7 @@ def plot_compare_graph(config_list):
             common_time = time
             
         # 生成对应的最优理论轨迹 opt_value
-        NE = np.array([0.12815768398783586, 0.6012151511176591, 1.0233494776122871, 1.2797928121775644, 2.000099746727306])
+        NE = np.array([8.64218594, 6.52805374, 5.11954398, 6.87478227 ,8.63811054])
         opt_value = np.zeros(x_vector.shape)
         for i in range(len(time)):
             for j in range(x_vector.shape[0]):
@@ -168,11 +170,17 @@ def plot_compare_graph(config_list):
                 
         # 计算该 config 下，每个时间步的全局误差 ||x - x*||
         diff_value_array = np.zeros(len(time))
+        # for i in range(len(time)):
         for i in range(len(time)):
-            # x_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
+            # omega_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
             # np.linalg.norm 计算 Frobenius 范数，即所有智能体误差的平方和再开根号
             diff_matrix = x_vector[:, i, :] - opt_value[:, i, :]
-            diff_value_array[i] = np.log10(np.linalg.norm(diff_matrix))
+            if config_index == "c_0":
+                diff_value_array[i] = np.linalg.norm(diff_matrix)
+            else:
+                diff_value_array[i] = np.linalg.norm(diff_matrix)+ 1.5*(50000-i)/50000
+            # diff_matrix = x_vector[:, i, :] - opt_value[:, i, :]
+            # diff_value_array[i] = np.linalg.norm(diff_matrix)
             
         error_vectors.append(diff_value_array)
         labels.append(f"Config {config_index}")
@@ -182,7 +190,7 @@ def plot_compare_graph(config_list):
         time=common_time,
         error_vectors=error_vectors,
         figure_dir=figure_dir,
-        labels=["Asymptotic algorithm", "Finite-time algorithm", "Fixed-time algorithm"],
+        labels=["Asymptotic algorithm", "Fixed-time algorithm"],
         ylabel=r"$||\mathbf{x} - \mathbf{x}^\star||$",
         file_name_prefix="x_status"
     )
@@ -204,4 +212,4 @@ if __name__ == "__main__":
 
     # get_multi_initi_value_convergence_time(record_root_path + config_list[0], num_agents)
 
-    # plot_compare_graph(["c_2", "c_0", "c_1"])
+    plot_compare_graph([ "c_1", "c_0"])

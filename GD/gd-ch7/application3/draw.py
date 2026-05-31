@@ -58,6 +58,7 @@ def plot_graph(memory, record_path):
     z_vector = align_list(memory['z']) # 状态估计，（agents, time, status_vector.shape）
     x_vector = align_list(memory['x']) # 位置
     v_vector = align_list(memory['v']) # 速度
+    NE_vector = align_list(memory['NE'])
     ui = align_list(memory['update_value']) # 控制输入
     time = np.array(memory['time'][-1][:len(y_vector[0])])
 
@@ -71,7 +72,7 @@ def plot_graph(memory, record_path):
     
     pg_opt_value = np.zeros((y_vector.shape[1], y_vector.shape[2]))
     for i in range(len(time)):
-        target_pos = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0])
+        target_pos = np.array([0.5*time[i],0 , 0])
         pg_opt_value[i, :] = target_pos
     
     z_opt_value = np.zeros(z_vector.shape)
@@ -79,35 +80,80 @@ def plot_graph(memory, record_path):
         for j in range(z_vector.shape[0]):
             z_opt_value[j, i, :] = status_vector[:, i, :]
     
-    opt_value = np.zeros(x_vector.shape)
-    for i in range(len(time)):
-        for j in range(x_vector.shape[0]):
-            target_pos = np.array([5*np.cos(0.5*time[i]), 5*np.sin(0.5*time[i]), 0])
-            
-            # --- 2. 设定智能体在目标周围的理想相位位置 (Formation Control) ---
-            # ID 0-3: UGV, ID 4-7: UAV
-            is_uav = j >= 4
-            radius = 3.0 if not is_uav else 4.0      # UAV 半径更大
-            height = 0.0 if not is_uav else 5.0      # UAV 高度更高
-            
-            # 计算围绕目标的相位: 4个智能体平均分布在 0, pi/2, pi, 3pi/2
-            phase = (i % 4) * (2 * np.pi / 4) + (0.5 * time[i]) # 加上时间项让队形转动
-            
-            # 理想位置 pi
-            pi = target_pos-[0.5, 0.5, 0] + np.array([
-                radius * np.cos(phase), 
-                radius * np.sin(phase), 
-                height
-            ])
-
-            opt_value[j, i, :] = pi+1/(8+1)*target_pos  + [0,0,height]
 
     # plot_multiple_time_slices(x_vector, figure_dir, global_target=pg_opt_value)
-    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=None, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
-    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=None, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
-    # plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
-    # plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$"], y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.05))
-    # plot_error_value_graph(time, z_vector, z_opt_value, figure_dir, ylabel_list=[r"$||z_1 - x||$", r"$||z_2 - x||$", r"$||z_3 - x||$", r"$||z_4 - x||$"], y_title=r"$||z_i - x||$", file_name_prefix='zi_status_error', xlim=(0, 0.05))
+    plot_multi_dimension_status_converge_dynamic_graph(time, status_vector, figure_dir, opt_value=NE_vector, y_title=r'\omega', label_opt=r'\omega', label=r'\omega',file_name_prefix='virtual_status_convergence')
+
+
+    target_times = [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi, 10.0]
+
+    # 转换为对应的数组索引 (四舍五入转为整数)
+    time_indices = [int(round(t / 0.05)) for t in target_times]
+
+    # 生成漂亮的时间标签，放在图片上
+    time_labels = [
+        r"$t=0$ s (Start)", 
+        r"$t=1.57$ s (Max Spread)", 
+        r"$t=3.14$ s (Half Cycle)", 
+        r"$t=4.71$ s (Min Spread)", 
+        r"$t=6.28$ s (Full Cycle)",
+        r"$t=10.0$ s (Steady)"
+    ]
+    # plot_3d_separate_time_slices(
+    #     status_vector=x_vector, 
+    #     time_indices=time_indices, 
+    #     figure_dir=figure_dir, 
+    #     global_target=pg_opt_value,
+    #     time_labels=time_labels,  # 传入对应的时间文本
+    #     file_tag="experiment1_",
+    #     draw_formation_net=True   # 开启阵型连线，强烈建议！
+    # )
+    plot_multi_dimension_status_converge_dynamic_graph(time, x_vector, figure_dir, opt_value=status_vector, y_title='x', label_opt='x', label='x',file_name_prefix='status_convergence')
+    plot_3d_trajectory_global_graph(x_vector, figure_dir, pg_opt_value)
+    plot_multi_dimension_status_converge_dynamic_graph(time, ui, figure_dir, opt_value=None, y_title='u', label_opt=r'\bar{y}', label=r'u',file_name_prefix='ui_status_covnergence')
+    plot_error_value_graph(time, y_vector, y_opt_value, figure_dir, 
+                           ylabel_list=[r"$||y_1 - \bar{y}||$", r"$||y_2 - \bar{y}||$", r"$||y_3 - \bar{y}||$", r"$||y_4 - \bar{y}||$", r"$||y_5 - \bar{y}||$", r"$||y_6 - \bar{y}||$", r"$||y_7 - \bar{y}||$", r"$||y_8 - \bar{y}||$", r"$||y_9 - \bar{y}||$"], 
+                           y_title=r"$||y_i - \bar{y}||$", file_name_prefix='yi_status_error', xlim=(0, 0.5))
+    
+    plot_error_value_graph(
+    time, 
+    z_vector, 
+    z_opt_value, 
+    figure_dir, 
+    ylabel_list=[
+        r"$||z_1 - \omega||$", 
+        r"$||z_2 - \omega||$", 
+        r"$||z_3 - \omega||$", 
+        r"$||z_4 - \omega||$", 
+        r"$||z_5 - \omega||$", 
+        r"$||z_6 - \omega||$", 
+        r"$||z_7 - \omega||$", 
+        r"$||z_8 - \omega||$"
+    ], 
+    y_title=r"$||z_i - \omega||$", 
+    file_name_prefix='zi_omega_error', 
+    xlim=(0, 0.5)
+)
+    
+    plot_error_value_graph(
+    time, 
+    x_vector, 
+    status_vector, 
+    figure_dir, 
+    ylabel_list=[
+        r"$||x_1 - \omega_1||$", 
+        r"$||x_2 - \omega_2||$", 
+        r"$||x_3 - \omega_3||$", 
+        r"$||x_4 - \omega_4||$", 
+        r"$||x_5 - \omega_5||$", 
+        r"$||x_6 - \omega_6||$", 
+        r"$||x_7 - \omega_7||$", 
+        r"$||x_8 - \omega_8||$"
+    ], 
+    y_title=r"$||x_i - \omega_i||$", 
+    file_name_prefix='xi_omega_error',  # 建议将文件名也同步修改
+    xlim=(0, 5)
+)
 
     # initial_value_norms = [15, 75, 135, 195, 255, 315, 375, 435]
     # asym_convergence_times = [3.74, 4.34, 4.58, 4.75, 4.91, 5.05, 5.15, 5.24] 
@@ -119,8 +165,8 @@ def plot_graph(memory, record_path):
 
 
 def plot_compare_graph(config_list):
-    num_agents = 4
-    model = "jssc"
+    num_agents = 8
+    model = "air_ground_protection"
     current_dir = os.path.dirname(os.path.realpath(__file__))
     record_root_path = f"{current_dir}/records/{model}/"
     print(record_root_path)
@@ -140,28 +186,26 @@ def plot_compare_graph(config_list):
         # 如果您想比较的是 vr，可以将 'x' 改为 'vr'
         x_vector = np.array(align_list(memory['x']))
         time = np.array(memory['time'][-1][:len(x_vector[0])])
+        print(x_vector.shape)
+        NE_vector = align_list(memory['NE'])
         print(len(time))
         
         if common_time is None:
             common_time = time
             
-        # 生成对应的最优理论轨迹 opt_value
-        opt_value = np.zeros(x_vector.shape)
-        for i in range(len(time)):
-            for j in range(x_vector.shape[0]):
-                opt_value[j, i, :] = np.array([
-                    3 * np.cos(0.5 * time[i]) + 2 * np.cos(2 * time[i] + j * np.pi / 2) - 0.4, 
-                    3 * np.sin(0.5 * time[i]) + 2 * np.sin(2 * time[i] + j * np.pi / 2) - 0.4, 
-                    0.5 * time[i]
-                ])
-                
+        NE_vector = np.array(NE_vector)
+        print(NE_vector.shape)
         # 计算该 config 下，每个时间步的全局误差 ||x - x*||
         diff_value_array = np.zeros(len(time))
         for i in range(len(time)):
             # x_vector[:, i, :] - opt_value[:, i, :] 是一个 (num_agents, dim) 的矩阵
             # np.linalg.norm 计算 Frobenius 范数，即所有智能体误差的平方和再开根号
-            diff_matrix = x_vector[:, i, :] - opt_value[:, i, :]
-            diff_value_array[i] = np.linalg.norm(diff_matrix)
+            diff_matrix = x_vector[:, i, :2] - NE_vector[:, i, :2]
+            diff_value_array[i] = np.linalg.norm(diff_matrix.flatten())
+            # if config_index == "r_2":
+            #     if diff_value_array[i] < 8e-2:
+            #         diff_value_array[i] = 8e-2
+            # diff_value_array[i] = np.linalg.norm(diff_matrix.flatten())
             
         error_vectors.append(diff_value_array)
         labels.append(f"Config {config_index}")
@@ -171,7 +215,7 @@ def plot_compare_graph(config_list):
         time=common_time,
         error_vectors=error_vectors,
         figure_dir=figure_dir,
-        labels=["Fixed-time algorithm", "Asymptotic algorithm"],
+        labels=["Asymptotic algorithm", "Fixed-time algorithm" ],
         ylabel=r"$||\mathbf{x} - \mathbf{x}^\star||$",
         file_name_prefix="x_status"
     )
@@ -179,7 +223,7 @@ def plot_compare_graph(config_list):
 if __name__ == "__main__":
     # 1
     from config import config
-    config_list = [ "r_0"]
+    config_list = [ "r_2"]
     # config_index = "r_0"
     model = "air_ground_protection"
     num_agents = 8
@@ -196,4 +240,4 @@ if __name__ == "__main__":
     # get_multi_initi_value_convergence_time(record_root_path + config_list[1], num_agents)
 
     # 3
-    # plot_compare_graph(config_list=["r_0", "r_1"])
+    # plot_compare_graph(config_list=["r_2", "r_1"])

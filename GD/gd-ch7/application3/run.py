@@ -118,8 +118,9 @@ class CentralizedModel:
             self.record()
             if self.counts % self.PROCESS_BAR_INTERVAL == 0:
                 self.publish_process_bar()
-                print(f"status: {self.agntes[0].memory['x']}" )
-                print(0.5*self.counts*self.agent_config['time_delta'])
+                print(f"status: {self.agntes[4].memory['x']}" )
+                print(f"v: {self.agntes[4].memory['v']}")
+                print(np.array([0.5*self.counts*self.agent_config['time_delta'], 0, 0]))
 
             self.counts += 1
         self.done()
@@ -163,7 +164,7 @@ def run_single_simulation(config_index, num_agents, init_value):
     centralized_system.run()
 
 if __name__ == "__main__":
-    config_list = ["r_0"]
+    config_list = ["r_2"]
     num_agents = 8
     run_single_simulation(config_list[0], num_agents, None)
 

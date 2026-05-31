@@ -59,7 +59,7 @@ class Model:
     
 
     def approximate_sign(self, value):
-        extra = 1e-4
+        extra = 1e-2
         value = value/(np.fabs(value)+extra)
         return value
 
@@ -162,13 +162,14 @@ class Model:
             error_sum += k_i[i]*self.power(eij[i], gama_i[i]) + k_i_tilde[i]*self.power(eij[i], gama_i_tilde[i])
         si = eij[order-1,:] + self.memory['ei_sum']
         self.memory['ei_sum'] += error_sum * self.time_delta
-        ui = -1*(eta*self.power(si, p) + zeta*self.power(si, q)) - error_sum
+        ui = -1*(eta*self.power(si, p) + zeta*self.power(si, q)-6*self.sign(si)) - error_sum
         self.memory['ui_hl'] = ui
         
         x_i_update = np.zeros(x_i.shape)
         for i in range(2):
             if i == order-1:
-                x_i_update[i] = ui
+                disturbance = np.array([3*np.cos(self.time), 4*np.sin(self.time)])
+                x_i_update[i] = ui + disturbance
             elif i < order:
                 x_i_update[i] = x_i[i+1]
             else:
@@ -283,10 +284,10 @@ class Model:
         Mi, Ci, Gi = self.get_Matrix()
         
         oi = dot_x + h1*(self.power(track_error,p) + self.power(track_error, q) + track_error)
-        ui = Gi + Ci@dot_x - h2*Mi@(self.power(oi, p)+self.power(oi, q)) - h1*Mi@(p*np.multiply(self.power(track_error, p-1),dot_track_error)+ q*np.multiply(
-            self.power(track_error, q-1), dot_track_error)+ dot_track_error)
+        ui =  Gi + Ci@dot_x - h2*Mi@(self.power(oi, p)+self.power(oi, q)) - h1*Mi@(p*np.multiply(self.power(track_error, p-1),dot_track_error)+ q*np.multiply(
+            self.power(track_error, q-1), dot_track_error)+ dot_track_error) - 5*self.sign(oi)
         self.memory['ui_el'] = ui
-        ddot_x = np.linalg.inv(Mi)@(ui - Ci@dot_x-Gi)
+        ddot_x = np.linalg.inv(Mi)@(ui + np.array([1*np.sin(3*self.time), 2*np.cos(2*self.time)]) - Ci@dot_x-Gi)
         
         update_value = np.zeros(self.memory['x_el'].shape)
         update_value[0] = dot_x

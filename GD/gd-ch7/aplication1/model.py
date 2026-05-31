@@ -16,8 +16,7 @@ class Model:
         self.is_finite = self.model_config.get('is_finite', False)
         self.time = 0
         self.agent_id = self.model_config['agent_id']
-        self.memory['x'] = copy.deepcopy(self.model_config['x0']) * self.initial_scale
-        self.memory['y'] = copy.deepcopy(self.model_config['y0']) * self.initial_scale
+        self.memory['y'] = copy.deepcopy(self.model_config['y0'])
         # self.memory['x'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
         # self.memory['y'] = copy.deepcopy(self.model_config['init_value'][self.agent_id])
         print(f"{self.agent_id}: init_value {self.memory['y']}")
@@ -111,11 +110,12 @@ class Model:
 
         partial_value_cost = self.partial_cost()
 
-        if self.topology_index != 0:
-            update_value = -tau[0] * self.power(partial_value_cost, p) - tau[1] * self.power(partial_value_cost, q)
-        else:
-            update_value = - beta[0] * self.power(partial_value_cost, p) - beta[1] * self.power(partial_value_cost, q)
+        # if self.topology_index != 0:
+        #     update_value = -tau[0] * self.power(partial_value_cost, p) - tau[1] * self.power(partial_value_cost, q)
+        # else:
+        #     update_value = - beta[0] * self.power(partial_value_cost, p) - beta[1] * self.power(partial_value_cost, q)
         # print(partial_value_cost)
+        update_value = - beta[0] * self.power(partial_value_cost, p) - beta[1] * self.power(partial_value_cost, q)
 
         self.memory['update_value'] = update_value
         
@@ -170,26 +170,6 @@ class Model:
     #     T = np.array([t1, t1@self.A, t1@self.A@self.A]).T
     #     return T
         
-
-    def status_update_function(self):
-        ki = self.model_config['ki']
-        xi = self.memory['x']
-        gama = self.model_config['gama']
-        yi = np.matrix(self.memory['y']).T
-        dot_yi = np.matrix(self.memory['update_value']).T
-        epsilon_i = xi - np.array(self.B@self.K1.T@yi).flatten()
-        Omega_i = -1*(ki[0] * self.power(epsilon_i, gama[0]) + ki[1]*self.power(epsilon_i, gama[1]))
-        self.memory['Omega_i'] = Omega_i
-        ui_hat =  np.linalg.inv(self.B)@(np.matrix(Omega_i).T-self.A@np.matrix(epsilon_i).T)
-        ui = -self.K2.T@yi+ self.K1.T@dot_yi + ui_hat
-        self.memory['ui'] = np.array(ui).flatten()
-        
-        status_update = self.A @ np.matrix(xi).T + (self.B @ ui)
-
-        status_update = np.array(status_update).flatten()
-
-        return status_update
-
             
     def cost_function(self):
         # z 保存了所有智能体状态（即发射功率 power profile x）的估计

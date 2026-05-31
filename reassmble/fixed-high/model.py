@@ -90,7 +90,7 @@ class Model:
     
     def approximate_sign(self, value):
         # 原生支持矢量化
-        extra = 5e-3
+        extra = 10e-3
         return value / (np.abs(value) + extra)
     
     def virtual_signal_update_function(self):
